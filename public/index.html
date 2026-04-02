@@ -238,6 +238,55 @@
       margin-bottom: 18px;
     }
 
+    .portal-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .search-input,
+    .type-select {
+      min-height: 48px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      padding: 0 14px;
+      font: inherit;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .search-input:focus,
+    .type-select:focus {
+      outline: 2px solid rgba(45, 174, 255, 0.35);
+      outline-offset: 2px;
+    }
+
+    .category-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .category-pill {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 14px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .category-pill.is-active {
+      border-color: transparent;
+      background: linear-gradient(135deg, #ef3f45, #ff8c55);
+      color: #fff;
+    }
+
     .library-kicker {
       display: inline-flex;
       margin-bottom: 8px;
@@ -303,6 +352,19 @@
       text-decoration: none;
       box-shadow: var(--shadow-soft);
       transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      animation: card-in 0.35s ease backwards;
+    }
+
+    @keyframes card-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .game-card::before {
@@ -355,6 +417,16 @@
       transform: scale(1.05);
     }
 
+    .game-card.is-hidden {
+      display: none;
+    }
+
+    .game-card.is-opening {
+      transform: scale(0.98);
+      opacity: 0.7;
+      transition: opacity 0.24s ease, transform 0.24s ease;
+    }
+
     .content {
       display: flex;
       flex: 1;
@@ -374,6 +446,93 @@
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
+    }
+
+    .meta-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .category-badge {
+      display: inline-flex;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(45, 174, 255, 0.12);
+      color: #1f5f8c;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .favorite-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 3;
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(17, 24, 39, 0.5);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .favorite-toggle.is-favorite {
+      background: linear-gradient(135deg, #ef3f45, #ff8c55);
+    }
+
+    .top-played,
+    .favorites-block {
+      margin-bottom: 20px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .top-played h3,
+    .favorites-block h3 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .ranking-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .favorites-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .favorite-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      font-weight: 700;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .favorite-link:hover {
+      border-color: rgba(45, 174, 255, 0.45);
     }
 
     .content strong {
@@ -527,6 +686,10 @@
       .games {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      .portal-tools {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 680px) {
@@ -621,6 +784,34 @@
           Biblioteca rapida y lista para jugar
         </div>
       </div>
+
+      <div class="portal-tools">
+        <input id="gameSearch" class="search-input" type="search" placeholder="Buscar juegos por nombre...">
+        <select id="typeFilter" class="type-select" aria-label="Filtrar por tipo de juego">
+          <option value="all">Todos los tipos</option>
+          <option value="clicker">Clicker</option>
+          <option value="action">Acción</option>
+          <option value="multiplayer">Multiplayer</option>
+        </select>
+      </div>
+
+      <div id="categoryRow" class="category-row" role="tablist" aria-label="Categorias">
+        <button class="category-pill is-active" type="button" data-category="all">Todo</button>
+        <button class="category-pill" type="button" data-category="action">Acción</button>
+        <button class="category-pill" type="button" data-category="idle">Idle</button>
+        <button class="category-pill" type="button" data-category="multiplayer">Multiplayer</button>
+        <button class="category-pill" type="button" data-category="classic">Clásicos</button>
+      </div>
+
+      <section class="favorites-block">
+        <h3>⭐ Tus juegos</h3>
+        <div id="favoritesList" class="favorites-list"></div>
+      </section>
+
+      <section class="top-played">
+        <h3>🔥 Más jugados</h3>
+        <ol id="rankingList" class="ranking-list"></ol>
+      </section>
 
       <section class="games">
         <a class="game-card" href="1.12.html">
@@ -908,8 +1099,185 @@
   <script>
     const SITE_VERSION = "4.0.0";
     const STORAGE_KEY = "juanjos_games_seen_version";
+    const FAVORITES_KEY = "juanjos_games_favorites_v1";
+    const PLAYS_KEY = "juanjos_games_plays_v1";
     const popup = document.getElementById("changelogPopup");
     const closeButton = document.getElementById("closeChangelog");
+    const searchInput = document.getElementById("gameSearch");
+    const typeFilter = document.getElementById("typeFilter");
+    const categoryRow = document.getElementById("categoryRow");
+    const favoritesList = document.getElementById("favoritesList");
+    const rankingList = document.getElementById("rankingList");
+    const cards = Array.from(document.querySelectorAll(".game-card"));
+    let activeCategory = "all";
+
+    const metadataByHref = {
+      "1.12.html": { category: "classic", type: "action" },
+      "1.8.html": { category: "multiplayer", type: "multiplayer" },
+      "1.21.x.html": { category: "action", type: "action" },
+      "cookie/index.html": { category: "idle", type: "clicker" },
+      "geometry-dash.html": { category: "action", type: "action" },
+      "hollow-knight.html": { category: "action", type: "action" },
+      "eggy-car.html": { category: "classic", type: "action" },
+      "fireboy-watergirl-1.html": { category: "multiplayer", type: "multiplayer" },
+      "among-us.html": { category: "multiplayer", type: "multiplayer" },
+      "level-devil.html": { category: "action", type: "action" },
+      "rocket-goal.html": { category: "multiplayer", type: "multiplayer" },
+      "stacktris.html": { category: "classic", type: "action" },
+      "drive-mad.html": { category: "action", type: "action" },
+      "subway-surfers.html": { category: "classic", type: "action" },
+      "red-ball.html": { category: "classic", type: "action" },
+      "snow-rider.html": { category: "action", type: "action" },
+      "Bitcoin Clicker.html": { category: "idle", type: "clicker" },
+      "Funkin-HTML-Port-main/index.html": { category: "classic", type: "action" },
+      "dumb.html": { category: "classic", type: "action" },
+      "solar.html": { category: "action", type: "action" },
+      "stickman-hook.html": { category: "action", type: "action" },
+      "superhot.html": { category: "action", type: "action" },
+      "wbwwb.html": { category: "classic", type: "action" },
+      "vex7.html": { category: "action", type: "action" },
+      "cookie-legacy.html": { category: "idle", type: "clicker" }
+    };
+
+    function parseJsonStorage(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function saveJsonStorage(key, data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function normalizeText(value) {
+      return value
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function generateFakePlayers(score, name) {
+      const hash = Array.from(name).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      return Math.max(18, score * 13 + hash % 250);
+    }
+
+    function enrichCards() {
+      const plays = parseJsonStorage(PLAYS_KEY, {});
+      const favorites = parseJsonStorage(FAVORITES_KEY, []);
+
+      cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 24}ms`;
+        const href = card.getAttribute("href");
+        const meta = metadataByHref[href] || { category: "classic", type: "action" };
+        const gameName = card.querySelector("strong").textContent.trim();
+        const playScore = plays[href] || 0;
+        const players = generateFakePlayers(playScore, gameName);
+
+        card.dataset.category = meta.category;
+        card.dataset.type = meta.type;
+        card.dataset.name = normalizeText(gameName);
+        card.dataset.players = players;
+
+        const favoriteButton = document.createElement("button");
+        favoriteButton.className = "favorite-toggle";
+        favoriteButton.type = "button";
+        favoriteButton.textContent = favorites.includes(href) ? "★" : "☆";
+        favoriteButton.setAttribute("aria-label", "Guardar en favoritos");
+        if (favorites.includes(href)) {
+          favoriteButton.classList.add("is-favorite");
+        }
+
+        favoriteButton.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          const currentFavorites = parseJsonStorage(FAVORITES_KEY, []);
+          const isFavorite = currentFavorites.includes(href);
+          const updated = isFavorite
+            ? currentFavorites.filter((entry) => entry !== href)
+            : currentFavorites.concat(href);
+          saveJsonStorage(FAVORITES_KEY, updated);
+          favoriteButton.textContent = isFavorite ? "☆" : "★";
+          favoriteButton.classList.toggle("is-favorite", !isFavorite);
+          renderFavorites();
+        });
+        card.appendChild(favoriteButton);
+
+        const content = card.querySelector(".content");
+        const metaLine = document.createElement("div");
+        metaLine.className = "meta-line";
+        metaLine.innerHTML = `<span>${players} jugadores</span><span class="category-badge">${meta.category}</span>`;
+        content.appendChild(metaLine);
+
+        card.addEventListener("click", function (event) {
+          if (event.defaultPrevented) return;
+          event.preventDefault();
+          const nextPlays = parseJsonStorage(PLAYS_KEY, {});
+          nextPlays[href] = (nextPlays[href] || 0) + 1;
+          saveJsonStorage(PLAYS_KEY, nextPlays);
+          card.classList.add("is-opening");
+          window.setTimeout(function () {
+            window.location.href = href;
+          }, 220);
+        });
+      });
+    }
+
+    function renderFavorites() {
+      const favorites = parseJsonStorage(FAVORITES_KEY, []);
+      favoritesList.innerHTML = "";
+      const byHref = Object.fromEntries(cards.map((card) => [card.getAttribute("href"), card]));
+
+      if (!favorites.length) {
+        favoritesList.innerHTML = "<p>Marca estrellas para guardar tus juegos aquí.</p>";
+        return;
+      }
+
+      favorites.forEach((href) => {
+        const card = byHref[href];
+        if (!card) return;
+        const gameName = card.querySelector("strong").textContent.trim();
+        const link = document.createElement("a");
+        link.className = "favorite-link";
+        link.href = href;
+        link.textContent = gameName;
+        favoritesList.appendChild(link);
+      });
+    }
+
+    function renderRanking() {
+      const plays = parseJsonStorage(PLAYS_KEY, {});
+      const data = cards
+        .map((card) => {
+          const href = card.getAttribute("href");
+          return {
+            href,
+            name: card.querySelector("strong").textContent.trim(),
+            score: plays[href] || 0
+          };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
+
+      rankingList.innerHTML = "";
+      data.forEach((entry) => {
+        const li = document.createElement("li");
+        li.textContent = `${entry.name} — ${entry.score} partidas`;
+        rankingList.appendChild(li);
+      });
+    }
+
+    function applyFilters() {
+      const text = normalizeText(searchInput.value.trim());
+      const selectedType = typeFilter.value;
+      cards.forEach((card) => {
+        const matchText = !text || card.dataset.name.includes(text);
+        const matchType = selectedType === "all" || card.dataset.type === selectedType;
+        const matchCategory = activeCategory === "all" || card.dataset.category === activeCategory;
+        card.classList.toggle("is-hidden", !(matchText && matchType && matchCategory));
+      });
+    }
 
     function closeChangelog() {
       localStorage.setItem(STORAGE_KEY, SITE_VERSION);
@@ -933,6 +1301,23 @@
       if (event.target === popup) {
         closeChangelog();
       }
+    });
+
+    enrichCards();
+    renderFavorites();
+    renderRanking();
+    applyFilters();
+
+    searchInput.addEventListener("input", applyFilters);
+    typeFilter.addEventListener("change", applyFilters);
+    categoryRow.addEventListener("click", function (event) {
+      const button = event.target.closest(".category-pill");
+      if (!button) return;
+      activeCategory = button.dataset.category;
+      document.querySelectorAll(".category-pill").forEach((pill) => {
+        pill.classList.toggle("is-active", pill === button);
+      });
+      applyFilters();
     });
   </script>
   <script src="site-theme.js"></script>

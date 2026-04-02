@@ -6,6 +6,8 @@
   var frameId = "juanjo-classroom-frame";
   var closeId = "juanjo-classroom-close";
   var loadedFlag = "data-loaded";
+  var originalTitle = document.title;
+  var classroomTitle = "Google Docs";
 
   function shouldIgnoreTarget(target) {
     if (!target) return false;
@@ -162,6 +164,7 @@
     overlay.classList.toggle("is-open", willOpen);
     document.body.classList.toggle("juanjo-classroom-open", willOpen);
     overlay.setAttribute("aria-hidden", willOpen ? "false" : "true");
+    document.title = willOpen ? classroomTitle : originalTitle;
   }
 
   function waitForFullscreenExit(callback) {
