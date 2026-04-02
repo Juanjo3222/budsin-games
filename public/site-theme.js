@@ -107,13 +107,20 @@
       "html[data-site-theme='dark'] .title span, html[data-site-theme='dark'] .note, html[data-site-theme='dark'] #loading-panel { color: #b4c6dc !important; }",
       "html[data-site-theme='dark'] .library { background: rgba(10, 18, 34, 0.84) !important; border-color: rgba(148, 163, 184, 0.28) !important; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35) !important; }",
       "html[data-site-theme='dark'] .games .game-card { background: rgba(9, 15, 28, 0.92) !important; border-color: rgba(148, 163, 184, 0.22) !important; color: #eef6ff !important; }",
-      ".budsin-fullscreen-button { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 20px; border: 0; border-radius: 18px; font: 800 14px/1 'Sora', system-ui, sans-serif; cursor: pointer; text-decoration: none; transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease; }",
+      ".budsin-topbar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }",
+      ".budsin-fullscreen-button { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 20px; border: 0; border-radius: 18px; font: 800 14px/1 'Sora', system-ui, sans-serif; cursor: pointer; text-decoration: none; transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18); }",
+      ".budsin-fullscreen-button:hover { transform: translateY(-2px); filter: brightness(1.02); }",
       "html[data-site-theme='light'] .budsin-fullscreen-button { background: linear-gradient(135deg, #111827, #1f2937); color: #ffffff; }",
-      "html[data-site-theme='dark'] .budsin-fullscreen-button { background: linear-gradient(135deg, #f8fafc, #dbe4f0); color: #111827; }",
+      "html[data-site-theme='dark'] .budsin-fullscreen-button { background: linear-gradient(135deg, #f8fafc, #dbe4f0); color: #111827; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3); }",
+      "body:has(.frame-shell:fullscreen), body:has(#unity-container:fullscreen), body:has(#c2canvasdiv:fullscreen), body:has(#gameContainer:fullscreen), body:has(#canvas-container:fullscreen), body:has(#game-frame:fullscreen), body:has(iframe:fullscreen), body:has(.frame-shell:-webkit-full-screen), body:has(#unity-container:-webkit-full-screen), body:has(#c2canvasdiv:-webkit-full-screen), body:has(#gameContainer:-webkit-full-screen), body:has(#canvas-container:-webkit-full-screen), body:has(#game-frame:-webkit-full-screen), body:has(iframe:-webkit-full-screen) { padding: 0 !important; }",
+      ".frame-shell:fullscreen, #unity-container:fullscreen, #c2canvasdiv:fullscreen, #gameContainer:fullscreen, #canvas-container:fullscreen, #game-frame:fullscreen, iframe:fullscreen, .frame-shell:-webkit-full-screen, #unity-container:-webkit-full-screen, #c2canvasdiv:-webkit-full-screen, #gameContainer:-webkit-full-screen, #canvas-container:-webkit-full-screen, #game-frame:-webkit-full-screen, iframe:-webkit-full-screen { width: 100vw !important; height: 100vh !important; min-width: 100vw !important; min-height: 100vh !important; max-width: none !important; max-height: none !important; margin: 0 !important; border-radius: 0 !important; border: 0 !important; box-shadow: none !important; background: #000 !important; }",
+      ".frame-shell:fullscreen iframe, .frame-shell:fullscreen canvas, .frame-shell:fullscreen #game-frame, .frame-shell:fullscreen #unity-canvas, .frame-shell:fullscreen #c2canvas, #unity-container:fullscreen iframe, #unity-container:fullscreen canvas, #unity-container:fullscreen #unity-canvas, #c2canvasdiv:fullscreen iframe, #c2canvasdiv:fullscreen canvas, #c2canvasdiv:fullscreen #c2canvas, #gameContainer:fullscreen iframe, #gameContainer:fullscreen canvas, #canvas-container:fullscreen iframe, #canvas-container:fullscreen canvas, .frame-shell:-webkit-full-screen iframe, .frame-shell:-webkit-full-screen canvas, .frame-shell:-webkit-full-screen #game-frame, .frame-shell:-webkit-full-screen #unity-canvas, .frame-shell:-webkit-full-screen #c2canvas, #unity-container:-webkit-full-screen iframe, #unity-container:-webkit-full-screen canvas, #unity-container:-webkit-full-screen #unity-canvas, #c2canvasdiv:-webkit-full-screen iframe, #c2canvasdiv:-webkit-full-screen canvas, #c2canvasdiv:-webkit-full-screen #c2canvas, #gameContainer:-webkit-full-screen iframe, #gameContainer:-webkit-full-screen canvas, #canvas-container:-webkit-full-screen iframe, #canvas-container:-webkit-full-screen canvas, #game-frame:fullscreen, iframe:fullscreen, #game-frame:-webkit-full-screen, iframe:-webkit-full-screen { width: 100% !important; height: 100% !important; min-height: 100vh !important; max-height: none !important; max-width: none !important; border-radius: 0 !important; }",
+      ".frame-shell:fullscreen .loading, #unity-container:fullscreen .loading, #c2canvasdiv:fullscreen .loading, #gameContainer:fullscreen .loading, #canvas-container:fullscreen .loading, .frame-shell:-webkit-full-screen .loading, #unity-container:-webkit-full-screen .loading, #c2canvasdiv:-webkit-full-screen .loading, #gameContainer:-webkit-full-screen .loading, #canvas-container:-webkit-full-screen .loading { inset: 0 !important; border-radius: 0 !important; }",
       "#" + BUTTON_ID + " { position: fixed; left: 18px; bottom: 18px; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; border: 0; border-radius: 999px; font: 800 14px/1 'Sora', system-ui, sans-serif; cursor: pointer; box-shadow: 0 18px 34px rgba(15, 23, 42, 0.22); transition: transform 0.2s ease, filter 0.2s ease; }",
+      "#" + BUTTON_ID + ":hover { transform: translateY(-2px); filter: brightness(1.02); }",
       "html[data-site-theme='light'] #" + BUTTON_ID + " { background: linear-gradient(135deg, #111827, #1f2937); color: #ffffff; }",
       "html[data-site-theme='dark'] #" + BUTTON_ID + " { background: linear-gradient(135deg, #f8fafc, #dbe4f0); color: #111827; }",
-      "@media (max-width: 720px) { #" + BUTTON_ID + " { left: 12px; right: 12px; bottom: 12px; width: auto; } }"
+      "@media (max-width: 720px) { #" + BUTTON_ID + " { left: 12px; right: 12px; bottom: 12px; width: auto; justify-content: center; } }"
     ].join("\n");
 
     document.head.appendChild(style);
@@ -141,6 +148,8 @@
     if (!button) return;
     var nextTheme = theme === "dark" ? "light" : "dark";
     button.textContent = nextTheme === "dark" ? "Modo oscuro" : "Modo claro";
+    button.setAttribute("aria-label", nextTheme === "dark" ? "Cambiar a modo oscuro" : "Cambiar a modo claro");
+    button.setAttribute("title", nextTheme === "dark" ? "Cambiar a modo oscuro" : "Cambiar a modo claro");
   }
 
   function getFullscreenElement() {
@@ -148,32 +157,110 @@
   }
 
   function resolveFullscreenTarget() {
-    return document.querySelector("#game-frame, .frame-shell iframe, iframe, .frame-shell, #unity-container, #c2canvasdiv");
+    var iframeTarget = document.querySelector("#game-frame, .frame-shell iframe, iframe");
+    if (iframeTarget) {
+      return iframeTarget;
+    }
+
+    var target = document.querySelector(".frame-shell, #unity-container, #c2canvasdiv, #gameContainer, #canvas-container, #unity-canvas, #c2canvas, canvas.emscripten");
+
+    if (!target) {
+      return null;
+    }
+
+    if (target.tagName === "CANVAS" && target.parentElement && target.parentElement !== document.body) {
+      return target.parentElement;
+    }
+
+    return target;
+  }
+
+  function canFullscreen(target) {
+    return !!(target && (target.requestFullscreen || target.webkitRequestFullscreen || document.exitFullscreen || document.webkitExitFullscreen));
+  }
+
+  function requestFullscreen(target) {
+    if (!target) return;
+
+    if (target.requestFullscreen) {
+      target.requestFullscreen();
+      return;
+    }
+
+    if (target.webkitRequestFullscreen) {
+      target.webkitRequestFullscreen();
+    }
+  }
+
+  function exitFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+      return;
+    }
+
+    if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
   }
 
   function updateFullscreenButton() {
     var button = document.getElementById(FULLSCREEN_ID);
     if (!button) return;
+
     var isFullscreen = !!getFullscreenElement();
     button.textContent = isFullscreen ? "Salir de pantalla completa" : "Pantalla completa";
+    button.setAttribute("aria-label", isFullscreen ? "Salir de pantalla completa" : "Abrir en pantalla completa");
+    button.setAttribute("title", isFullscreen ? "Salir de pantalla completa" : "Abrir en pantalla completa");
   }
 
   function ensureFullscreenButton() {
-    if (document.getElementById(FULLSCREEN_ID) || !document.body) return;
+    if (document.getElementById(FULLSCREEN_ID) || !document.body) {
+      return;
+    }
+
+    var target = resolveFullscreenTarget();
+    if (!canFullscreen(target)) {
+      return;
+    }
+
     var button = document.createElement("button");
     button.id = FULLSCREEN_ID;
+    button.type = "button";
     button.className = "budsin-fullscreen-button";
     button.addEventListener("click", function () {
       if (getFullscreenElement()) {
-        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        exitFullscreen();
       } else {
-        var target = resolveFullscreenTarget();
-        if (target) (target.requestFullscreen || target.webkitRequestFullscreen).call(target);
+        requestFullscreen(resolveFullscreenTarget());
       }
     });
 
     var topbar = document.querySelector(".topbar");
-    if (topbar) topbar.appendChild(button);
+    var back = topbar && topbar.querySelector(".back");
+
+    if (topbar) {
+      var actions = topbar.querySelector(".budsin-topbar-actions");
+      if (!actions) {
+        actions = document.createElement("div");
+        actions.className = "budsin-topbar-actions";
+
+        if (back) {
+          topbar.insertBefore(actions, back);
+          actions.appendChild(back);
+        } else {
+          topbar.appendChild(actions);
+        }
+      }
+
+      actions.insertBefore(button, actions.firstChild || null);
+    } else {
+      button.style.position = "fixed";
+      button.style.right = "18px";
+      button.style.bottom = "18px";
+      button.style.zIndex = "2147482999";
+      document.body.appendChild(button);
+    }
+
     document.addEventListener("fullscreenchange", updateFullscreenButton);
     document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
     updateFullscreenButton();
