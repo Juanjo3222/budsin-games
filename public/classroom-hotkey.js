@@ -141,11 +141,60 @@
     }
   }
 
+  function getFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function exitFullscreen() {
+    if (document.exitFullscreen) {
+      return document.exitFullscreen();
+    }
+
+    if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+      return null;
+    }
+
+    return null;
+  }
+
+  function applyOverlayState(overlay, willOpen) {
+    overlay.classList.toggle("is-open", willOpen);
+    document.body.classList.toggle("juanjo-classroom-open", willOpen);
+    overlay.setAttribute("aria-hidden", willOpen ? "false" : "true");
+  }
+
+  function waitForFullscreenExit(callback) {
+    var resolved = false;
+
+    function finish() {
+      if (resolved) {
+        return;
+      }
+
+      resolved = true;
+      document.removeEventListener("fullscreenchange", onChange);
+      document.removeEventListener("webkitfullscreenchange", onChange);
+      callback();
+    }
+
+    function onChange() {
+      if (!getFullscreenElement()) {
+        finish();
+      }
+    }
+
+    document.addEventListener("fullscreenchange", onChange);
+    document.addEventListener("webkitfullscreenchange", onChange);
+    window.setTimeout(finish, 400);
+  }
+
   function toggleClassroom() {
     var overlay = createOverlay();
     var frame = document.getElementById(frameId);
     var isOpen = overlay.classList.contains("is-open");
     var willOpen = !isOpen;
+    var fullscreenElement = getFullscreenElement();
 
     if (!isOpen && frame && !frame.getAttribute(loadedFlag)) {
       frame.src = CLASSROOM_URL;
@@ -153,9 +202,16 @@
     }
 
     triggerFunkinEscape();
-    overlay.classList.toggle("is-open");
-    document.body.classList.toggle("juanjo-classroom-open", willOpen);
-    overlay.setAttribute("aria-hidden", willOpen ? "false" : "true");
+
+    if (willOpen && fullscreenElement) {
+      waitForFullscreenExit(function () {
+        applyOverlayState(overlay, true);
+      });
+      exitFullscreen();
+      return;
+    }
+
+    applyOverlayState(overlay, willOpen);
   }
 
   function isToggleHotkey(event) {
@@ -165,19 +221,26 @@
     return (
       key === "|" ||
       key === "°" ||
+      key === "º" ||
       code === "Backquote" ||
       code === "IntlBackslash"
     );
   }
 
-  document.addEventListener("keydown", function (event) {
+  function handleHotkeyKeydown(event) {
     if (event.defaultPrevented || shouldIgnoreTarget(event.target)) {
       return;
     }
 
     if (isToggleHotkey(event)) {
       event.preventDefault();
+      event.stopPropagation();
       toggleClassroom();
     }
+  }
+
+  window.addEventListener("keydown", handleHotkeyKeydown, true);
+  window.addEventListener("juanjo:toggle-classroom", function () {
+    toggleClassroom();
   });
 })();

@@ -5,6 +5,7 @@
   var DEFAULT_THEME = "light";
   var STYLE_ID = "budsin-theme-style";
   var BUTTON_ID = "budsin-theme-toggle";
+  var FULLSCREEN_ID = "budsin-fullscreen-toggle";
 
   var THEMES = {
     light: {
@@ -101,20 +102,18 @@
       "html[data-site-theme='dark'] #topBar { background: rgba(8, 17, 31, 0.82) !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28); }",
       "html[data-site-theme='light'] #topBar a, html[data-site-theme='light'] #topBar div { color: #111827 !important; text-shadow: none !important; }",
       "html[data-site-theme='dark'] #topBar a, html[data-site-theme='dark'] #topBar div { color: #eef6ff !important; }",
-      "html[data-site-theme='dark'] body::before, html[data-site-theme='dark'] body::after { opacity: 0.45; filter: saturate(0.72) brightness(0.9); }",
-      "html[data-site-theme='dark'] .shell, html[data-site-theme='dark'] .topbar, html[data-site-theme='dark'] .title, html[data-site-theme='dark'] .library, html[data-site-theme='dark'] .note, html[data-site-theme='dark'] #loading-panel, html[data-site-theme='dark'] .frame-shell { color: var(--text, #e6edf8); }",
-      "html[data-site-theme='dark'] .topbar, html[data-site-theme='dark'] .title, html[data-site-theme='dark'] .library, html[data-site-theme='dark'] .note, html[data-site-theme='dark'] #loading-panel { border-color: rgba(170, 193, 222, 0.24) !important; background: linear-gradient(145deg, rgba(16, 27, 48, 0.9), rgba(10, 18, 33, 0.88)) !important; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.34) !important; }",
-      "html[data-site-theme='dark'] .title::before, html[data-site-theme='dark'] .hero-badges span { background: rgba(160, 184, 217, 0.12) !important; color: #c9d8eb !important; border-color: rgba(170, 193, 222, 0.22) !important; }",
-      "html[data-site-theme='dark'] .title p, html[data-site-theme='dark'] .title span, html[data-site-theme='dark'] .library-head p, html[data-site-theme='dark'] .note { color: var(--muted, #a4b6ce) !important; }",
-      "html[data-site-theme='dark'] .frame-shell, html[data-site-theme='dark'] #unity-container, html[data-site-theme='dark'] #c2canvasdiv { border-color: rgba(149, 175, 210, 0.24) !important; box-shadow: 0 28px 54px rgba(0, 0, 0, 0.38) !important; }",
-      "html[data-site-theme='dark'] .btn-alt { background: linear-gradient(135deg, #cfd9e8, #a9bed8) !important; color: #0f172a !important; box-shadow: 0 14px 28px rgba(0, 0, 0, 0.32) !important; }",
-      "html[data-site-theme='dark'] .back, html[data-site-theme='dark'] .btn-primary, html[data-site-theme='dark'] .player-overlay__start, html[data-site-theme='dark'] .c-button { background: linear-gradient(135deg, #61c3ff, #3a7fff) !important; color: #071122 !important; box-shadow: 0 16px 32px rgba(58, 127, 255, 0.32) !important; }",
-      "html[data-site-theme='dark'] a { color: #8ed8ff; }",
+      "html[data-site-theme='dark'] .topbar, html[data-site-theme='dark'] .frame-shell, html[data-site-theme='dark'] #unity-container, html[data-site-theme='dark'] #c2canvasdiv, html[data-site-theme='dark'] .note, html[data-site-theme='dark'] #loading-panel { border-color: rgba(148, 163, 184, 0.32) !important; }",
+      "html[data-site-theme='dark'] .title, html[data-site-theme='dark'] .title strong { color: #eef6ff !important; }",
+      "html[data-site-theme='dark'] .title span, html[data-site-theme='dark'] .note, html[data-site-theme='dark'] #loading-panel { color: #b4c6dc !important; }",
+      "html[data-site-theme='dark'] .library { background: rgba(10, 18, 34, 0.84) !important; border-color: rgba(148, 163, 184, 0.28) !important; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35) !important; }",
+      "html[data-site-theme='dark'] .games .game-card { background: rgba(9, 15, 28, 0.92) !important; border-color: rgba(148, 163, 184, 0.22) !important; color: #eef6ff !important; }",
+      ".budsin-fullscreen-button { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 20px; border: 0; border-radius: 18px; font: 800 14px/1 'Sora', system-ui, sans-serif; cursor: pointer; text-decoration: none; transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease; }",
+      "html[data-site-theme='light'] .budsin-fullscreen-button { background: linear-gradient(135deg, #111827, #1f2937); color: #ffffff; }",
+      "html[data-site-theme='dark'] .budsin-fullscreen-button { background: linear-gradient(135deg, #f8fafc, #dbe4f0); color: #111827; }",
       "#" + BUTTON_ID + " { position: fixed; left: 18px; bottom: 18px; z-index: 2147483000; display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 18px; border: 0; border-radius: 999px; font: 800 14px/1 'Sora', system-ui, sans-serif; cursor: pointer; box-shadow: 0 18px 34px rgba(15, 23, 42, 0.22); transition: transform 0.2s ease, filter 0.2s ease; }",
-      "#" + BUTTON_ID + ":hover { transform: translateY(-2px); filter: brightness(1.02); }",
       "html[data-site-theme='light'] #" + BUTTON_ID + " { background: linear-gradient(135deg, #111827, #1f2937); color: #ffffff; }",
       "html[data-site-theme='dark'] #" + BUTTON_ID + " { background: linear-gradient(135deg, #f8fafc, #dbe4f0); color: #111827; }",
-      "@media (max-width: 720px) { #" + BUTTON_ID + " { left: 12px; right: 12px; bottom: 12px; width: auto; justify-content: center; } }"
+      "@media (max-width: 720px) { #" + BUTTON_ID + " { left: 12px; right: 12px; bottom: 12px; width: auto; } }"
     ].join("\n");
 
     document.head.appendChild(style);
@@ -123,7 +122,6 @@
   function markPageType() {
     var body = document.body;
     if (!body) return;
-
     var isSurfacePage = !!document.querySelector(".shell, .topbar, .frame-shell, #message, #launch_countdown_screen, #loading-panel");
     body.classList.add(isSurfacePage ? "budsin-theme-surface" : "budsin-game-only");
   }
@@ -131,11 +129,9 @@
   function setThemeVariables(theme) {
     var root = document.documentElement;
     var palette = THEMES[theme] || THEMES[DEFAULT_THEME];
-
     Object.keys(palette).forEach(function (key) {
       root.style.setProperty(key, palette[key]);
     });
-
     root.dataset.siteTheme = theme;
     root.style.colorScheme = theme;
   }
@@ -143,11 +139,44 @@
   function updateButton(theme) {
     var button = document.getElementById(BUTTON_ID);
     if (!button) return;
-
     var nextTheme = theme === "dark" ? "light" : "dark";
     button.textContent = nextTheme === "dark" ? "Modo oscuro" : "Modo claro";
-    button.setAttribute("aria-label", nextTheme === "dark" ? "Cambiar a modo oscuro" : "Cambiar a modo claro");
-    button.setAttribute("title", nextTheme === "dark" ? "Cambiar a modo oscuro" : "Cambiar a modo claro");
+  }
+
+  function getFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function resolveFullscreenTarget() {
+    return document.querySelector("#game-frame, .frame-shell iframe, iframe, .frame-shell, #unity-container, #c2canvasdiv");
+  }
+
+  function updateFullscreenButton() {
+    var button = document.getElementById(FULLSCREEN_ID);
+    if (!button) return;
+    var isFullscreen = !!getFullscreenElement();
+    button.textContent = isFullscreen ? "Salir de pantalla completa" : "Pantalla completa";
+  }
+
+  function ensureFullscreenButton() {
+    if (document.getElementById(FULLSCREEN_ID) || !document.body) return;
+    var button = document.createElement("button");
+    button.id = FULLSCREEN_ID;
+    button.className = "budsin-fullscreen-button";
+    button.addEventListener("click", function () {
+      if (getFullscreenElement()) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        var target = resolveFullscreenTarget();
+        if (target) (target.requestFullscreen || target.webkitRequestFullscreen).call(target);
+      }
+    });
+
+    var topbar = document.querySelector(".topbar");
+    if (topbar) topbar.appendChild(button);
+    document.addEventListener("fullscreenchange", updateFullscreenButton);
+    document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
+    updateFullscreenButton();
   }
 
   function applyTheme(theme) {
@@ -158,18 +187,13 @@
   }
 
   function ensureButton() {
-    if (document.getElementById(BUTTON_ID) || !document.body) {
-      return;
-    }
-
+    if (document.getElementById(BUTTON_ID) || !document.body) return;
     var button = document.createElement("button");
     button.id = BUTTON_ID;
-    button.type = "button";
     button.addEventListener("click", function () {
       var current = resolveTheme(document.documentElement.dataset.siteTheme || getStoredTheme());
       applyTheme(current === "dark" ? "light" : "dark");
     });
-
     document.body.appendChild(button);
   }
 
@@ -177,6 +201,7 @@
     ensureStyle();
     markPageType();
     ensureButton();
+    ensureFullscreenButton();
     applyTheme(getStoredTheme());
   }
 
