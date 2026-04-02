@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Juega Cookie Clicker Legacy Edition desde Budsin Games.">
+  <title>Cookie Clicker Legacy Edition | Budsin Games</title>
+  <link rel="icon" type="image/jpeg" href="images.jpeg">
+  <style>
+    :root {
+      --bg: #1d120b;
+      --panel: rgba(40, 24, 14, 0.9);
+      --line: rgba(255, 255, 255, 0.1);
+      --text: #fff8ef;
+      --muted: #ddc8b3;
+      --accent: #f59e0b;
+      --accent-2: #b45309;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(245, 158, 11, 0.22), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(180, 83, 9, 0.24), transparent 28%),
+        linear-gradient(180deg, #0f0804 0%, #1d120b 100%);
+    }
+
+    .shell {
+      width: min(1400px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+    }
+
+    .title strong {
+      display: block;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 6px;
+    }
+
+    .title span {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #1a0d05;
+      text-decoration: none;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .frame-shell {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: min(72vw, 82vh);
+      min-height: 560px;
+      border: 0;
+      background: #000;
+    }
+
+    .note {
+      margin-top: 14px;
+      padding: 0 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      iframe {
+        height: 78vh;
+        min-height: 460px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <main class="frame-shell">
+      <iframe
+        src="https://script.google.com/macros/s/AKfycbxGM35J29NkO-2LYjxWj_cA9IUaaXypkUy-LqXyLRbGTz0R6lXmAEapz1STN1jlTIRavw/exec"
+        width="100%"
+        height="100%"
+        frameborder="0"
+        allowfullscreen
+        title="Cookie Clicker Legacy Edition"
+      ></iframe>
+    </main>
+
+    <header class="topbar">
+      <div class="title">
+        <strong>Cookie Clicker Legacy Edition</strong>
+        <span>Esta edición ayuda a arreglar problemas con los saves, aunque es un poco más antigua y menos recomendada que la versión principal.</span>
+      </div>
+      <a class="back" href="index.html">Volver al index</a>
+    </header>
+
+    <p class="note">
+      La versión principal sigue siendo la más recomendada. Si tienes problemas al guardar allí, prueba esta Legacy Edition como alternativa más compatible con saves.
+    </p>
+  </div>
+</body>
+  <script src="classroom-hotkey.js"></script>
+</html>

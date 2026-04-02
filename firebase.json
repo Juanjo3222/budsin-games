@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "budsin-games",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Budsin Games">
+  <title>Budsin Games</title>
+  <link rel="icon" type="image/jpeg" href="images.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08111f;
+      --panel: rgba(10, 20, 38, 0.82);
+      --line: rgba(255, 255, 255, 0.1);
+      --text: #eef6ff;
+      --muted: #b4c6dc;
+      --accent: #ff9a3d;
+      --accent-2: #ffd166;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 154, 61, 0.2), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(77, 226, 197, 0.14), transparent 28%),
+        linear-gradient(160deg, #040814 0%, #08111f 48%, #0c1730 100%);
+    }
+
+    .shell {
+      width: min(1040px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 34px;
+    }
+
+    .title {
+      margin: 0 0 24px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-family: "Abril Fatface", serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 0.95;
+      letter-spacing: 0.01em;
+    }
+
+    .title p {
+      max-width: 34rem;
+      margin: 16px auto 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .games {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .game-card {
+      display: block;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: var(--panel);
+      color: var(--text);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 209, 102, 0.45);
+    }
+
+    .cover {
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cover img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .content {
+      padding: 15px 15px 17px;
+    }
+
+    .content span {
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .content strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 1.15rem;
+    }
+
+    .content p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .changelog-popup {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(3, 7, 14, 0.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .changelog-popup.is-visible {
+      display: flex;
+    }
+
+    .changelog-card {
+      width: min(560px, 100%);
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(8, 17, 31, 0.96);
+      box-shadow: var(--shadow);
+    }
+
+    .changelog-card span {
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 154, 61, 0.14);
+      color: var(--accent-2);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .changelog-card h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .changelog-card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .changelog-list {
+      margin: 0 0 20px;
+      padding-left: 18px;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .changelog-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .suggestions-cta {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .suggestions-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 22px;
+      border: 1px solid rgba(255, 209, 102, 0.35);
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 154, 61, 0.2), rgba(255, 209, 102, 0.12));
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .suggestions-link:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 209, 102, 0.6);
+    }
+
+    .changelog-close {
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media (max-width: 760px) {
+      .games {
+        grid-template-columns: 1fr;
+      }
+
+      .title {
+        padding: 22px;
+      }
+
+      .changelog-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="changelogPopup" class="changelog-popup" aria-hidden="true">
+    <div class="changelog-card" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+      <span>Version 4.0.0</span>
+      <h2 id="changelogTitle">Novedades de Budsin Games</h2>
+      <p>Este popup solo aparece una vez por versión o la primera vez que entras al sitio.</p>
+      <ul class="changelog-list">
+        <li>Se añadió Minecraft 1.21.x al catálogo con su propia página dedicada.</li>
+        <li>Se añadió Bitcoin Clicker al catálogo con su propia página dedicada.</li>
+        <li>Se añadió Friday Night Funkin al catálogo con su propia página dedicada.</li>
+      </ul>
+      <div class="changelog-actions">
+        <button id="closeChangelog" class="changelog-close" type="button">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="shell">
+    <section class="title">
+      <h1>Budsin Games</h1>
+      <p>Elige un juego, entra directo desde el navegador y juega cuando quieras.</p>
+    </section>
+
+    <section class="games">
+      <a class="game-card" href="1.12.html">
+        <div class="cover">
+          <img src="Minecraft-1.12.2-Official.jpg" alt="Minecraft 1.12.2">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Minecraft 1.12.2</strong>
+          <p>Explora libremente desde el navegador. Esta edición no incluye multijugador.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="1.8.html">
+        <div class="cover">
+          <img src="Snapshot18-1.jpg" alt="Minecraft 1.8">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Minecraft 1.8</strong>
+          <p>La versión recomendada para jugar con multijugador.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="1.21.x.html">
+        <div class="cover">
+          <img src="1.21.11.jpeg" alt="Minecraft 1.21.x">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Minecraft 1.21.x</strong>
+          <p>Cliente nuevo para explorar desde el navegador en su propia página dedicada.</p>
+        </div>
+      </a>
+
+
+      <a class="game-card" href="cookie/index.html">
+        <div class="cover">
+          <img src="perfectCookie.png" alt="Cookie Clicker">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Cookie Clicker</strong>
+          <p>La versión más recomendada para jugar y hornear sin parar.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="geometry-dash.html">
+        <div class="cover">
+          <img src="geometry.jpeg" alt="Geometry Dash">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Geometry Dash</strong>
+          <p>Ritmo, reflejos y saltos al límite en su página dedicada.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="hollow-knight.html">
+        <div class="cover">
+          <img src="hollow.avif" alt="Hollow Knight">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Hollow Knight</strong>
+          <p>Explora Hallownest desde su propia página con carga dedicada del juego.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="eggy-car.html">
+        <div class="cover">
+          <img src="eggy.jpeg" alt="Eggy Car">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Eggy Car</strong>
+          <p>Mantén el equilibrio, conduce con cuidado y llega lo más lejos posible sin romper el huevo.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="fireboy-watergirl-1.html">
+        <div class="cover">
+          <img src="Fireboy-Watergirl-ForestTemple_OG-logo.jpg" alt="Fireboy And Watergirl 1">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Fireboy And Watergirl 1</strong>
+          <p>Juega cooperativo clásico en el Templo del Bosque desde su propia página dedicada.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="among-us.html">
+        <div class="cover">
+          <img src="among.avif" alt="Among Us">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Among Us</strong>
+          <p>Encuentra al impostor o sabotea a la tripulación desde su página dedicada.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="level-devil.html">
+        <div class="cover">
+          <img src="level devil.jpeg" alt="Level Devil">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Level Devil</strong>
+          <p>Supera trampas impredecibles y niveles engañosos desde su propia página dedicada.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="rocket-goal.html">
+        <div class="cover">
+          <img src="rocketgoal-io_16x9-cover.webp" alt="Rocket Goal">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Rocket Goal</strong>
+          <p>Conduce, golpea la pelota y marca goles en una arena de coches con cohetes.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="stacktris.html">
+        <div class="cover">
+          <img src="stacktris.png" alt="Stacktris">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Stacktris</strong>
+          <p>Apila piezas con precisión y evita que todo se venga abajo en este reto de equilibrio.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="drive-mad.html">
+        <div class="cover">
+          <img src="drive.jpg" alt="Drive Mad">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Drive Mad</strong>
+          <p>Supera puentes, saltos y vehículos imposibles en un reto de conducción basado en física.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="subway-surfers.html">
+        <div class="cover">
+          <img src="subway.jpeg" alt="Subway Surfers">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Subway Surfers</strong>
+          <p>Corre sin parar, esquiva trenes y recoge monedas en una de las carreras endless más clásicas.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="red-ball.html">
+        <div class="cover">
+          <img src="redball.webp" alt="Red Ball">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Red Ball</strong>
+          <p>Rueda, salta y supera obstáculos con esta aventura clásica ahora integrada en el portal.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="snow-rider.html">
+        <div class="cover">
+          <img src="snow-rider-3d.webp" alt="Snow Rider">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Snow Rider</strong>
+          <p>Baja a toda velocidad por la nieve, esquiva obstáculos y aguanta lo más posible en cada carrera.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="Bitcoin Clicker.html">
+        <div class="cover">
+          <img src="bitcoin.jpg" alt="Bitcoin Clicker">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Bitcoin Clicker</strong>
+          <p>Haz clic, acumula bitcoins y sigue creciendo en este idle game integrado al portal.</p>
+        </div>
+      </a>
+
+
+      <a class="game-card" href="Funkin-HTML-Port-main/index.html">
+        <div class="cover">
+          <img src="Funkin-HTML-Port-main/favicon.png" alt="Friday Night Funkin">
+        </div>
+        <div class="content">
+          <span>Disponible</span>
+          <strong>Friday Night Funkin</strong>
+          <p>Sigue el ritmo, encadena notas y juega Friday Night Funkin desde su propia página dedicada.</p>
+        </div>
+      </a>
+
+      <a class="game-card" href="cookie-legacy.html">
+        <div class="cover">
+          <img src="perfectCookie.png" alt="Cookie Clicker Legacy Edition">
+        </div>
+        <div class="content">
+          <span>Alternativa</span>
+          <strong>Cookie Clicker Legacy Edition</strong>
+          <p>Úsala si la versión nueva te da problemas con los saves. Es más antigua y menos recomendada.</p>
+        </div>
+      </a>
+    </section>
+
+    <div class="suggestions-cta">
+      <a class="suggestions-link" href="https://forms.gle/3XU8Xru3nzKBtPhYA" target="_blank" rel="noreferrer">¡Envía tus sugerencias a Budsin!</a>
+    </div>
+  </main>
+
+  <script>
+    const SITE_VERSION = "4.0.0";
+    const STORAGE_KEY = "juanjos_games_seen_version";
+    const popup = document.getElementById("changelogPopup");
+    const closeButton = document.getElementById("closeChangelog");
+
+    function closeChangelog() {
+      localStorage.setItem(STORAGE_KEY, SITE_VERSION);
+      popup.classList.remove("is-visible");
+      popup.setAttribute("aria-hidden", "true");
+    }
+
+    try {
+      const seenVersion = localStorage.getItem(STORAGE_KEY);
+      if (seenVersion !== SITE_VERSION) {
+        popup.classList.add("is-visible");
+        popup.setAttribute("aria-hidden", "false");
+      }
+    } catch (error) {
+      popup.classList.add("is-visible");
+      popup.setAttribute("aria-hidden", "false");
+    }
+
+    closeButton.addEventListener("click", closeChangelog);
+    popup.addEventListener("click", function (event) {
+      if (event.target === popup) {
+        closeChangelog();
+      }
+    });
+  </script>
+</body>
+  <script src="classroom-hotkey.js"></script>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Juega Eggy Car desde Budsin Games.">
+  <title>Eggy Car | Budsin Games</title>
+  <link rel="icon" href="images.jpeg">
+  <style>
+    :root {
+      --bg: #10151f;
+      --panel: rgba(15, 22, 35, 0.92);
+      --line: rgba(255, 255, 255, 0.1);
+      --text: #eef6ff;
+      --muted: #b7c6d8;
+      --accent: #f4b63f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(244, 182, 63, 0.2), transparent 22%),
+        linear-gradient(180deg, #0a0f16 0%, #10151f 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .shell {
+      width: 100%;
+      flex: 1;
+      margin: 0 auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+    }
+
+    .title strong {
+      display: block;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 6px;
+    }
+
+    .title span {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 14px;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .game-shell {
+      display: flex;
+      justify-content: center;
+      flex: 1;
+    }
+
+    #c2canvasdiv {
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+    }
+
+    #c2canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+      touch-action: none;
+    }
+
+    .note {
+      margin: 10px 4px 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      #c2canvasdiv {
+        width: 100% !important;
+        min-height: 420px;
+      }
+
+      #c2canvas {
+        width: 100% !important;
+        height: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div id="fb-root"></div>
+
+    <div class="game-shell">
+      <div id="c2canvasdiv">
+        <canvas id="c2canvas" width="1280" height="720" tabindex="0">
+          <h1>Tu navegador no parece soportar HTML5.</h1>
+        </canvas>
+      </div>
+    </div>
+
+    <header class="topbar">
+      <div class="title">
+        <strong>Eggy Car</strong>
+        <span>Mantén el equilibrio del huevo y avanza lo máximo posible desde su página dedicada.</span>
+      </div>
+      <a class="back" href="index.html">Volver al index</a>
+    </header>
+
+    <p class="note">
+      Si el juego no carga, revisa que el navegador permita los scripts remotos usados por esta versión.
+    </p>
+  </main>
+
+  <script>
+    (function () {
+      if (window.location.protocol.substr(0, 4) === "file") {
+        alert("Exported games won't work until you upload them.");
+      }
+    })();
+  </script>
+
+  <script src="https://493104753-963057148227461038.preview.editmysite.com/uploads/b/139890129-825858355833705451/files/jquery-2.1.1.min.js"></script>
+  <script src="https://493104753-963057148227461038.preview.editmysite.com/uploads/b/139890129-825858355833705451/files/c2runtime.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/st39/sdk@main/api.js"></script>
+  <script>
+    jQuery(document).ready(function () {
+      cr_createRuntime("c2canvas");
+
+      const canvas = document.getElementById("c2canvas");
+      canvas.addEventListener("pointerdown", function () {
+        canvas.focus();
+      });
+    });
+
+    function onVisibilityChanged() {
+      if (document.hidden || document.mozHidden || document.webkitHidden || document.msHidden) {
+        cr_setSuspended(true);
+      } else {
+        cr_setSuspended(false);
+      }
+    }
+
+    document.addEventListener("visibilitychange", onVisibilityChanged, false);
+    document.addEventListener("mozvisibilitychange", onVisibilityChanged, false);
+    document.addEventListener("webkitvisibilitychange", onVisibilityChanged, false);
+    document.addEventListener("msvisibilitychange", onVisibilityChanged, false);
+
+    function OnRegisterSWError(e) {
+      console.warn("Failed to register service worker: ", e);
+    }
+
+    window.C2_RegisterSW = function C2_RegisterSW() {
+      if (!navigator.serviceWorker) return;
+
+      try {
+        navigator.serviceWorker.register("sw.js", { scope: "./" })
+          .then(function (reg) {
+            console.log("Registered service worker on " + reg.scope);
+          })
+          .catch(OnRegisterSWError);
+      } catch (e) {
+        OnRegisterSWError(e);
+      }
+    };
+  </script>
+  <script src="classroom-hotkey.js"></script>
+</body>
+</html>

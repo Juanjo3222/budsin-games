@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" style="width:100%;height:100%;background-color:black;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="description" content="Juega Minecraft 1.21.x desde Budsin Games.">
+  <meta name="keywords" content="minecraft, eaglercraft, eaglercraftz, 1.20, 1.20.4, 1.21.x">
+  <title>Minecraft 1.21.x | Budsin Games</title>
+  <meta property="og:locale" content="en-US">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Minecraft 1.21.x">
+  <meta property="og:description" content="Cliente local de Minecraft 1.21.x para Budsin Games.">
+  <link rel="icon" type="image/jpeg" href="images.jpeg">
+  <script type="text/javascript" src="classes.js"></script>
+  <script type="text/javascript">
+    "use strict";
+
+    (function () {
+      var nativeOpen = window.open ? window.open.bind(window) : null;
+
+      function isAllowedUrl(rawUrl) {
+        if (typeof rawUrl !== "string" || rawUrl.trim() === "") return true;
+
+        try {
+          var url = new URL(rawUrl, window.location.href);
+          if (url.origin === window.location.origin) return true;
+          if (url.protocol === "blob:" || url.protocol === "data:" || url.protocol === "about:") return true;
+          return false;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function blockExternalUrl(rawUrl) {
+        if (isAllowedUrl(rawUrl)) return false;
+        console.warn("Budsin Games: navegación externa bloqueada:", rawUrl);
+        return true;
+      }
+
+      if (nativeOpen) {
+        window.open = function (url, target, features) {
+          if (blockExternalUrl(url)) return null;
+          return nativeOpen(url, target, features);
+        };
+      }
+
+      document.addEventListener("click", function (event) {
+        var link = event.target.closest ? event.target.closest("a[href]") : null;
+        if (link && blockExternalUrl(link.getAttribute("href"))) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }, true);
+    })();
+
+    window.addEventListener("load", function () {
+      if (window.location.href.indexOf("file:") === 0) {
+        alert("HTTP please, do not open this file locally, run a local HTTP server and load it via HTTP");
+        return;
+      }
+
+      var relayId = Math.floor(Math.random() * 3);
+
+      window.eaglercraftXOpts = {
+        lang: "es_MX",
+        demoMode: false,
+        container: "game_frame",
+        assetsURI: "assets.epk",
+        localesURI: "lang/",
+        worldsDB: "worlds",
+        enableServerCookies: false,
+        allowServerRedirects: false,
+        logInvalidCerts: true,
+        crashOnUncaughtExceptions: true,
+        servers: [
+          { addr: "ws://localhost:8081/", name: "Local test server" },
+          { addr: "mc.arch.lol", name: "ArchMC" },
+          { addr: "wss://web.thanatos-network.xyz", name: "Thanatos Network" },
+          { addr: "wss://clever-teaching.com", name: "Clever Teaching" }
+        ],
+        relays: [
+          { addr: "wss://relay.deev.is/", comment: "lax1dude relay #1", primary: relayId === 0 },
+          { addr: "wss://relay.lax1dude.net/", comment: "lax1dude relay #2", primary: relayId === 1 },
+          { addr: "wss://relay.shhnowisnottheti.me/", comment: "ayunami relay #1", primary: relayId === 2 }
+        ]
+      };
+
+      var q = window.location.search;
+      if ((typeof q === "string") && q[0] === "?" && (typeof window.URLSearchParams !== "undefined")) {
+        q = new window.URLSearchParams(q);
+        var s = q.get("server");
+        if (s) window.eaglercraftXOpts.joinServer = s;
+      }
+
+      if (typeof main === "function") {
+        main();
+      } else {
+        console.error("Minecraft 1.21.x: classes.js no define main()");
+        alert("No se pudo iniciar: classes.js está vacío o no define main().");
+      }
+    });
+  </script>
+</head>
+<body style="margin:0px;width:100%;height:100%;overflow:hidden;background-color:black;" id="game_frame">
+  <script src="classroom-hotkey.js"></script>
+</body>
+</html>

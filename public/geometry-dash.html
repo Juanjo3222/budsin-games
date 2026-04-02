@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Juega Geometry Dash desde Budsin Games.">
+  <title>Geometry Dash | Budsin Games</title>
+  <link rel="icon" type="image/jpeg" href="images.jpeg">
+  <style>
+    :root {
+      --bg: #06111f;
+      --panel: rgba(8, 18, 36, 0.9);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #eef6ff;
+      --muted: #b5c7dd;
+      --accent: #38bdf8;
+      --accent-2: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.22), transparent 28%),
+        linear-gradient(180deg, #040814 0%, #08111f 100%);
+    }
+
+    .shell {
+      width: min(1400px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+    }
+
+    .title strong {
+      display: block;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 6px;
+    }
+
+    .title span {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #03111f;
+      text-decoration: none;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .frame-shell {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      overflow: hidden;
+      background: #02060e;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: min(72vw, 82vh);
+      min-height: 560px;
+      border: 0;
+      background: #000;
+    }
+
+    .note {
+      margin-top: 14px;
+      padding: 0 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      iframe {
+        height: 78vh;
+        min-height: 460px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <main class="frame-shell">
+      <iframe
+        src="https://ozgames.io/geometry-dash.embed"
+        width="1280"
+        height="720"
+        frameborder="0"
+        border="0"
+        scrolling="none"
+        allowfullscreen
+        title="Geometry Dash"
+      ></iframe>
+    </main>
+
+    <header class="topbar">
+      <div class="title">
+        <strong>Geometry Dash</strong>
+        <span>Juega desde Budsin Games, con cuidado obvio.</span>
+      </div>
+      <a class="back" href="index.html">Volver al index</a>
+    </header>
+
+    <p class="note">
+      Si el juego tarda en cargar, espera unos segundos. Si el juego no carga, es posible que el sitio de origen esté caído o tenga problemas. En ese caso, lo siento, no puedo hacer nada.
+    </p>
+  </div>
+  <script src="classroom-hotkey.js"></script>
+</body>
+</html>

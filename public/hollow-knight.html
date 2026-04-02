@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Juega Hollow Knight desde Budsin Games.">
+  <title>Hollow Knight | Budsin Games</title>
+  <link rel="icon" type="image/jpeg" href="images.jpeg">
+  <style>
+    :root {
+      --bg: #04070d;
+      --panel: rgba(10, 15, 26, 0.92);
+      --line: rgba(255, 255, 255, 0.1);
+      --text: #edf5ff;
+      --muted: #aab9cf;
+      --accent: #9bd5ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(155, 213, 255, 0.12), transparent 20%),
+        linear-gradient(180deg, #04070d 0%, #09111f 100%);
+      color: var(--text);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      margin: 14px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+    }
+
+    .title strong {
+      display: block;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 6px;
+    }
+
+    .title span {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 14px;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    #unity-container {
+      position: relative;
+      width: calc(100% - 28px);
+      flex: 1;
+      margin: 0 14px 14px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #loading-panel {
+      width: min(860px, calc(100% - 28px));
+      margin: 14px auto 0;
+      padding: 28px 26px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top, rgba(155, 213, 255, 0.18), transparent 35%),
+        rgba(9, 15, 28, 0.9);
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.35),
+        0 0 40px rgba(155, 213, 255, 0.08);
+      text-align: center;
+    }
+
+    #loading-kicker {
+      margin-bottom: 14px;
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    #loading-text {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.8rem, 4.4vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1.1;
+      text-transform: uppercase;
+      text-shadow: 0 0 24px rgba(155, 213, 255, 0.24);
+    }
+
+    #loading-note {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      display: none;
+      background: #000;
+    }
+
+    #unity-loading-bar {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(680px, calc(100% - 40px));
+      display: none;
+      z-index: 2;
+    }
+
+    #unity-progress-bar-empty {
+      width: 100%;
+      height: 22px;
+      overflow: hidden;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    #unity-progress-bar-full {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #6fb5ff, #d7f1ff);
+      box-shadow: 0 0 20px rgba(155, 213, 255, 0.6);
+    }
+
+    #unity-mobile-warning {
+      display: none;
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.72);
+      color: #fff;
+      font-size: 0.9rem;
+      z-index: 2;
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      #loading-panel {
+        padding: 24px 18px;
+        border-radius: 22px;
+      }
+
+      #loading-note {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container" class="unity-desktop">
+    <canvas id="unity-canvas" width="1166" height="650"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+    <div id="unity-mobile-warning">WebGL builds are not supported on mobile devices.</div>
+  </div>
+
+  <div id="loading-panel">
+    <div id="loading-kicker">Cargando Hollow Knight</div>
+    <p id="loading-text">Loading... 0.00 MB / 909.17 MB</p>
+    <p id="loading-note">La carga inicial tarda un poco porque el juego se recompone por partes antes de arrancar.</p>
+  </div>
+
+  <header class="topbar">
+    <div class="title">
+      <strong>Hollow Knight</strong>
+      <span>Explora Hallownest desde Budsin Games. La carga puede tardar porque el juego se reconstruye por partes. Cuando te salga la cutscene, skipealo varias veces, si aparece negro, vuelve a presiopnar una tecla varias veces.</span>
+    </div>
+    <a class="back" href="index.html">Volver al index</a>
+  </header>
+
+  <script>
+    const root_dir = "https://play.2games.io/game/hollow-knight/";
+    const loadingText = document.querySelector("#loading-text");
+    const loadingPanel = document.querySelector("#loading-panel");
+    let loadedBytes = 0;
+
+    async function fetchWithProgress(url) {
+      const response = await fetch(url);
+      const reader = response.body.getReader();
+      const chunks = [];
+      let received = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        received += value.length;
+        loadedBytes += value.length;
+        chunks.push(value);
+        const mbDone = (loadedBytes / (1024 * 1024)).toFixed(2);
+        loadingText.textContent = `LOADING... ${mbDone} MB / 909.17 MB`;
+      }
+
+      const fullBuffer = new Uint8Array(received);
+      let offset = 0;
+      for (const chunk of chunks) {
+        fullBuffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+      return fullBuffer.buffer;
+    }
+
+    async function mergeFiles(fileParts) {
+      const buffers = await Promise.all(fileParts.map((part) => fetchWithProgress(part)));
+      const mergedBlob = new Blob(buffers);
+      return URL.createObjectURL(mergedBlob);
+    }
+
+    function getParts(file, start, end) {
+      const parts = [];
+      for (let i = start; i <= end; i++) {
+        parts.push(file + ".part" + i);
+      }
+      return parts;
+    }
+
+    (async () => {
+      const dataUrl = await mergeFiles(getParts(root_dir + "Build/bog.data", 1, 44));
+      const wasmUrl = await mergeFiles(getParts(root_dir + "Build/bog.wasm", 1, 2));
+      const buildUrl = root_dir + "Build";
+      const loaderUrl = buildUrl + "/bog.loader.js";
+      const config = {
+        dataUrl: dataUrl,
+        frameworkUrl: buildUrl + "/bog.framework.js",
+        codeUrl: wasmUrl,
+        streamingAssetsUrl: root_dir + "StreamingAssets",
+        companyName: "Team Cherry & Truffled",
+        productName: "Hollow Knight",
+        productVersion: "1.0"
+      };
+
+      const container = document.querySelector("#unity-container");
+      const canvas = document.querySelector("#unity-canvas");
+      const loadingBar = document.querySelector("#unity-loading-bar");
+      const progressBarFull = document.querySelector("#unity-progress-bar-full");
+      const mobileWarning = document.querySelector("#unity-mobile-warning");
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        container.className = "unity-mobile";
+        config.devicePixelRatio = 1;
+        mobileWarning.style.display = "block";
+        setTimeout(() => {
+          mobileWarning.style.display = "none";
+        }, 5000);
+      } else {
+        function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight - 130;
+          canvas.style.width = "100%";
+          canvas.style.height = "100%";
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+      }
+
+      loadingBar.style.display = "block";
+      const script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then(() => {
+          loadingText.textContent = "Hollow Knight cargado.";
+          loadingPanel.style.display = "none";
+          loadingBar.style.display = "none";
+          canvas.style.display = "block";
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+    })();
+  </script>
+  <script src="classroom-hotkey.js"></script>
+</body>
+</html>
