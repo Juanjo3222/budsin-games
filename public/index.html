@@ -926,7 +926,6 @@
     const FAVORITES_KEY = "budsin_favorites";
     const POPULARITY_KEY = "budsin_popularity";
     const FIREBASE_COLLECTION = "game_popularity";
-    const FIREBASE_WRITE_WAIT_MS = 220;
     const popup = document.getElementById("changelogPopup");
     const closeButton = document.getElementById("closeChangelog");
     const searchInput = document.getElementById("gameSearch");
@@ -942,14 +941,6 @@
     let popularityState = readJson(POPULARITY_KEY, {});
     let firebaseDb = null;
     let firebaseEnabled = false;
-
-    function logFirebase(message, error) {
-      if (error) {
-        console.warn(`[Budsin Firebase] ${message}`, error);
-        return;
-      }
-      console.info(`[Budsin Firebase] ${message}`);
-    }
 
     function hasFirebaseConfig(config) {
       if (!config) return false;
@@ -967,10 +958,8 @@
           : window.firebase.initializeApp(window.BUDSIN_FIREBASE_CONFIG);
         firebaseDb = app.firestore();
         firebaseEnabled = true;
-        logFirebase("Firebase inicializado correctamente.");
       } catch (error) {
         firebaseEnabled = false;
-        logFirebase("No se pudo inicializar Firebase.", error);
       }
     }
 
@@ -991,10 +980,7 @@
         });
         popularityState = remotePopularity;
         writeJson(POPULARITY_KEY, popularityState);
-        logFirebase(`Popularidad remota cargada (${Object.keys(remotePopularity).length} docs).`);
-      } catch (error) {
-        logFirebase("Error cargando popularidad remota.", error);
-      }
+      } catch (error) {}
     }
 
     function saveLocalPopularity() {
@@ -1003,25 +989,18 @@
 
     async function incrementRemotePopularity(href, gameName) {
       if (!firebaseEnabled || !firebaseDb) {
-        return false;
+        return;
       }
 
       try {
         const docRef = firebaseDb.collection(FIREBASE_COLLECTION).doc(encodeURIComponent(href));
-        const snapshot = await docRef.get();
-        const currentHits = snapshot.exists ? Number(snapshot.data().hits || 0) : 0;
-
         await docRef.set({
           href,
           name: gameName,
-          hits: currentHits + 1,
+          hits: window.firebase.firestore.FieldValue.increment(1),
           updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-        return true;
-      } catch (error) {
-        logFirebase("Error incrementando popularidad remota.", error);
-        return false;
-      }
+      } catch (error) {}
     }
 
     function closeChangelog() {
@@ -1121,17 +1100,14 @@
         renderShelves();
       });
 
-      card.addEventListener("click", async (event) => {
+      card.addEventListener("click", (event) => {
         event.preventDefault();
         const href = card.getAttribute("href");
         const gameName = card.querySelector("strong").textContent;
         popularityState[href] = (Number(popularityState[href]) || 0) + 1;
         saveLocalPopularity();
         renderShelves();
-        await Promise.race([
-          incrementRemotePopularity(href, gameName),
-          new Promise((resolve) => window.setTimeout(resolve, FIREBASE_WRITE_WAIT_MS))
-        ]);
+        incrementRemotePopularity(href, gameName);
         openAppTransition(href);
       });
     });
