@@ -903,10 +903,41 @@
       <div id="noResults" class="no-results">No encontramos juegos con ese filtro. Prueba otra búsqueda.</div>
     </section>
 
-    <div class="suggestions-cta">
-      <a class="suggestions-link" href="https://forms.gle/3XU8Xru3nzKBtPhYA" target="_blank" rel="noreferrer">Envia tus sugerencias a Budsin</a>
-    </div>
-  </main>
+    function renderShelves() {
+      const favorites = readJson(FAVORITES_KEY, []);
+      const popularity = popularityState;
+
+      const favoriteNames = cards
+        .filter(card => favorites.includes(card.getAttribute("href")))
+        .map(card => card.querySelector("strong").textContent);
+
+      favoritesList.innerHTML = favoriteNames.length
+        ? favoriteNames.map(name => `<li><span>${name}</span><span>Guardado</span></li>`).join("")
+        : "<li><span>Aún no tienes favoritos.</span><span>—</span></li>";
+
+      const ranking = cards
+        .map(card => {
+          const href = card.getAttribute("href");
+          const name = card.querySelector("strong").textContent;
+          return { name, hits: popularity[href] || 0 };
+        })
+        .sort((a, b) => b.hits - a.hits)
+        .slice(0, 6);
+
+      popularList.innerHTML = ranking
+        .map((item, index) => `<li><span>#${index + 1} ${item.name}</span><span>${item.hits} jugadores</span></li>`)
+        .join("");
+
+      cards.forEach(card => {
+        const href = card.getAttribute("href");
+        const hits = Number(popularity[href] || 0);
+        card.querySelector("[data-players]").textContent = `🔥 ${hits}`;
+        const favBtn = card.querySelector(".favorite-btn");
+        const isFavorite = favorites.includes(href);
+        favBtn.classList.toggle("is-favorite", isFavorite);
+        favBtn.textContent = isFavorite ? "★" : "☆";
+      });
+    }
 
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
@@ -926,7 +957,6 @@
     const FAVORITES_KEY = "budsin_favorites";
     const POPULARITY_KEY = "budsin_popularity";
     const FIREBASE_COLLECTION = "game_popularity";
-    const FIREBASE_WRITE_TIMEOUT_MS = 4500;
     const popup = document.getElementById("changelogPopup");
     const closeButton = document.getElementById("closeChangelog");
     const searchInput = document.getElementById("gameSearch");
@@ -942,14 +972,6 @@
     let popularityState = readJson(POPULARITY_KEY, {});
     let firebaseDb = null;
     let firebaseEnabled = false;
-
-    function logFirebase(message, error) {
-      if (error) {
-        console.warn(`[Budsin Firebase] ${message}`, error);
-        return;
-      }
-      console.info(`[Budsin Firebase] ${message}`);
-    }
 
     function hasFirebaseConfig(config) {
       if (!config) return false;
@@ -967,10 +989,8 @@
           : window.firebase.initializeApp(window.BUDSIN_FIREBASE_CONFIG);
         firebaseDb = app.firestore();
         firebaseEnabled = true;
-        logFirebase("Firebase inicializado correctamente.");
       } catch (error) {
         firebaseEnabled = false;
-        logFirebase("No se pudo inicializar Firebase.", error);
       }
     }
 
@@ -991,23 +1011,11 @@
         });
         popularityState = remotePopularity;
         writeJson(POPULARITY_KEY, popularityState);
-        logFirebase(`Popularidad remota cargada (${Object.keys(remotePopularity).length} docs).`);
-      } catch (error) {
-        logFirebase("Error cargando popularidad remota.", error);
-      }
+      } catch (error) {}
     }
 
     function saveLocalPopularity() {
       writeJson(POPULARITY_KEY, popularityState);
-    }
-
-    function withTimeout(promise, timeoutMs, timeoutMessage) {
-      return Promise.race([
-        promise,
-        new Promise((_, reject) => {
-          window.setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
-        })
-      ]);
     }
 
     async function incrementRemotePopularity(href, gameName) {
@@ -1015,26 +1023,23 @@
         return;
       }
 
-      const docRef = firebaseDb.collection(FIREBASE_COLLECTION).doc(encodeURIComponent(href));
-      const snapshot = await docRef.get();
-      const currentHits = snapshot.exists ? Number(snapshot.data().hits || 0) : 0;
-
-      await docRef.set({
-        href,
-        name: gameName,
-        hits: currentHits + 1,
-        updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      try {
+        const docRef = firebaseDb.collection(FIREBASE_COLLECTION).doc(encodeURIComponent(href));
+        await docRef.set({
+          href,
+          name: gameName,
+          hits: window.firebase.firestore.FieldValue.increment(1),
+          updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (error) {}
     }
 
-    function closeChangelog() {
-      try {
-        localStorage.setItem(STORAGE_KEY, SITE_VERSION);
-      } catch (error) {
-        logFirebase("No se pudo guardar el estado del changelog en localStorage.", error);
-      }
-      popup.classList.remove("is-visible");
-      popup.setAttribute("aria-hidden", "true");
+    function openAppTransition(url) {
+      appTransition.classList.add("is-open");
+      appTransition.setAttribute("aria-hidden", "false");
+      window.setTimeout(() => {
+        window.location.href = url;
+      }, 260);
     }
 
     function readJson(key, fallback) {
@@ -1128,23 +1133,14 @@
         renderShelves();
       });
 
-      card.addEventListener("click", async (event) => {
+      card.addEventListener("click", (event) => {
         event.preventDefault();
         const href = card.getAttribute("href");
         const gameName = card.querySelector("strong").textContent;
         popularityState[href] = (Number(popularityState[href]) || 0) + 1;
         saveLocalPopularity();
         renderShelves();
-        try {
-          await withTimeout(
-            incrementRemotePopularity(href, gameName),
-            FIREBASE_WRITE_TIMEOUT_MS,
-            "Tiempo de espera agotado al guardar en Firebase."
-          );
-        } catch (error) {
-          logFirebase("Error incrementando popularidad remota.", error);
-          window.alert(`No se pudo guardar el contador en la nube.\n\n${error.message || error}\n\nAl aceptar, te redirigiremos al juego.`);
-        }
+        incrementRemotePopularity(href, gameName);
         openAppTransition(href);
       });
     });
@@ -1171,6 +1167,16 @@
         }
       });
     }
+
+    searchInput.addEventListener("input", applyFilters);
+    typeFilters.addEventListener("click", (event) => {
+      const button = event.target.closest(".chip");
+      if (!button) return;
+      activeType = button.dataset.type;
+      typeFilters.querySelectorAll(".chip").forEach(chip => chip.classList.remove("active"));
+      button.classList.add("active");
+      applyFilters();
+    });
 
     searchInput.addEventListener("input", applyFilters);
     typeFilters.addEventListener("click", (event) => {
