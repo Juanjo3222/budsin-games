@@ -908,11 +908,24 @@
     </div>
   </main>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script>
+    window.BUDSIN_FIREBASE_CONFIG = window.BUDSIN_FIREBASE_CONFIG || {
+      apiKey: "",
+      authDomain: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: "",
+      appId: ""
+    };
+  </script>
   <script>
     const SITE_VERSION = "4.1.0";
     const STORAGE_KEY = "juanjos_games_seen_version";
     const FAVORITES_KEY = "budsin_favorites";
     const POPULARITY_KEY = "budsin_popularity";
+    const FIREBASE_COLLECTION = "game_popularity";
     const popup = document.getElementById("changelogPopup");
     const closeButton = document.getElementById("closeChangelog");
     const searchInput = document.getElementById("gameSearch");
@@ -925,6 +938,70 @@
     const appTransition = document.getElementById("appTransition");
 
     let activeType = "all";
+    let popularityState = readJson(POPULARITY_KEY, {});
+    let firebaseDb = null;
+    let firebaseEnabled = false;
+
+    function hasFirebaseConfig(config) {
+      if (!config) return false;
+      return ["apiKey", "authDomain", "projectId", "appId"].every((key) => typeof config[key] === "string" && config[key].trim() !== "");
+    }
+
+    function initFirebase() {
+      if (!window.firebase || !hasFirebaseConfig(window.BUDSIN_FIREBASE_CONFIG)) {
+        return;
+      }
+
+      try {
+        const app = window.firebase.apps.length
+          ? window.firebase.app()
+          : window.firebase.initializeApp(window.BUDSIN_FIREBASE_CONFIG);
+        firebaseDb = app.firestore();
+        firebaseEnabled = true;
+      } catch (error) {
+        firebaseEnabled = false;
+      }
+    }
+
+    async function loadRemotePopularity() {
+      if (!firebaseEnabled || !firebaseDb) {
+        return;
+      }
+
+      try {
+        const snapshot = await firebaseDb.collection(FIREBASE_COLLECTION).get();
+        const remotePopularity = {};
+        snapshot.forEach((doc) => {
+          const href = decodeURIComponent(doc.id);
+          const hits = Number(doc.data().hits || 0);
+          if (hits > 0) {
+            remotePopularity[href] = hits;
+          }
+        });
+        popularityState = remotePopularity;
+        writeJson(POPULARITY_KEY, popularityState);
+      } catch (error) {}
+    }
+
+    function saveLocalPopularity() {
+      writeJson(POPULARITY_KEY, popularityState);
+    }
+
+    async function incrementRemotePopularity(href, gameName) {
+      if (!firebaseEnabled || !firebaseDb) {
+        return;
+      }
+
+      try {
+        const docRef = firebaseDb.collection(FIREBASE_COLLECTION).doc(encodeURIComponent(href));
+        await docRef.set({
+          href,
+          name: gameName,
+          hits: window.firebase.firestore.FieldValue.increment(1),
+          updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (error) {}
+    }
 
     function closeChangelog() {
       localStorage.setItem(STORAGE_KEY, SITE_VERSION);
@@ -946,7 +1023,7 @@
 
     function renderShelves() {
       const favorites = readJson(FAVORITES_KEY, []);
-      const popularity = readJson(POPULARITY_KEY, {});
+      const popularity = popularityState;
 
       const favoriteNames = cards
         .filter(card => favorites.includes(card.getAttribute("href")))
@@ -971,7 +1048,7 @@
 
       cards.forEach(card => {
         const href = card.getAttribute("href");
-        const hits = popularity[href] || 0;
+        const hits = Number(popularity[href] || 0);
         card.querySelector("[data-players]").textContent = `🔥 ${hits}`;
         const favBtn = card.querySelector(".favorite-btn");
         const isFavorite = favorites.includes(href);
@@ -1026,10 +1103,11 @@
       card.addEventListener("click", (event) => {
         event.preventDefault();
         const href = card.getAttribute("href");
-        const popularity = readJson(POPULARITY_KEY, {});
-        popularity[href] = (popularity[href] || 0) + 1;
-        writeJson(POPULARITY_KEY, popularity);
+        const gameName = card.querySelector("strong").textContent;
+        popularityState[href] = (Number(popularityState[href]) || 0) + 1;
+        saveLocalPopularity();
         renderShelves();
+        incrementRemotePopularity(href, gameName);
         openAppTransition(href);
       });
     });
@@ -1062,8 +1140,13 @@
       applyFilters();
     });
 
-    renderShelves();
-    applyFilters();
+    initFirebase();
+
+    (async function initializePopularity() {
+      await loadRemotePopularity();
+      renderShelves();
+      applyFilters();
+    })();
   </script>
   <script src="site-theme.js"></script>
   <script src="classroom-hotkey.js"></script>
