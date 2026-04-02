@@ -8,17 +8,22 @@
   <link rel="icon" type="image/jpeg" href="images.jpeg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #08111f;
-      --panel: rgba(10, 20, 38, 0.82);
-      --line: rgba(255, 255, 255, 0.1);
-      --text: #eef6ff;
-      --muted: #b4c6dc;
-      --accent: #ff9a3d;
-      --accent-2: #ffd166;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      --bg: #edf1f5;
+      --bg-2: #dfe6ee;
+      --surface: rgba(255, 255, 255, 0.92);
+      --surface-strong: #ffffff;
+      --line: rgba(18, 24, 38, 0.1);
+      --text: #111827;
+      --muted: #5c6678;
+      --red: #ef3f45;
+      --blue: #2daeff;
+      --yellow: #ffd84a;
+      --green: #2fc98a;
+      --shadow: 0 24px 64px rgba(15, 23, 42, 0.12);
+      --shadow-soft: 0 16px 36px rgba(15, 23, 42, 0.08);
     }
 
     * {
@@ -28,74 +33,314 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: "Space Grotesk", sans-serif;
+      font-family: "Sora", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255, 154, 61, 0.2), transparent 24%),
-        radial-gradient(circle at bottom right, rgba(77, 226, 197, 0.14), transparent 28%),
-        linear-gradient(160deg, #040814 0%, #08111f 48%, #0c1730 100%);
+        radial-gradient(circle at top center, rgba(255, 216, 74, 0.34), transparent 26%),
+        linear-gradient(180deg, #f7fafc 0%, var(--bg) 48%, var(--bg-2) 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      top: 24px;
+      bottom: 24px;
+      width: clamp(16px, 3vw, 36px);
+      border-radius: 999px;
+      opacity: 0.95;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      left: 14px;
+      background: linear-gradient(180deg, #ff686e 0%, var(--red) 100%);
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+    }
+
+    body::after {
+      right: 14px;
+      background: linear-gradient(180deg, #63d4ff 0%, var(--blue) 100%);
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
     }
 
     .shell {
-      width: min(1040px, calc(100% - 28px));
+      position: relative;
+      z-index: 1;
+      width: min(1320px, calc(100% - 88px));
       margin: 0 auto;
-      padding: 22px 0 34px;
+      padding: 30px 0 40px;
     }
 
     .title {
+      position: relative;
       margin: 0 0 24px;
-      padding: 22px;
-      border: 1px solid var(--line);
-      border-radius: 30px;
-      background: var(--panel);
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 42px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(246, 249, 252, 0.88)),
+        linear-gradient(135deg, rgba(239, 63, 69, 0.08), rgba(45, 174, 255, 0.08));
       box-shadow: var(--shadow);
-      text-align: center;
+      overflow: hidden;
     }
 
-    .title h1 {
+    .title::before {
+      content: "Inicio";
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(17, 24, 39, 0.06);
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .title::after {
+      content: "";
+      position: absolute;
+      inset: 20px 20px auto auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 40px;
+      background: radial-gradient(circle at 30% 30%, rgba(239, 63, 69, 0.22), transparent 52%), radial-gradient(circle at 70% 70%, rgba(45, 174, 255, 0.2), transparent 46%);
+      transform: rotate(14deg);
+      opacity: 0.85;
+    }
+
+    .title-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .title-copy h1 {
       margin: 0;
-      font-family: "Abril Fatface", serif;
-      font-size: clamp(3rem, 8vw, 6rem);
-      line-height: 0.95;
-      letter-spacing: 0.01em;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(4rem, 10vw, 7rem);
+      line-height: 0.9;
+      letter-spacing: 0.04em;
     }
 
-    .title p {
-      max-width: 34rem;
-      margin: 16px auto 0;
+    .title-copy p {
+      max-width: 44rem;
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 1rem;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .hero-badges span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(17, 24, 39, 0.05);
+      border: 1px solid rgba(17, 24, 39, 0.05);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .hero-showcase {
+      display: grid;
+      gap: 14px;
+    }
+
+    .showcase-panel {
+      position: relative;
+      padding: 20px;
+      border-radius: 30px;
+      color: #fff;
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .showcase-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -24px -24px auto;
+      width: 120px;
+      height: 120px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.18);
+      transform: rotate(18deg);
+    }
+
+    .showcase-panel span {
+      display: inline-flex;
+      margin-bottom: 10px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .showcase-panel strong {
+      display: block;
+      position: relative;
+      z-index: 1;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.04em;
+    }
+
+    .showcase-panel p {
+      position: relative;
+      z-index: 1;
+      margin: 8px 0 0;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.65;
+      font-size: 0.94rem;
+    }
+
+    .showcase-panel.primary {
+      min-height: 188px;
+      background: linear-gradient(135deg, #ef3f45 0%, #ff7b54 100%);
+    }
+
+    .showcase-panel.secondary {
+      min-height: 138px;
+      background: linear-gradient(135deg, #1f7cf0 0%, #33c8ff 100%);
+    }
+
+    .library {
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 40px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .library-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .library-kicker {
+      display: inline-flex;
+      margin-bottom: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(239, 63, 69, 0.1);
+      color: var(--red);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .library-head h2 {
+      margin: 0;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      letter-spacing: 0.03em;
+    }
+
+    .library-head p {
+      margin: 8px 0 0;
       color: var(--muted);
       line-height: 1.7;
-      font-size: 1rem;
+      max-width: 40rem;
+    }
+
+    .library-meta {
+      min-width: 220px;
+      padding: 14px 16px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.94), rgba(31, 41, 55, 0.9));
+      color: rgba(255, 255, 255, 0.78);
+      text-align: right;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .library-meta strong {
+      display: block;
+      color: #fff;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
     }
 
     .games {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
     }
 
     .game-card {
-      display: block;
-      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      padding: 12px;
       border: 1px solid var(--line);
-      border-radius: 26px;
-      background: var(--panel);
+      border-radius: 30px;
+      background: var(--surface-strong);
       color: var(--text);
       text-decoration: none;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    .game-card::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--red), #ff8f5b);
+      box-shadow: 0 0 0 6px rgba(239, 63, 69, 0.08);
+      z-index: 2;
     }
 
     .game-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(255, 209, 102, 0.45);
+      transform: translateY(-8px) scale(1.01);
+      border-color: rgba(45, 174, 255, 0.28);
+      box-shadow: 0 26px 44px rgba(15, 23, 42, 0.14);
+    }
+
+    .game-card:nth-child(1) {
+      grid-column: span 2;
+    }
+
+    .game-card:nth-child(1) .cover {
+      aspect-ratio: 21 / 9;
+    }
+
+    .game-card:nth-child(1) .content strong {
+      font-size: 2rem;
     }
 
     .cover {
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 16 / 10;
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.05);
-      border-bottom: 1px solid var(--line);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.08), rgba(17, 24, 39, 0.02));
     }
 
     .cover img {
@@ -103,35 +348,48 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .game-card:hover .cover img {
+      transform: scale(1.05);
     }
 
     .content {
-      padding: 15px 15px 17px;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 16px 6px 8px;
     }
 
     .content span {
       display: inline-flex;
+      align-self: flex-start;
       margin-bottom: 12px;
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(17, 24, 39, 0.06);
       color: var(--muted);
-      font-size: 0.78rem;
-      letter-spacing: 0.05em;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
     .content strong {
       display: block;
-      margin-bottom: 10px;
-      font-size: 1.15rem;
+      margin-bottom: 8px;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.55rem;
+      line-height: 1;
+      letter-spacing: 0.04em;
     }
 
     .content p {
       margin: 0;
       color: var(--muted);
-      line-height: 1.6;
-      font-size: 0.95rem;
+      line-height: 1.65;
+      font-size: 0.92rem;
     }
 
     .changelog-popup {
@@ -142,8 +400,8 @@
       align-items: center;
       justify-content: center;
       padding: 18px;
-      background: rgba(3, 7, 14, 0.72);
-      backdrop-filter: blur(10px);
+      background: rgba(15, 23, 42, 0.38);
+      backdrop-filter: blur(12px);
     }
 
     .changelog-popup.is-visible {
@@ -151,42 +409,45 @@
     }
 
     .changelog-card {
-      width: min(560px, 100%);
-      padding: 24px;
-      border: 1px solid var(--line);
-      border-radius: 28px;
-      background: rgba(8, 17, 31, 0.96);
+      width: min(580px, 100%);
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 34px;
+      background: rgba(255, 255, 255, 0.96);
       box-shadow: var(--shadow);
     }
 
     .changelog-card span {
       display: inline-flex;
       margin-bottom: 14px;
-      padding: 6px 10px;
+      padding: 7px 12px;
       border-radius: 999px;
-      background: rgba(255, 154, 61, 0.14);
-      color: var(--accent-2);
-      font-size: 0.8rem;
-      letter-spacing: 0.05em;
+      background: rgba(239, 63, 69, 0.1);
+      color: var(--red);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
     .changelog-card h2 {
       margin: 0 0 10px;
-      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: 0.03em;
     }
 
     .changelog-card p {
       margin: 0 0 16px;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
     .changelog-list {
-      margin: 0 0 20px;
+      margin: 0 0 22px;
       padding-left: 18px;
       color: var(--text);
-      line-height: 1.7;
+      line-height: 1.8;
     }
 
     .changelog-actions {
@@ -194,56 +455,111 @@
       justify-content: flex-end;
     }
 
-    .suggestions-cta {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
+    .changelog-close,
     .suggestions-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 52px;
-      padding: 0 22px;
-      border: 1px solid rgba(255, 209, 102, 0.35);
+      min-height: 50px;
+      padding: 0 20px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255, 154, 61, 0.2), rgba(255, 209, 102, 0.12));
-      color: var(--text);
+      border: 0;
+      font: inherit;
+      font-weight: 800;
       text-decoration: none;
-      font-weight: 700;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .suggestions-link:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 209, 102, 0.6);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
     }
 
     .changelog-close {
-      min-height: 46px;
-      padding: 0 18px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
+      background: linear-gradient(135deg, #111827, #1f2937);
+      color: #fff;
+      box-shadow: var(--shadow-soft);
     }
 
-    @media (max-width: 760px) {
+    .suggestions-cta {
+      display: flex;
+      justify-content: center;
+      margin-top: 22px;
+    }
+
+    .suggestions-link {
+      min-width: min(100%, 420px);
+      background: linear-gradient(135deg, #ef3f45, #ff8c55);
+      color: #fff;
+      box-shadow: 0 18px 34px rgba(239, 63, 69, 0.24);
+      text-align: center;
+    }
+
+    .changelog-close:hover,
+    .suggestions-link:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.02);
+    }
+
+    @media (max-width: 1180px) {
+      .games {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 920px) {
+      body::before,
+      body::after {
+        display: none;
+      }
+
+      .shell {
+        width: min(100%, calc(100% - 28px));
+      }
+
+      .title-grid,
+      .library-head {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .library-meta {
+        min-width: 0;
+        text-align: left;
+      }
+
+      .games {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .shell {
+        padding-top: 18px;
+      }
+
+      .title,
+      .library,
+      .changelog-card {
+        padding: 20px;
+        border-radius: 28px;
+      }
+
       .games {
         grid-template-columns: 1fr;
       }
 
-      .title {
-        padding: 22px;
+      .game-card:nth-child(1) {
+        grid-column: auto;
       }
 
-      .changelog-card {
-        padding: 20px;
+      .game-card:nth-child(1) .cover {
+        aspect-ratio: 16 / 10;
+      }
+
+      .hero-badges {
+        gap: 8px;
+      }
+
+      .hero-badges span {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
@@ -267,225 +583,259 @@
 
   <main class="shell">
     <section class="title">
-      <h1>Budsin Games</h1>
-      <p>Elige un juego, entra directo desde el navegador y juega cuando quieras.</p>
+      <div class="title-grid">
+        <div class="title-copy">
+          <h1>Budsin Games</h1>
+          <p>Una portada pensada como menu de consola: entra al portal, elige una caratula y salta directo a jugar desde el navegador.</p>
+          <div class="hero-badges">
+            <span>19 juegos listos</span>
+            <span>Entrada rapida</span>
+            <span>Biblioteca estilo Switch</span>
+          </div>
+        </div>
+        <div class="hero-showcase">
+          <article class="showcase-panel primary">
+            <span>Modo consola</span>
+            <strong>Tu biblioteca al instante</strong>
+            <p>Las portadas son el centro de la experiencia, con un inicio mas visual, limpio y rapido para entrar a cada juego.</p>
+          </article>
+          <article class="showcase-panel secondary">
+            <span>Favoritos</span>
+            <strong>Minecraft, FNF, clickers y clasicos del portal</strong>
+            <p>Todo queda a un clic, como una fila de juegos en pantalla principal.</p>
+          </article>
+        </div>
+      </div>
     </section>
 
-    <section class="games">
-      <a class="game-card" href="1.12.html">
-        <div class="cover">
-          <img src="Minecraft-1.12.2-Official.jpg" alt="Minecraft 1.12.2">
+    <section class="library">
+      <div class="library-head">
+        <div>
+          <span class="library-kicker">Biblioteca</span>
+          <h2>Elige tu siguiente partida</h2>
+          <p>Las portadas funcionan como accesos directos. Abre un juego, vuelve al portal y sigue navegando como si fuera el menu de una consola.</p>
         </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Minecraft 1.12.2</strong>
-          <p>Explora libremente desde el navegador. Esta edición no incluye multijugador.</p>
+        <div class="library-meta">
+          Actualizado en vivo
+          <strong>Budsin Portal</strong>
+          Biblioteca rapida y lista para jugar
         </div>
-      </a>
+      </div>
 
-      <a class="game-card" href="1.8.html">
-        <div class="cover">
-          <img src="Snapshot18-1.jpg" alt="Minecraft 1.8">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Minecraft 1.8</strong>
-          <p>La versión recomendada para jugar con multijugador.</p>
-        </div>
-      </a>
+      <section class="games">
+        <a class="game-card" href="1.12.html">
+          <div class="cover">
+            <img src="Minecraft-1.12.2-Official.jpg" alt="Minecraft 1.12.2">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Minecraft 1.12.2</strong>
+            <p>Explora libremente desde el navegador. Esta edicion no incluye multijugador.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="1.21.x.html">
-        <div class="cover">
-          <img src="1.21.11.jpeg" alt="Minecraft 1.21.x">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Minecraft 1.21.x</strong>
-          <p>Cliente nuevo para explorar desde el navegador en su propia página dedicada.</p>
-        </div>
-      </a>
+        <a class="game-card" href="1.8.html">
+          <div class="cover">
+            <img src="Snapshot18-1.jpg" alt="Minecraft 1.8">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Minecraft 1.8</strong>
+            <p>La version recomendada para jugar con multijugador.</p>
+          </div>
+        </a>
 
+        <a class="game-card" href="1.21.x.html">
+          <div class="cover">
+            <img src="1.21.11.jpeg" alt="Minecraft 1.21.x">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Minecraft 1.21.x</strong>
+            <p>Cliente nuevo para explorar desde el navegador en su propia pagina dedicada.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="cookie/index.html">
-        <div class="cover">
-          <img src="perfectCookie.png" alt="Cookie Clicker">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Cookie Clicker</strong>
-          <p>La versión más recomendada para jugar y hornear sin parar.</p>
-        </div>
-      </a>
+        <a class="game-card" href="cookie/index.html">
+          <div class="cover">
+            <img src="perfectCookie.png" alt="Cookie Clicker">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Cookie Clicker</strong>
+            <p>La version mas recomendada para jugar y hornear sin parar.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="geometry-dash.html">
-        <div class="cover">
-          <img src="geometry.jpeg" alt="Geometry Dash">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Geometry Dash</strong>
-          <p>Ritmo, reflejos y saltos al límite en su página dedicada.</p>
-        </div>
-      </a>
+        <a class="game-card" href="geometry-dash.html">
+          <div class="cover">
+            <img src="geometry.jpeg" alt="Geometry Dash">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Geometry Dash</strong>
+            <p>Ritmo, reflejos y saltos al limite en su pagina dedicada.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="hollow-knight.html">
-        <div class="cover">
-          <img src="hollow.avif" alt="Hollow Knight">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Hollow Knight</strong>
-          <p>Explora Hallownest desde su propia página con carga dedicada del juego.</p>
-        </div>
-      </a>
+        <a class="game-card" href="hollow-knight.html">
+          <div class="cover">
+            <img src="hollow.avif" alt="Hollow Knight">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Hollow Knight</strong>
+            <p>Explora Hallownest desde su propia pagina con carga dedicada del juego.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="eggy-car.html">
-        <div class="cover">
-          <img src="eggy.jpeg" alt="Eggy Car">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Eggy Car</strong>
-          <p>Mantén el equilibrio, conduce con cuidado y llega lo más lejos posible sin romper el huevo.</p>
-        </div>
-      </a>
+        <a class="game-card" href="eggy-car.html">
+          <div class="cover">
+            <img src="eggy.jpeg" alt="Eggy Car">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Eggy Car</strong>
+            <p>Manten el equilibrio, conduce con cuidado y llega lo mas lejos posible sin romper el huevo.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="fireboy-watergirl-1.html">
-        <div class="cover">
-          <img src="Fireboy-Watergirl-ForestTemple_OG-logo.jpg" alt="Fireboy And Watergirl 1">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Fireboy And Watergirl 1</strong>
-          <p>Juega cooperativo clásico en el Templo del Bosque desde su propia página dedicada.</p>
-        </div>
-      </a>
+        <a class="game-card" href="fireboy-watergirl-1.html">
+          <div class="cover">
+            <img src="Fireboy-Watergirl-ForestTemple_OG-logo.jpg" alt="Fireboy And Watergirl 1">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Fireboy And Watergirl 1</strong>
+            <p>Juega cooperativo clasico en el Templo del Bosque desde su propia pagina dedicada.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="among-us.html">
-        <div class="cover">
-          <img src="among.avif" alt="Among Us">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Among Us</strong>
-          <p>Encuentra al impostor o sabotea a la tripulación desde su página dedicada.</p>
-        </div>
-      </a>
+        <a class="game-card" href="among-us.html">
+          <div class="cover">
+            <img src="among.avif" alt="Among Us">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Among Us</strong>
+            <p>Encuentra al impostor o sabotea a la tripulacion desde su pagina dedicada.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="level-devil.html">
-        <div class="cover">
-          <img src="level devil.jpeg" alt="Level Devil">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Level Devil</strong>
-          <p>Supera trampas impredecibles y niveles engañosos desde su propia página dedicada.</p>
-        </div>
-      </a>
+        <a class="game-card" href="level-devil.html">
+          <div class="cover">
+            <img src="level devil.jpeg" alt="Level Devil">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Level Devil</strong>
+            <p>Supera trampas impredecibles y niveles enganiosos desde su propia pagina dedicada.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="rocket-goal.html">
-        <div class="cover">
-          <img src="rocketgoal-io_16x9-cover.webp" alt="Rocket Goal">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Rocket Goal</strong>
-          <p>Conduce, golpea la pelota y marca goles en una arena de coches con cohetes.</p>
-        </div>
-      </a>
+        <a class="game-card" href="rocket-goal.html">
+          <div class="cover">
+            <img src="rocketgoal-io_16x9-cover.webp" alt="Rocket Goal">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Rocket Goal</strong>
+            <p>Conduce, golpea la pelota y marca goles en una arena de coches con cohetes.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="stacktris.html">
-        <div class="cover">
-          <img src="stacktris.png" alt="Stacktris">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Stacktris</strong>
-          <p>Apila piezas con precisión y evita que todo se venga abajo en este reto de equilibrio.</p>
-        </div>
-      </a>
+        <a class="game-card" href="stacktris.html">
+          <div class="cover">
+            <img src="stacktris.png" alt="Stacktris">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Stacktris</strong>
+            <p>Apila piezas con precision y evita que todo se venga abajo en este reto de equilibrio.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="drive-mad.html">
-        <div class="cover">
-          <img src="drive.jpg" alt="Drive Mad">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Drive Mad</strong>
-          <p>Supera puentes, saltos y vehículos imposibles en un reto de conducción basado en física.</p>
-        </div>
-      </a>
+        <a class="game-card" href="drive-mad.html">
+          <div class="cover">
+            <img src="drive.jpg" alt="Drive Mad">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Drive Mad</strong>
+            <p>Supera puentes, saltos y vehiculos imposibles en un reto de conduccion basado en fisica.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="subway-surfers.html">
-        <div class="cover">
-          <img src="subway.jpeg" alt="Subway Surfers">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Subway Surfers</strong>
-          <p>Corre sin parar, esquiva trenes y recoge monedas en una de las carreras endless más clásicas.</p>
-        </div>
-      </a>
+        <a class="game-card" href="subway-surfers.html">
+          <div class="cover">
+            <img src="subway.jpeg" alt="Subway Surfers">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Subway Surfers</strong>
+            <p>Corre sin parar, esquiva trenes y recoge monedas en una de las carreras endless mas clasicas.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="red-ball.html">
-        <div class="cover">
-          <img src="redball.webp" alt="Red Ball">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Red Ball</strong>
-          <p>Rueda, salta y supera obstáculos con esta aventura clásica ahora integrada en el portal.</p>
-        </div>
-      </a>
+        <a class="game-card" href="red-ball.html">
+          <div class="cover">
+            <img src="redball.webp" alt="Red Ball">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Red Ball</strong>
+            <p>Rueda, salta y supera obstaculos con esta aventura clasica ahora integrada en el portal.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="snow-rider.html">
-        <div class="cover">
-          <img src="snow-rider-3d.webp" alt="Snow Rider">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Snow Rider</strong>
-          <p>Baja a toda velocidad por la nieve, esquiva obstáculos y aguanta lo más posible en cada carrera.</p>
-        </div>
-      </a>
+        <a class="game-card" href="snow-rider.html">
+          <div class="cover">
+            <img src="snow-rider-3d.webp" alt="Snow Rider">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Snow Rider</strong>
+            <p>Baja a toda velocidad por la nieve, esquiva obstaculos y aguanta lo mas posible en cada carrera.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="Bitcoin Clicker.html">
-        <div class="cover">
-          <img src="bitcoin.jpg" alt="Bitcoin Clicker">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Bitcoin Clicker</strong>
-          <p>Haz clic, acumula bitcoins y sigue creciendo en este idle game integrado al portal.</p>
-        </div>
-      </a>
+        <a class="game-card" href="Bitcoin Clicker.html">
+          <div class="cover">
+            <img src="bitcoin.jpg" alt="Bitcoin Clicker">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Bitcoin Clicker</strong>
+            <p>Haz clic, acumula bitcoins y sigue creciendo en este idle game integrado al portal.</p>
+          </div>
+        </a>
 
+        <a class="game-card" href="Funkin-HTML-Port-main/index.html">
+          <div class="cover">
+            <img src="Funkin-HTML-Port-main/favicon.png" alt="Friday Night Funkin">
+          </div>
+          <div class="content">
+            <span>Disponible</span>
+            <strong>Friday Night Funkin</strong>
+            <p>Sigue el ritmo, encadena notas y juega Friday Night Funkin desde su propia pagina dedicada.</p>
+          </div>
+        </a>
 
-      <a class="game-card" href="Funkin-HTML-Port-main/index.html">
-        <div class="cover">
-          <img src="Funkin-HTML-Port-main/favicon.png" alt="Friday Night Funkin">
-        </div>
-        <div class="content">
-          <span>Disponible</span>
-          <strong>Friday Night Funkin</strong>
-          <p>Sigue el ritmo, encadena notas y juega Friday Night Funkin desde su propia página dedicada.</p>
-        </div>
-      </a>
-
-      <a class="game-card" href="cookie-legacy.html">
-        <div class="cover">
-          <img src="perfectCookie.png" alt="Cookie Clicker Legacy Edition">
-        </div>
-        <div class="content">
-          <span>Alternativa</span>
-          <strong>Cookie Clicker Legacy Edition</strong>
-          <p>Úsala si la versión nueva te da problemas con los saves. Es más antigua y menos recomendada.</p>
-        </div>
-      </a>
+        <a class="game-card" href="cookie-legacy.html">
+          <div class="cover">
+            <img src="perfectCookie.png" alt="Cookie Clicker Legacy Edition">
+          </div>
+          <div class="content">
+            <span>Alternativa</span>
+            <strong>Cookie Clicker Legacy Edition</strong>
+            <p>Usala si la version nueva te da problemas con los saves. Es mas antigua y menos recomendada.</p>
+          </div>
+        </a>
+      </section>
     </section>
 
     <div class="suggestions-cta">
-      <a class="suggestions-link" href="https://forms.gle/3XU8Xru3nzKBtPhYA" target="_blank" rel="noreferrer">¡Envía tus sugerencias a Budsin!</a>
+      <a class="suggestions-link" href="https://forms.gle/3XU8Xru3nzKBtPhYA" target="_blank" rel="noreferrer">Envia tus sugerencias a Budsin</a>
     </div>
   </main>
 
@@ -519,6 +869,7 @@
       }
     });
   </script>
-</body>
+  <script src="site-theme.js"></script>
   <script src="classroom-hotkey.js"></script>
+</body>
 </html>
