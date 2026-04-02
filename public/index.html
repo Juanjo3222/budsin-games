@@ -1147,13 +1147,19 @@
 
     try {
       const seenVersion = localStorage.getItem(STORAGE_KEY);
-      if (seenVersion !== SITE_VERSION) {
+      if (ENABLE_CHANGELOG_POPUP && seenVersion !== SITE_VERSION) {
         popup.classList.add("is-visible");
         popup.setAttribute("aria-hidden", "false");
       }
     } catch (error) {
-      popup.classList.add("is-visible");
-      popup.setAttribute("aria-hidden", "false");
+      if (ENABLE_CHANGELOG_POPUP) {
+        popup.classList.add("is-visible");
+        popup.setAttribute("aria-hidden", "false");
+      }
+    }
+
+    if (closeButton) {
+      closeButton.addEventListener("click", closeChangelog);
     }
 
     if (closeButton) {
