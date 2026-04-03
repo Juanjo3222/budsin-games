@@ -307,14 +307,28 @@
     fullscreenHotkeyFocusInterval = null;
   }
 
-  function syncFullscreenHotkeyFocusLoop() {
+  function shouldForceHotkeyFocus() {
     var fullscreenElement = getFullscreenElement();
     var isGameIframeFullscreen = fullscreenElement &&
       fullscreenElement.tagName &&
       fullscreenElement.tagName.toLowerCase() === "iframe" &&
       fullscreenElement.id !== frameId;
 
-    if (!isGameIframeFullscreen) {
+    if (isGameIframeFullscreen) {
+      return true;
+    }
+
+    var activeElement = document.activeElement;
+    var isGameIframeActive = activeElement &&
+      activeElement.tagName &&
+      activeElement.tagName.toLowerCase() === "iframe" &&
+      activeElement.id !== frameId;
+
+    return !!isGameIframeActive;
+  }
+
+  function syncFullscreenHotkeyFocusLoop() {
+    if (!shouldForceHotkeyFocus()) {
       clearFullscreenHotkeyFocusLoop();
       return;
     }
@@ -323,6 +337,11 @@
 
     if (!fullscreenHotkeyFocusInterval) {
       fullscreenHotkeyFocusInterval = window.setInterval(function () {
+        if (!shouldForceHotkeyFocus()) {
+          clearFullscreenHotkeyFocusLoop();
+          return;
+        }
+
         recoverPageHotkeyFocus();
       }, 350);
     }
@@ -403,6 +422,8 @@
   }
 
   window.addEventListener("keydown", handleHotkeyKeydown, true);
+  window.addEventListener("focus", syncFullscreenHotkeyFocusLoop, true);
+  document.addEventListener("focusin", syncFullscreenHotkeyFocusLoop, true);
   document.addEventListener("fullscreenchange", syncFullscreenHotkeyFocusLoop);
   document.addEventListener("webkitfullscreenchange", syncFullscreenHotkeyFocusLoop);
   window.addEventListener("juanjo:toggle-classroom", function () {
