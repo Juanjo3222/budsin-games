@@ -303,6 +303,7 @@
       text-decoration: none;
       box-shadow: var(--shadow-soft);
       transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      will-change: transform;
     }
 
     .game-card::before {
@@ -322,6 +323,10 @@
       transform: translateY(-8px) scale(1.01);
       border-color: rgba(45, 174, 255, 0.28);
       box-shadow: 0 26px 44px rgba(15, 23, 42, 0.14);
+    }
+
+    .game-card.is-reordering {
+      transition: transform 0.42s cubic-bezier(.2, .9, .2, 1), box-shadow 0.22s ease, border-color 0.22s ease;
     }
 
     .game-card:nth-child(1) {
@@ -944,6 +949,7 @@
     const searchInput = document.getElementById("gameSearch");
     const typeFilters = document.getElementById("typeFilters");
     const cards = Array.from(document.querySelectorAll(".game-card"));
+    const gamesGrid = document.getElementById("gamesGrid");
     const noResults = document.getElementById("noResults");
     const resultsCount = document.getElementById("resultsCount");
     const favoritesList = document.getElementById("favoritesList");
@@ -954,6 +960,8 @@
     let popularityState = readJson(POPULARITY_KEY, {});
     let firebaseDb = null;
     let firebaseEnabled = false;
+    let rankingReady = false;
+    const defaultCardOrder = new Map(cards.map((card, index) => [card.getAttribute("href"), index]));
 
     function logFirebase(message, error) {
       if (error) {
@@ -1009,7 +1017,7 @@
 
     async function loadRemotePopularity() {
       if (!firebaseEnabled || !firebaseDb) {
-        return;
+        return false;
       }
 
       try {
@@ -1025,8 +1033,11 @@
         popularityState = remotePopularity;
         writeJson(POPULARITY_KEY, popularityState);
         logFirebase(`Popularidad remota cargada (${Object.keys(remotePopularity).length} docs).`);
+        rankingReady = true;
+        return true;
       } catch (error) {
         logFirebase("Error cargando popularidad remota.", error);
+        return false;
       }
     }
 
@@ -1055,6 +1066,66 @@
       if (!appTransition) return;
       appTransition.classList.remove("is-open");
       appTransition.setAttribute("aria-hidden", "true");
+    }
+
+    function captureCardRects() {
+      const rects = new Map();
+      cards.forEach((card) => {
+        if (!card.classList.contains("hidden-card")) {
+          rects.set(card, card.getBoundingClientRect());
+        }
+      });
+      return rects;
+    }
+
+    function animateCardReorder(previousRects) {
+      cards.forEach((card) => {
+        const first = previousRects.get(card);
+        if (!first || card.classList.contains("hidden-card")) return;
+        const last = card.getBoundingClientRect();
+        const dx = first.left - last.left;
+        const dy = first.top - last.top;
+        if (!dx && !dy) return;
+
+        card.classList.add("is-reordering");
+        card.style.transition = "none";
+        card.style.transform = `translate(${dx}px, ${dy}px)`;
+        card.getBoundingClientRect();
+        card.style.transition = "";
+        card.style.transform = "";
+      });
+
+      window.setTimeout(() => {
+        cards.forEach((card) => {
+          card.classList.remove("is-reordering");
+        });
+      }, 480);
+    }
+
+    function sortGamesByRanking(withAnimation) {
+      if (!gamesGrid) return;
+
+      const previousRects = withAnimation ? captureCardRects() : null;
+      const sortedCards = cards.slice().sort((cardA, cardB) => {
+        const hrefA = cardA.getAttribute("href");
+        const hrefB = cardB.getAttribute("href");
+
+        if (!rankingReady) {
+          return (defaultCardOrder.get(hrefA) || 0) - (defaultCardOrder.get(hrefB) || 0);
+        }
+
+        const scoreA = Number(popularityState[hrefA] || 0);
+        const scoreB = Number(popularityState[hrefB] || 0);
+        if (scoreA !== scoreB) {
+          return scoreB - scoreA;
+        }
+        return (defaultCardOrder.get(hrefA) || 0) - (defaultCardOrder.get(hrefB) || 0);
+      });
+
+      sortedCards.forEach((card) => gamesGrid.appendChild(card));
+      if (withAnimation && previousRects) {
+        animateCardReorder(previousRects);
+      }
     }
 
     async function incrementRemotePopularity(href, gameName, amount) {
@@ -1172,6 +1243,7 @@
 
       resultsCount.textContent = `${visibleCount} juegos`;
       noResults.style.display = visibleCount ? "none" : "block";
+      sortGamesByRanking(false);
     }
 
     function openAppTransition(url) {
@@ -1262,10 +1334,17 @@
     initFirebase();
 
     (async function initializePopularity() {
-      await loadRemotePopularity();
+      renderShelves();
+      applyFilters();
+      sortGamesByRanking(false);
+
+      const loadedRemote = await loadRemotePopularity();
       await flushPendingRemoteIncrements();
       renderShelves();
       applyFilters();
+      if (loadedRemote) {
+        sortGamesByRanking(true);
+      }
     })();
   </script>
   <script src="site-theme.js"></script>

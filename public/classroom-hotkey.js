@@ -5,6 +5,7 @@
   var overlayId = "juanjo-classroom-overlay";
   var frameId = "juanjo-classroom-frame";
   var closeId = "juanjo-classroom-close";
+  var quickToggleId = "juanjo-classroom-quick-toggle";
   var loadedFlag = "data-loaded";
   var originalTitle = document.title;
   var disguisedTitle = "Google Docs";
@@ -63,6 +64,27 @@
       "backdrop-filter:blur(8px);" +
       "}" +
       "#" + closeId + ":hover{" +
+      "background:rgba(30,41,59,.92);" +
+      "}" +
+      "#" + quickToggleId + "{" +
+      "position:fixed;" +
+      "left:14px;" +
+      "bottom:14px;" +
+      "z-index:1000001;" +
+      "min-height:40px;" +
+      "padding:0 14px;" +
+      "border:0;" +
+      "border-radius:999px;" +
+      "background:rgba(15,23,42,.82);" +
+      "color:#fff;" +
+      "font:700 12px/1 Arial,sans-serif;" +
+      "cursor:pointer;" +
+      "display:inline-flex;" +
+      "align-items:center;" +
+      "justify-content:center;" +
+      "backdrop-filter:blur(8px);" +
+      "}" +
+      "#" + quickToggleId + ":hover{" +
       "background:rgba(30,41,59,.92);" +
       "}" +
       "body.juanjo-classroom-open{" +
@@ -217,6 +239,67 @@
     applyOverlayState(overlay, willOpen);
   }
 
+  function ensureQuickToggleButton() {
+    if (document.getElementById(quickToggleId)) {
+      return;
+    }
+
+    var button = document.createElement("button");
+    button.id = quickToggleId;
+    button.type = "button";
+    button.textContent = "Ocultar";
+    button.setAttribute("aria-label", "Activar modo ocultar");
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleClassroom();
+    });
+
+    document.body.appendChild(button);
+  }
+
+  function attachHotkeyToIframe(iframe) {
+    if (!iframe || iframe.__juanjoHotkeyBound) {
+      return;
+    }
+
+    function onFrameKeydown(event) {
+      if (event.defaultPrevented || shouldIgnoreTarget(event.target)) {
+        return;
+      }
+
+      if (isToggleHotkey(event)) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleClassroom();
+      }
+    }
+
+    function bindNow() {
+      try {
+        if (!iframe.contentWindow || !iframe.contentDocument) {
+          return;
+        }
+
+        iframe.contentWindow.addEventListener("keydown", onFrameKeydown, true);
+        iframe.contentDocument.addEventListener("keydown", onFrameKeydown, true);
+        iframe.__juanjoHotkeyBound = true;
+      } catch (error) {
+        iframe.__juanjoHotkeyBound = true;
+      }
+    }
+
+    iframe.addEventListener("load", bindNow);
+    bindNow();
+  }
+
+  function bindIframeHotkeys() {
+    var iframes = document.getElementsByTagName("iframe");
+    for (var i = 0; i < iframes.length; i += 1) {
+      attachHotkeyToIframe(iframes[i]);
+    }
+  }
+
   function isToggleHotkey(event) {
     var key = event.key || "";
     var code = event.code || "";
@@ -246,4 +329,7 @@
   window.addEventListener("juanjo:toggle-classroom", function () {
     toggleClassroom();
   });
+  createOverlay();
+  ensureQuickToggleButton();
+  bindIframeHotkeys();
 })();
