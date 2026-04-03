@@ -303,6 +303,7 @@
       text-decoration: none;
       box-shadow: var(--shadow-soft);
       transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      will-change: transform;
     }
 
     .game-card::before {
@@ -322,6 +323,10 @@
       transform: translateY(-8px) scale(1.01);
       border-color: rgba(45, 174, 255, 0.28);
       box-shadow: 0 26px 44px rgba(15, 23, 42, 0.14);
+    }
+
+    .game-card.is-reordering {
+      transition: transform 0.42s cubic-bezier(.2, .9, .2, 1), box-shadow 0.22s ease, border-color 0.22s ease;
     }
 
     .game-card:nth-child(1) {
@@ -392,49 +397,261 @@
       font-size: 0.92rem;
     }
 
-    .changelog-popup {
+
+    .library-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(220px, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: var(--surface-strong);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .search-wrap input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      font: inherit;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--surface-strong);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .chip.active {
+      background: var(--accent);
+      color: var(--surface-strong);
+      border-color: var(--accent);
+    }
+
+    .shelves {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .shelf {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--surface);
+      padding: 14px;
+    }
+
+    .shelf h3 {
+      margin: 0 0 8px;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: .04em;
+    }
+
+    .shelf-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .shelf-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: .9rem;
+      color: var(--muted);
+    }
+
+    .games-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 8px;
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    .favorite-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 3;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(17,24,39,.7);
+      color: var(--surface-strong);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .favorite-btn.is-favorite {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+    }
+
+    .game-card .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .category-tag {
+      background: rgba(45, 174, 255, 0.14);
+      color: var(--blue);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .players {
+      font-weight: 700;
+    }
+
+    .hidden-card {
+      display: none !important;
+    }
+
+    .no-results {
+      display: none;
+      border-radius: 16px;
+      border: 1px dashed var(--line);
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .app-transition {
       position: fixed;
       inset: 0;
-      z-index: 50;
+      z-index: 60;
+      display: grid;
+      place-items: center;
+      background: rgba(11,18,32,.8);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+    }
+
+    .app-transition.is-open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .loader-dot {
+      width: 64px;
+      height: 64px;
+      border-radius: 999px;
+      border: 4px solid rgba(255,255,255,.24);
+      border-top-color: var(--surface-strong);
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    html[data-site-theme="dark"] .search-wrap,
+    html[data-site-theme="dark"] .chip,
+    html[data-site-theme="dark"] .shelf {
+      background: rgba(9, 15, 28, 0.92);
+      border-color: rgba(148, 163, 184, 0.28);
+      color: var(--text);
+    }
+
+    html[data-site-theme="dark"] .chip.active {
+      color: #03111f;
+    }
+
+    html[data-site-theme="dark"] .category-tag {
+      background: rgba(99, 212, 255, 0.18);
+      color: #93dcff;
+    }
+
+    html[data-site-theme="dark"] .favorite-btn {
+      background: rgba(4, 10, 20, 0.82);
+      border-color: rgba(148, 163, 184, 0.36);
+    }
+
+    html[data-site-theme="dark"] .app-transition {
+      background: rgba(3, 8, 18, 0.82);
+    }
+
+    .changelog-popup {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 95;
       display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(15, 23, 42, 0.38);
-      backdrop-filter: blur(12px);
+      pointer-events: none;
     }
 
     .changelog-popup.is-visible {
-      display: flex;
+      display: block;
     }
 
     .changelog-card {
-      width: min(580px, 100%);
-      padding: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.85);
-      border-radius: 34px;
-      background: rgba(255, 255, 255, 0.96);
+      width: min(420px, calc(100vw - 36px));
+      padding: 18px 18px 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface-strong);
       box-shadow: var(--shadow);
+      pointer-events: auto;
+      position: relative;
     }
 
     .changelog-card span {
       display: inline-flex;
-      margin-bottom: 14px;
-      padding: 7px 12px;
+      margin-bottom: 10px;
+      padding: 6px 10px;
       border-radius: 999px;
       background: rgba(239, 63, 69, 0.1);
       color: var(--red);
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
     .changelog-card h2 {
-      margin: 0 0 10px;
+      margin: 0 0 8px;
       font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: clamp(1.5rem, 4vw, 2rem);
       letter-spacing: 0.03em;
+      padding-right: 34px;
     }
 
     .changelog-card p {
@@ -444,15 +661,11 @@
     }
 
     .changelog-list {
-      margin: 0 0 22px;
+      margin: 0;
       padding-left: 18px;
       color: var(--text);
-      line-height: 1.8;
-    }
-
-    .changelog-actions {
-      display: flex;
-      justify-content: flex-end;
+      line-height: 1.55;
+      font-size: 0.9rem;
     }
 
     .changelog-close,
@@ -472,9 +685,17 @@
     }
 
     .changelog-close {
-      background: linear-gradient(135deg, #111827, #1f2937);
-      color: #fff;
-      box-shadow: var(--shadow-soft);
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      min-height: 30px;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border-radius: 999px;
+      background: rgba(17, 24, 39, 0.08);
+      color: var(--text);
+      box-shadow: none;
     }
 
     .suggestions-cta {
@@ -527,6 +748,10 @@
       .games {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      .library-tools {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 680px) {
@@ -539,6 +764,11 @@
       .changelog-card {
         padding: 20px;
         border-radius: 28px;
+      }
+
+      .changelog-popup {
+        top: 10px;
+        left: 10px;
       }
 
       .games {
@@ -566,7 +796,8 @@
 </head>
 <body>
   <div id="changelogPopup" class="changelog-popup" aria-hidden="true">
-    <div class="changelog-card" role="dialog" aria-modal="true" aria-labelledby="changelogTitle">
+    <div class="changelog-card" role="status" aria-live="polite" aria-labelledby="changelogTitle">
+      <button id="closeChangelog" class="changelog-close" type="button" aria-label="Cerrar notificación">×</button>
       <span>Version 4.0.0</span>
       <h2 id="changelogTitle">Novedades de Budsin Games</h2>
       <p>Este popup solo aparece una vez por versión o la primera vez que entras al sitio.</p>
@@ -575,10 +806,11 @@
         <li>Se añadió Bitcoin Clicker al catálogo con su propia página dedicada.</li>
         <li>Se añadió Friday Night Funkin al catálogo con su propia página dedicada.</li>
       </ul>
-      <div class="changelog-actions">
-        <button id="closeChangelog" class="changelog-close" type="button">Entendido</button>
-      </div>
     </div>
+  </div>
+
+  <div id="appTransition" class="app-transition" aria-hidden="true">
+    <div class="loader-dot" aria-label="Cargando"></div>
   </div>
 
   <main class="shell">
@@ -622,282 +854,69 @@
         </div>
       </div>
 
-      <section class="games">
-        <a class="game-card" href="1.12.html">
-          <div class="cover">
-            <img src="Minecraft-1.12.2-Official.jpg" alt="Minecraft 1.12.2">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Minecraft 1.12.2</strong>
-            <p>Explora libremente desde el navegador. Esta edicion no incluye multijugador.</p>
-          </div>
-        </a>
+      <div class="library-tools">
+        <label class="search-wrap" for="gameSearch">
+          <span>🔎</span>
+          <input id="gameSearch" type="search" placeholder="Buscar juego por nombre..." autocomplete="off">
+        </label>
+        <div class="chips" id="typeFilters">
+          <button type="button" class="chip active" data-type="all">Todos</button>
+          <button type="button" class="chip" data-type="clicker">Clicker</button>
+          <button type="button" class="chip" data-type="action">Acción</button>
+          <button type="button" class="chip" data-type="multiplayer">Multiplayer</button>
+          <button type="button" class="chip" data-type="idle">Idle</button>
+          <button type="button" class="chip" data-type="classic">Clásicos</button>
+        </div>
+      </div>
 
-        <a class="game-card" href="1.8.html">
-          <div class="cover">
-            <img src="Snapshot18-1.jpg" alt="Minecraft 1.8">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Minecraft 1.8</strong>
-            <p>La version recomendada para jugar con multijugador.</p>
-          </div>
-        </a>
+      <div class="shelves">
+        <section class="shelf">
+          <h3>🔥 Más jugados</h3>
+          <ul id="popularList" class="shelf-list">
+            <li><span>Cargando ranking...</span><span>—</span></li>
+          </ul>
+        </section>
+        <section class="shelf" id="favoritesShelf">
+          <h3>🎮 Tus juegos</h3>
+          <ul id="favoritesList" class="shelf-list">
+            <li><span>Aún no tienes favoritos.</span><span>—</span></li>
+          </ul>
+        </section>
+      </div>
 
-        <a class="game-card" href="1.21.x.html">
-          <div class="cover">
-            <img src="1.21.11.jpeg" alt="Minecraft 1.21.x">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Minecraft 1.21.x</strong>
-            <p>Cliente nuevo para explorar desde el navegador en su propia pagina dedicada.</p>
-          </div>
-        </a>
+      <div class="games-heading">
+        <span>Categorías visibles: Acción · Idle · Multiplayer · Clásicos</span>
+        <span id="resultsCount"></span>
+      </div>
 
-        <a class="game-card" href="cookie/index.html">
-          <div class="cover">
-            <img src="perfectCookie.png" alt="Cookie Clicker">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Cookie Clicker</strong>
-            <p>La version mas recomendada para jugar y hornear sin parar.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="geometry-dash.html">
-          <div class="cover">
-            <img src="geometry.jpeg" alt="Geometry Dash">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Geometry Dash</strong>
-            <p>Ritmo, reflejos y saltos al limite en su pagina dedicada.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="hollow-knight.html">
-          <div class="cover">
-            <img src="hollow.avif" alt="Hollow Knight">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Hollow Knight</strong>
-            <p>Explora Hallownest desde su propia pagina con carga dedicada del juego.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="eggy-car.html">
-          <div class="cover">
-            <img src="eggy.jpeg" alt="Eggy Car">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Eggy Car</strong>
-            <p>Manten el equilibrio, conduce con cuidado y llega lo mas lejos posible sin romper el huevo.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="fireboy-watergirl-1.html">
-          <div class="cover">
-            <img src="Fireboy-Watergirl-ForestTemple_OG-logo.jpg" alt="Fireboy And Watergirl 1">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Fireboy And Watergirl 1</strong>
-            <p>Juega cooperativo clasico en el Templo del Bosque desde su propia pagina dedicada.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="among-us.html">
-          <div class="cover">
-            <img src="among.avif" alt="Among Us">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Among Us</strong>
-            <p>Encuentra al impostor o sabotea a la tripulacion desde su pagina dedicada.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="level-devil.html">
-          <div class="cover">
-            <img src="level devil.jpeg" alt="Level Devil">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Level Devil</strong>
-            <p>Supera trampas impredecibles y niveles enganiosos desde su propia pagina dedicada.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="rocket-goal.html">
-          <div class="cover">
-            <img src="rocketgoal-io_16x9-cover.webp" alt="Rocket Goal">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Rocket Goal</strong>
-            <p>Conduce, golpea la pelota y marca goles en una arena de coches con cohetes.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="stacktris.html">
-          <div class="cover">
-            <img src="stacktris.png" alt="Stacktris">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Stacktris</strong>
-            <p>Apila piezas con precision y evita que todo se venga abajo en este reto de equilibrio.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="drive-mad.html">
-          <div class="cover">
-            <img src="drive.jpg" alt="Drive Mad">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Drive Mad</strong>
-            <p>Supera puentes, saltos y vehiculos imposibles en un reto de conduccion basado en fisica.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="subway-surfers.html">
-          <div class="cover">
-            <img src="subway.jpeg" alt="Subway Surfers">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Subway Surfers</strong>
-            <p>Corre sin parar, esquiva trenes y recoge monedas en una de las carreras endless mas clasicas.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="red-ball.html">
-          <div class="cover">
-            <img src="redball.webp" alt="Red Ball">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Red Ball</strong>
-            <p>Rueda, salta y supera obstaculos con esta aventura clasica ahora integrada en el portal.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="snow-rider.html">
-          <div class="cover">
-            <img src="snow-rider-3d.webp" alt="Snow Rider">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Snow Rider</strong>
-            <p>Baja a toda velocidad por la nieve, esquiva obstaculos y aguanta lo mas posible en cada carrera.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="Bitcoin Clicker.html">
-          <div class="cover">
-            <img src="bitcoin.jpg" alt="Bitcoin Clicker">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Bitcoin Clicker</strong>
-            <p>Haz clic, acumula bitcoins y sigue creciendo en este idle game integrado al portal.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="Funkin-HTML-Port-main/index.html">
-          <div class="cover">
-            <img src="Funkin-HTML-Port-main/favicon.png" alt="Friday Night Funkin">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Friday Night Funkin</strong>
-            <p>Sigue el ritmo, encadena notas y juega Friday Night Funkin desde su propia pagina dedicada.</p>
-          </div>
-        </a>
-
-
-        <a class="game-card" href="dumb.html">
-          <div class="cover">
-            <img src="dumb-ways-to-die-zvhqg.png" alt="Dumb Ways to Die">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Dumb Ways to Die</strong>
-            <p>Supera minijuegos absurdos y rapidísimos mientras intentas no morir de formas ridículas.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="solar.html">
-          <div class="cover">
-            <img src="solarsmash.jpg" alt="Solar Smash">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Solar Smash</strong>
-            <p>Haz explotar planetas, prueba armas imposibles y experimenta con el caos del espacio.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="stickman-hook.html">
-          <div class="cover">
-            <img src="stickhook.jpeg" alt="Stickman Hook">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Stickman Hook</strong>
-            <p>Lanza la cuerda, balancéate con ritmo y encadena saltos para llegar al final de cada nivel.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="superhot.html">
-          <div class="cover">
-            <img src="superhot.avif" alt="SuperHot">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>SuperHot</strong>
-            <p>Piensa cada paso en un shooter donde el tiempo solo avanza cuando tú te mueves.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="wbwwb.html">
-          <div class="cover">
-            <img src="webecome.webp" alt="We Become What We Behold">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>We Become What We Behold</strong>
-            <p>Observa, fotografía y altera la multitud en esta sátira breve, extraña e inquietante.</p>
-          </div>
-        </a>
-
-        <a class="game-card" href="vex7.html">
-          <div class="cover">
-            <img src="Vex7_OG-logo.jpg" alt="Vex 7">
-          </div>
-          <div class="content">
-            <span>Disponible</span>
-            <strong>Vex 7</strong>
-            <p>Corre, salta y supera trampas precisas en una de las entregas más intensas de Vex.</p>
-          </div>
-        </a>
-        <a class="game-card" href="cookie-legacy.html">
-          <div class="cover">
-            <img src="perfectCookie.png" alt="Cookie Clicker Legacy Edition">
-          </div>
-          <div class="content">
-            <span>Alternativa</span>
-            <strong>Cookie Clicker Legacy Edition</strong>
-            <p>Usala si la version nueva te da problemas con los saves. Es mas antigua y menos recomendada.</p>
-          </div>
-        </a>
+      <section class="games" id="gamesGrid">
+        <a class="game-card" href="1.12.html" data-name="minecraft 1.12.2" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="Minecraft-1.12.2-Official.jpg" alt="Minecraft 1.12.2"></div><div class="content"><span>Disponible</span><strong>Minecraft 1.12.2</strong><p>Explora libremente desde el navegador. Esta edicion no incluye multijugador.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="1.8.html" data-name="minecraft 1.8" data-type="multiplayer action" data-category="Multiplayer"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="Snapshot18-1.jpg" alt="Minecraft 1.8"></div><div class="content"><span>Disponible</span><strong>Minecraft 1.8</strong><p>La version recomendada para jugar con multijugador.</p><div class="meta-row"><span class="category-tag">Multiplayer</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="1.21.x.html" data-name="minecraft 1.21.x" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="1.21.11.jpeg" alt="Minecraft 1.21.x"></div><div class="content"><span>Disponible</span><strong>Minecraft 1.21.x</strong><p>Cliente nuevo para explorar desde el navegador en su propia pagina dedicada.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="cookie/index.html" data-name="cookie clicker" data-type="clicker idle" data-category="Idle"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="perfectCookie.png" alt="Cookie Clicker"></div><div class="content"><span>Disponible</span><strong>Cookie Clicker</strong><p>La version mas recomendada para jugar y hornear sin parar.</p><div class="meta-row"><span class="category-tag">Idle</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="geometry-dash.html" data-name="geometry dash" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="geometry.jpeg" alt="Geometry Dash"></div><div class="content"><span>Disponible</span><strong>Geometry Dash</strong><p>Ritmo, reflejos y saltos al limite en su pagina dedicada.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="hollow-knight.html" data-name="hollow knight" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="hollow.avif" alt="Hollow Knight"></div><div class="content"><span>Disponible</span><strong>Hollow Knight</strong><p>Explora Hallownest desde su propia pagina con carga dedicada del juego.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="eggy-car.html" data-name="eggy car" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="eggy.jpeg" alt="Eggy Car"></div><div class="content"><span>Disponible</span><strong>Eggy Car</strong><p>Manten el equilibrio y llega lo mas lejos posible sin romper el huevo.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="fireboy-watergirl-1.html" data-name="fireboy and watergirl 1" data-type="multiplayer action" data-category="Multiplayer"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="Fireboy-Watergirl-ForestTemple_OG-logo.jpg" alt="Fireboy And Watergirl 1"></div><div class="content"><span>Disponible</span><strong>Fireboy And Watergirl 1</strong><p>Juega cooperativo clasico en el Templo del Bosque.</p><div class="meta-row"><span class="category-tag">Multiplayer</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="among-us.html" data-name="among us" data-type="multiplayer action" data-category="Multiplayer"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="among.avif" alt="Among Us"></div><div class="content"><span>Disponible</span><strong>Among Us</strong><p>Encuentra al impostor o sabotea a la tripulacion.</p><div class="meta-row"><span class="category-tag">Multiplayer</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="level-devil.html" data-name="level devil" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="level devil.jpeg" alt="Level Devil"></div><div class="content"><span>Disponible</span><strong>Level Devil</strong><p>Supera trampas impredecibles y niveles engañosos.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="rocket-goal.html" data-name="rocket goal" data-type="multiplayer action" data-category="Multiplayer"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="rocketgoal-io_16x9-cover.webp" alt="Rocket Goal"></div><div class="content"><span>Disponible</span><strong>Rocket Goal</strong><p>Conduce y marca goles en una arena de coches con cohetes.</p><div class="meta-row"><span class="category-tag">Multiplayer</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="stacktris.html" data-name="stacktris" data-type="classic" data-category="Clásicos"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="stacktris.png" alt="Stacktris"></div><div class="content"><span>Disponible</span><strong>Stacktris</strong><p>Apila piezas con precision y evita que todo se venga abajo.</p><div class="meta-row"><span class="category-tag">Clásicos</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="drive-mad.html" data-name="drive mad" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="drive.jpg" alt="Drive Mad"></div><div class="content"><span>Disponible</span><strong>Drive Mad</strong><p>Supera puentes, saltos y vehiculos imposibles.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="subway-surfers.html" data-name="subway surfers" data-type="classic action" data-category="Clásicos"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="subway.jpeg" alt="Subway Surfers"></div><div class="content"><span>Disponible</span><strong>Subway Surfers</strong><p>Corre sin parar, esquiva trenes y recoge monedas.</p><div class="meta-row"><span class="category-tag">Clásicos</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="red-ball.html" data-name="red ball" data-type="classic action" data-category="Clásicos"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="redball.webp" alt="Red Ball"></div><div class="content"><span>Disponible</span><strong>Red Ball</strong><p>Rueda, salta y supera obstaculos en esta aventura clasica.</p><div class="meta-row"><span class="category-tag">Clásicos</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="snow-rider.html" data-name="snow rider" data-type="classic" data-category="Clásicos"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="snow-rider-3d.webp" alt="Snow Rider"></div><div class="content"><span>Disponible</span><strong>Snow Rider</strong><p>Baja a toda velocidad por la nieve y esquiva obstaculos.</p><div class="meta-row"><span class="category-tag">Clásicos</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="Bitcoin Clicker.html" data-name="bitcoin clicker" data-type="clicker idle" data-category="Idle"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="bitcoin.jpg" alt="Bitcoin Clicker"></div><div class="content"><span>Disponible</span><strong>Bitcoin Clicker</strong><p>Haz clic, acumula bitcoins y sigue creciendo.</p><div class="meta-row"><span class="category-tag">Idle</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="Funkin-HTML-Port-main/index.html" data-name="friday night funkin" data-type="action classic" data-category="Clásicos"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="Funkin-HTML-Port-main/favicon.png" alt="Friday Night Funkin"></div><div class="content"><span>Disponible</span><strong>Friday Night Funkin</strong><p>Sigue el ritmo y encadena notas en su pagina dedicada.</p><div class="meta-row"><span class="category-tag">Clásicos</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="dumb.html" data-name="dumb ways to die" data-type="classic" data-category="Clásicos"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="dumb-ways-to-die-zvhqg.png" alt="Dumb Ways to Die"></div><div class="content"><span>Disponible</span><strong>Dumb Ways to Die</strong><p>Supera minijuegos absurdos y rapidísimos.</p><div class="meta-row"><span class="category-tag">Clásicos</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="solar.html" data-name="solar smash" data-type="classic" data-category="Clásicos"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="solarsmash.jpg" alt="Solar Smash"></div><div class="content"><span>Disponible</span><strong>Solar Smash</strong><p>Haz explotar planetas y prueba armas imposibles.</p><div class="meta-row"><span class="category-tag">Clásicos</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="stickman-hook.html" data-name="stickman hook" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="stickhook.jpeg" alt="Stickman Hook"></div><div class="content"><span>Disponible</span><strong>Stickman Hook</strong><p>Lanza la cuerda y encadena saltos hasta el final.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="superhot.html" data-name="superhot" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="superhot.avif" alt="SuperHot"></div><div class="content"><span>Disponible</span><strong>SuperHot</strong><p>Shooter táctico donde el tiempo avanza cuando te mueves.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="wbwwb.html" data-name="we become what we behold" data-type="classic" data-category="Clásicos"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="webecome.webp" alt="We Become What We Behold"></div><div class="content"><span>Disponible</span><strong>We Become What We Behold</strong><p>Observa y altera la multitud en esta sátira inquietante.</p><div class="meta-row"><span class="category-tag">Clásicos</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="vex7.html" data-name="vex 7" data-type="action" data-category="Acción"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="Vex7_OG-logo.jpg" alt="Vex 7"></div><div class="content"><span>Disponible</span><strong>Vex 7</strong><p>Corre, salta y supera trampas precisas.</p><div class="meta-row"><span class="category-tag">Acción</span><span class="players" data-players>🔥 0</span></div></div></a>
+        <a class="game-card" href="cookie-legacy.html" data-name="cookie clicker legacy edition" data-type="clicker idle classic" data-category="Idle"><button type="button" class="favorite-btn" aria-label="Agregar a favoritos">☆</button><div class="cover"><img src="perfectCookie.png" alt="Cookie Clicker Legacy Edition"></div><div class="content"><span>Alternativa</span><strong>Cookie Clicker Legacy Edition</strong><p>Usala si la version nueva te da problemas con los saves.</p><div class="meta-row"><span class="category-tag">Idle</span><span class="players" data-players>🔥 0</span></div></div></a>
       </section>
+      <div id="noResults" class="no-results">No encontramos juegos con ese filtro. Prueba otra búsqueda.</div>
     </section>
 
     <div class="suggestions-cta">
@@ -905,35 +924,428 @@
     </div>
   </main>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script>
-    const SITE_VERSION = "4.0.0";
+    window.BUDSIN_FIREBASE_CONFIG = window.BUDSIN_FIREBASE_CONFIG || {
+      apiKey: "AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U",
+      authDomain: "juanjo-games.firebaseapp.com",
+      projectId: "juanjo-games",
+      storageBucket: "juanjo-games.firebasestorage.app",
+      messagingSenderId: "927529249414",
+      appId: "1:927529249414:web:410a686dc7f0da25ec3f07"
+    };
+  </script>
+  <script>
+    const SITE_VERSION = "4.1.0";
     const STORAGE_KEY = "juanjos_games_seen_version";
+    const ENABLE_CHANGELOG_POPUP = true;
+    const FAVORITES_KEY = "budsin_favorites";
+    const POPULARITY_KEY = "budsin_popularity";
+    const PENDING_POPULARITY_KEY = "budsin_popularity_pending";
+    const FIREBASE_COLLECTION = "game_popularity";
     const popup = document.getElementById("changelogPopup");
     const closeButton = document.getElementById("closeChangelog");
+    const searchInput = document.getElementById("gameSearch");
+    const typeFilters = document.getElementById("typeFilters");
+    const cards = Array.from(document.querySelectorAll(".game-card"));
+    const gamesGrid = document.getElementById("gamesGrid");
+    const noResults = document.getElementById("noResults");
+    const resultsCount = document.getElementById("resultsCount");
+    const favoritesList = document.getElementById("favoritesList");
+    const popularList = document.getElementById("popularList");
+    const appTransition = document.getElementById("appTransition");
+
+    let activeType = "all";
+    let popularityState = readJson(POPULARITY_KEY, {});
+    let firebaseDb = null;
+    let firebaseEnabled = false;
+    let rankingReady = false;
+    const defaultCardOrder = new Map(cards.map((card, index) => [card.getAttribute("href"), index]));
+
+    function logFirebase(message, error) {
+      if (error) {
+        console.warn(`[Budsin Firebase] ${message}`, error);
+        return;
+      }
+      console.info(`[Budsin Firebase] ${message}`);
+    }
+
+    function removeMergeArtifactText() {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const toClear = [];
+      while (walker.nextNode()) {
+        const value = (walker.currentNode.nodeValue || "").trim();
+        if (!value) continue;
+        if (
+          value.includes("<<<<<<<") ||
+          value.includes(">>>>>>>") ||
+          value.includes("=======") ||
+          value.includes("codex/add-game-search-and-filtering-features")
+        ) {
+          toClear.push(walker.currentNode);
+        }
+      }
+
+      toClear.forEach((node) => {
+        node.nodeValue = "";
+      });
+    }
+
+    function hasFirebaseConfig(config) {
+      if (!config) return false;
+      return ["apiKey", "authDomain", "projectId", "appId"].every((key) => typeof config[key] === "string" && config[key].trim() !== "");
+    }
+
+    function initFirebase() {
+      if (!window.firebase || !hasFirebaseConfig(window.BUDSIN_FIREBASE_CONFIG)) {
+        return;
+      }
+
+      try {
+        const app = window.firebase.apps.length
+          ? window.firebase.app()
+          : window.firebase.initializeApp(window.BUDSIN_FIREBASE_CONFIG);
+        firebaseDb = app.firestore();
+        firebaseEnabled = true;
+        logFirebase("Firebase inicializado correctamente.");
+      } catch (error) {
+        firebaseEnabled = false;
+        logFirebase("No se pudo inicializar Firebase.", error);
+      }
+    }
+
+    async function loadRemotePopularity() {
+      if (!firebaseEnabled || !firebaseDb) {
+        return false;
+      }
+
+      try {
+        const snapshot = await firebaseDb.collection(FIREBASE_COLLECTION).get();
+        const remotePopularity = {};
+        snapshot.forEach((doc) => {
+          const href = decodeURIComponent(doc.id);
+          const hits = Number(doc.data().hits || 0);
+          if (hits > 0) {
+            remotePopularity[href] = hits;
+          }
+        });
+        popularityState = remotePopularity;
+        writeJson(POPULARITY_KEY, popularityState);
+        logFirebase(`Popularidad remota cargada (${Object.keys(remotePopularity).length} docs).`);
+        rankingReady = true;
+        return true;
+      } catch (error) {
+        logFirebase("Error cargando popularidad remota.", error);
+        return false;
+      }
+    }
+
+    function saveLocalPopularity() {
+      writeJson(POPULARITY_KEY, popularityState);
+    }
+
+    function readPendingPopularity() {
+      return readJson(PENDING_POPULARITY_KEY, {});
+    }
+
+    function savePendingPopularity(value) {
+      writeJson(PENDING_POPULARITY_KEY, value);
+    }
+
+    function queueRemoteIncrement(href, gameName, amount) {
+      const pending = readPendingPopularity();
+      const current = pending[href] || { name: gameName, amount: 0 };
+      current.name = gameName;
+      current.amount = Number(current.amount || 0) + Number(amount || 1);
+      pending[href] = current;
+      savePendingPopularity(pending);
+    }
+
+    function resetAppTransition() {
+      if (!appTransition) return;
+      appTransition.classList.remove("is-open");
+      appTransition.setAttribute("aria-hidden", "true");
+    }
+
+    function captureCardRects() {
+      const rects = new Map();
+      cards.forEach((card) => {
+        if (!card.classList.contains("hidden-card")) {
+          rects.set(card, card.getBoundingClientRect());
+        }
+      });
+      return rects;
+    }
+
+    function animateCardReorder(previousRects) {
+      cards.forEach((card) => {
+        const first = previousRects.get(card);
+        if (!first || card.classList.contains("hidden-card")) return;
+        const last = card.getBoundingClientRect();
+        const dx = first.left - last.left;
+        const dy = first.top - last.top;
+        if (!dx && !dy) return;
+
+        card.classList.add("is-reordering");
+        card.style.transition = "none";
+        card.style.transform = `translate(${dx}px, ${dy}px)`;
+        card.getBoundingClientRect();
+        card.style.transition = "";
+        card.style.transform = "";
+      });
+
+      window.setTimeout(() => {
+        cards.forEach((card) => {
+          card.classList.remove("is-reordering");
+        });
+      }, 480);
+    }
+
+    function sortGamesByRanking(withAnimation) {
+      if (!gamesGrid) return;
+
+      const previousRects = withAnimation ? captureCardRects() : null;
+      const sortedCards = cards.slice().sort((cardA, cardB) => {
+        const hrefA = cardA.getAttribute("href");
+        const hrefB = cardB.getAttribute("href");
+
+        if (!rankingReady) {
+          return (defaultCardOrder.get(hrefA) || 0) - (defaultCardOrder.get(hrefB) || 0);
+        }
+
+        const scoreA = Number(popularityState[hrefA] || 0);
+        const scoreB = Number(popularityState[hrefB] || 0);
+        if (scoreA !== scoreB) {
+          return scoreB - scoreA;
+        }
+        return (defaultCardOrder.get(hrefA) || 0) - (defaultCardOrder.get(hrefB) || 0);
+      });
+
+      sortedCards.forEach((card) => gamesGrid.appendChild(card));
+      if (withAnimation && previousRects) {
+        animateCardReorder(previousRects);
+      }
+    }
+
+    async function incrementRemotePopularity(href, gameName, amount) {
+      if (!firebaseEnabled || !firebaseDb) {
+        return false;
+      }
+
+      try {
+        const docRef = firebaseDb.collection(FIREBASE_COLLECTION).doc(encodeURIComponent(href));
+        await docRef.set({
+          href,
+          name: gameName,
+          hits: window.firebase.firestore.FieldValue.increment(Number(amount || 1)),
+          updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        return true;
+      } catch (error) {
+        logFirebase("Error incrementando popularidad remota.", error);
+        return false;
+      }
+    }
+
+    async function flushPendingRemoteIncrements() {
+      if (!firebaseEnabled || !firebaseDb) {
+        return;
+      }
+
+      const pending = readPendingPopularity();
+      const entries = Object.entries(pending);
+      if (!entries.length) {
+        return;
+      }
+
+      for (const [href, payload] of entries) {
+        const ok = await incrementRemotePopularity(href, payload.name || href, Number(payload.amount || 1));
+        if (ok) {
+          delete pending[href];
+        }
+      }
+
+      savePendingPopularity(pending);
+    }
 
     function closeChangelog() {
-      localStorage.setItem(STORAGE_KEY, SITE_VERSION);
+      try {
+        localStorage.setItem(STORAGE_KEY, SITE_VERSION);
+      } catch (error) {
+        logFirebase("No se pudo guardar el estado del changelog en localStorage.", error);
+      }
       popup.classList.remove("is-visible");
       popup.setAttribute("aria-hidden", "true");
     }
 
+    function readJson(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function writeJson(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function renderShelves() {
+      const favorites = readJson(FAVORITES_KEY, []);
+      const popularity = popularityState;
+
+      const favoriteNames = cards
+        .filter(card => favorites.includes(card.getAttribute("href")))
+        .map(card => card.querySelector("strong").textContent);
+
+      favoritesList.innerHTML = favoriteNames.length
+        ? favoriteNames.map(name => `<li><span>${name}</span><span>Guardado</span></li>`).join("")
+        : "<li><span>Aún no tienes favoritos.</span><span>—</span></li>";
+
+      const ranking = cards
+        .map(card => {
+          const href = card.getAttribute("href");
+          const name = card.querySelector("strong").textContent;
+          return { name, hits: popularity[href] || 0 };
+        })
+        .sort((a, b) => b.hits - a.hits)
+        .slice(0, 6);
+
+      popularList.innerHTML = ranking
+        .map((item, index) => `<li><span>#${index + 1} ${item.name}</span><span>${item.hits} jugadores</span></li>`)
+        .join("");
+
+      cards.forEach(card => {
+        const href = card.getAttribute("href");
+        const hits = Number(popularity[href] || 0);
+        card.querySelector("[data-players]").textContent = `🔥 ${hits}`;
+        const favBtn = card.querySelector(".favorite-btn");
+        const isFavorite = favorites.includes(href);
+        favBtn.classList.toggle("is-favorite", isFavorite);
+        favBtn.textContent = isFavorite ? "★" : "☆";
+      });
+    }
+
+    function applyFilters() {
+      const term = (searchInput.value || "").trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const name = card.dataset.name || "";
+        const types = (card.dataset.type || "").split(" ");
+        const matchSearch = !term || name.includes(term);
+        const matchType = activeType === "all" || types.includes(activeType);
+        const visible = matchSearch && matchType;
+        card.classList.toggle("hidden-card", !visible);
+        if (visible) visibleCount += 1;
+      });
+
+      resultsCount.textContent = `${visibleCount} juegos`;
+      noResults.style.display = visibleCount ? "none" : "block";
+      sortGamesByRanking(false);
+    }
+
+    function openAppTransition(url) {
+      appTransition.classList.add("is-open");
+      appTransition.setAttribute("aria-hidden", "false");
+      window.setTimeout(() => {
+        window.location.href = url;
+      }, 260);
+    }
+
+    cards.forEach(card => {
+      const favBtn = card.querySelector(".favorite-btn");
+      favBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const favorites = readJson(FAVORITES_KEY, []);
+        const href = card.getAttribute("href");
+        const index = favorites.indexOf(href);
+        if (index >= 0) {
+          favorites.splice(index, 1);
+        } else {
+          favorites.push(href);
+        }
+        writeJson(FAVORITES_KEY, favorites);
+        renderShelves();
+      });
+
+      card.addEventListener("click", async (event) => {
+        event.preventDefault();
+        const href = card.getAttribute("href");
+        const gameName = card.querySelector("strong").textContent;
+        popularityState[href] = (Number(popularityState[href]) || 0) + 1;
+        saveLocalPopularity();
+        renderShelves();
+        const success = await incrementRemotePopularity(href, gameName, 1);
+        if (!success) {
+          queueRemoteIncrement(href, gameName, 1);
+        }
+        openAppTransition(href);
+      });
+    });
+
     try {
       const seenVersion = localStorage.getItem(STORAGE_KEY);
-      if (seenVersion !== SITE_VERSION) {
+      if (ENABLE_CHANGELOG_POPUP && seenVersion !== SITE_VERSION) {
         popup.classList.add("is-visible");
         popup.setAttribute("aria-hidden", "false");
       }
     } catch (error) {
-      popup.classList.add("is-visible");
-      popup.setAttribute("aria-hidden", "false");
+      if (ENABLE_CHANGELOG_POPUP) {
+        popup.classList.add("is-visible");
+        popup.setAttribute("aria-hidden", "false");
+      }
     }
 
-    closeButton.addEventListener("click", closeChangelog);
-    popup.addEventListener("click", function (event) {
-      if (event.target === popup) {
+    if (closeButton) {
+      closeButton.addEventListener("click", closeChangelog);
+    }
+
+    if (popup) {
+      popup.addEventListener("click", function (event) {
+        if (event.target === popup) {
+          closeChangelog();
+        }
+      });
+    }
+
+    window.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && popup && popup.classList.contains("is-visible")) {
         closeChangelog();
       }
     });
+
+    window.addEventListener("pageshow", resetAppTransition);
+
+    searchInput.addEventListener("input", applyFilters);
+    typeFilters.addEventListener("click", (event) => {
+      const button = event.target.closest(".chip");
+      if (!button) return;
+      activeType = button.dataset.type;
+      typeFilters.querySelectorAll(".chip").forEach(chip => chip.classList.remove("active"));
+      button.classList.add("active");
+      applyFilters();
+    });
+
+    removeMergeArtifactText();
+    resetAppTransition();
+    initFirebase();
+
+    (async function initializePopularity() {
+      renderShelves();
+      applyFilters();
+      sortGamesByRanking(false);
+
+      const loadedRemote = await loadRemotePopularity();
+      await flushPendingRemoteIncrements();
+      renderShelves();
+      applyFilters();
+      if (loadedRemote) {
+        sortGamesByRanking(true);
+      }
+    })();
   </script>
   <script src="site-theme.js"></script>
   <script src="classroom-hotkey.js"></script>

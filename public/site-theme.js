@@ -103,6 +103,8 @@
       "html[data-site-theme='light'] #topBar a, html[data-site-theme='light'] #topBar div { color: #111827 !important; text-shadow: none !important; }",
       "html[data-site-theme='dark'] #topBar a, html[data-site-theme='dark'] #topBar div { color: #eef6ff !important; }",
       "html[data-site-theme='dark'] .topbar, html[data-site-theme='dark'] .frame-shell, html[data-site-theme='dark'] #unity-container, html[data-site-theme='dark'] #c2canvasdiv, html[data-site-theme='dark'] .note, html[data-site-theme='dark'] #loading-panel { border-color: rgba(148, 163, 184, 0.32) !important; }",
+      "html[data-site-theme='light'] .note { background: rgba(255, 255, 255, 0.78) !important; color: #5c6678 !important; border-color: rgba(18, 24, 38, 0.1) !important; }",
+      "html[data-site-theme='dark'] .note { background: rgba(9, 15, 28, 0.92) !important; color: #b4c6dc !important; border-color: rgba(148, 163, 184, 0.32) !important; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28) !important; }",
       "html[data-site-theme='dark'] .topbar { background: linear-gradient(140deg, rgba(14, 23, 42, 0.96), rgba(8, 16, 32, 0.9)), linear-gradient(120deg, rgba(99, 212, 255, 0.12), rgba(37, 99, 235, 0.08)) !important; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.34) !important; }",
       "html[data-site-theme='dark'] .back, html[data-site-theme='dark'] .btn-primary, html[data-site-theme='dark'] .player-overlay__start { background: linear-gradient(135deg, #63d4ff, #2563eb) !important; color: #03111f !important; box-shadow: 0 18px 34px rgba(37, 99, 235, 0.35) !important; }",
       "html[data-site-theme='dark'] .btn-alt { background: linear-gradient(135deg, #0f172a, #1e293b) !important; color: #e2e8f0 !important; box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3) !important; }",
