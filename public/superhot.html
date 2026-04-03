@@ -164,13 +164,16 @@
       border-radius: 34px;
       background: #030712;
       box-shadow: var(--shadow);
-      min-height: clamp(420px, 68vh, 860px);
+      flex: 1;
+      min-height: clamp(420px, 72vh, 980px);
+      height: calc(100vh - 240px);
+      height: calc(100dvh - 240px);
     }
 
     #game-frame {
       display: block;
       width: 100%;
-      height: clamp(420px, 68vh, 860px);
+      height: 100%;
       border: 0;
       background: #000;
     }
@@ -246,6 +249,33 @@
 
       .back {
         width: 100%;
+      }
+
+      .frame-shell {
+        height: calc(100vh - 210px);
+        height: calc(100dvh - 210px);
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 12px 0 18px;
+      }
+
+      .shell {
+        gap: 12px;
+      }
+
+      .topbar {
+        padding: 14px;
+        border-radius: 22px;
+      }
+
+      .frame-shell {
+        border-radius: 22px;
+        min-height: 56vh;
+        height: calc(100vh - 160px);
+        height: calc(100dvh - 160px);
       }
     }
   </style>
