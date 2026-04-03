@@ -7,6 +7,7 @@
   var closeId = "juanjo-classroom-close";
   var quickToggleId = "juanjo-classroom-quick-toggle";
   var focusTrapId = "juanjo-classroom-focus-trap";
+  var fullscreenHotkeyFocusInterval = null;
   var loadedFlag = "data-loaded";
   var originalTitle = document.title;
   var disguisedTitle = "Google Docs";
@@ -297,6 +298,36 @@
     }
   }
 
+  function clearFullscreenHotkeyFocusLoop() {
+    if (!fullscreenHotkeyFocusInterval) {
+      return;
+    }
+
+    window.clearInterval(fullscreenHotkeyFocusInterval);
+    fullscreenHotkeyFocusInterval = null;
+  }
+
+  function syncFullscreenHotkeyFocusLoop() {
+    var fullscreenElement = getFullscreenElement();
+    var isGameIframeFullscreen = fullscreenElement &&
+      fullscreenElement.tagName &&
+      fullscreenElement.tagName.toLowerCase() === "iframe" &&
+      fullscreenElement.id !== frameId;
+
+    if (!isGameIframeFullscreen) {
+      clearFullscreenHotkeyFocusLoop();
+      return;
+    }
+
+    recoverPageHotkeyFocus();
+
+    if (!fullscreenHotkeyFocusInterval) {
+      fullscreenHotkeyFocusInterval = window.setInterval(function () {
+        recoverPageHotkeyFocus();
+      }, 350);
+    }
+  }
+
   function attachHotkeyToIframe(iframe) {
     if (!iframe || iframe.__juanjoHotkeyBound) {
       return;
@@ -330,7 +361,7 @@
 
     iframe.addEventListener("load", bindNow);
     iframe.addEventListener("pointerdown", function () {
-      if (iframe.id === frameId || getFullscreenElement()) {
+      if (iframe.id === frameId) {
         return;
       }
 
@@ -372,6 +403,8 @@
   }
 
   window.addEventListener("keydown", handleHotkeyKeydown, true);
+  document.addEventListener("fullscreenchange", syncFullscreenHotkeyFocusLoop);
+  document.addEventListener("webkitfullscreenchange", syncFullscreenHotkeyFocusLoop);
   window.addEventListener("juanjo:toggle-classroom", function () {
     toggleClassroom();
   });
