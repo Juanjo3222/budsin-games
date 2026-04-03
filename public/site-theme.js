@@ -171,6 +171,13 @@
   }
 
   function resolveFullscreenTarget() {
+    if (document.body && document.body.dataset.fullscreenTarget === "container") {
+      var containerTarget = document.querySelector(".frame-shell, #unity-container, #c2canvasdiv, #gameContainer, #canvas-container");
+      if (containerTarget) {
+        return containerTarget;
+      }
+    }
+
     var iframeTarget = document.querySelector("#game-frame, .frame-shell iframe, iframe");
     if (iframeTarget) {
       return iframeTarget;
