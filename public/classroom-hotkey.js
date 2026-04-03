@@ -8,6 +8,7 @@
   var quickToggleId = "juanjo-classroom-quick-toggle";
   var focusTrapId = "juanjo-classroom-focus-trap";
   var fullscreenHotkeyFocusInterval = null;
+  var forceHotkeyFocusFromIframe = false;
   var loadedFlag = "data-loaded";
   var originalTitle = document.title;
   var disguisedTitle = "Google Docs";
@@ -307,14 +308,30 @@
     fullscreenHotkeyFocusInterval = null;
   }
 
-  function syncFullscreenHotkeyFocusLoop() {
-    var fullscreenElement = getFullscreenElement();
-    var isGameIframeFullscreen = fullscreenElement &&
-      fullscreenElement.tagName &&
-      fullscreenElement.tagName.toLowerCase() === "iframe" &&
-      fullscreenElement.id !== frameId;
+  function isGameIframeElement(element) {
+    return element &&
+      element.tagName &&
+      element.tagName.toLowerCase() === "iframe" &&
+      element.id !== frameId;
+  }
 
-    if (!isGameIframeFullscreen) {
+  function shouldForceHotkeyFocus() {
+    var fullscreenElement = getFullscreenElement();
+
+    if (isGameIframeElement(fullscreenElement)) {
+      return true;
+    }
+
+    if (forceHotkeyFocusFromIframe) {
+      return true;
+    }
+
+    var activeElement = document.activeElement;
+    return isGameIframeElement(activeElement);
+  }
+
+  function syncFullscreenHotkeyFocusLoop() {
+    if (!shouldForceHotkeyFocus()) {
       clearFullscreenHotkeyFocusLoop();
       return;
     }
@@ -323,6 +340,11 @@
 
     if (!fullscreenHotkeyFocusInterval) {
       fullscreenHotkeyFocusInterval = window.setInterval(function () {
+        if (!shouldForceHotkeyFocus()) {
+          clearFullscreenHotkeyFocusLoop();
+          return;
+        }
+
         recoverPageHotkeyFocus();
       }, 350);
     }
@@ -365,7 +387,11 @@
         return;
       }
 
-      window.setTimeout(recoverPageHotkeyFocus, 0);
+      if (!getFullscreenElement()) {
+        forceHotkeyFocusFromIframe = true;
+      }
+
+      window.setTimeout(syncFullscreenHotkeyFocusLoop, 0);
     });
     bindNow();
   }
@@ -403,8 +429,18 @@
   }
 
   window.addEventListener("keydown", handleHotkeyKeydown, true);
+  window.addEventListener("focus", syncFullscreenHotkeyFocusLoop, true);
+  document.addEventListener("focusin", syncFullscreenHotkeyFocusLoop, true);
   document.addEventListener("fullscreenchange", syncFullscreenHotkeyFocusLoop);
   document.addEventListener("webkitfullscreenchange", syncFullscreenHotkeyFocusLoop);
+  document.addEventListener("pointerdown", function (event) {
+    if (isGameIframeElement(event.target)) {
+      return;
+    }
+
+    forceHotkeyFocusFromIframe = false;
+    syncFullscreenHotkeyFocusLoop();
+  }, true);
   window.addEventListener("juanjo:toggle-classroom", function () {
     toggleClassroom();
   });
