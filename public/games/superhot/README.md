@@ -11,6 +11,14 @@ Con el UnityLoader que compartiste, estos archivos deben existir junto al `index
 - `webgl.mem` o `webgl.memgz`
 - `webgl.data` o `webgl.datagz`
 
+Si tú solo tienes:
+
+- `webgl.jsgz`
+- `webgl.memgz`
+- `webgl.datagz`
+
+**sí sirven**. El `index.html` está configurado para usar `webgl.js/webgl.mem/webgl.data` y el loader hace fallback automático a `*.jsgz/*.memgz/*.datagz`.
+
 Además, el `webgl.data` contiene los recursos internos mencionados por el loader (preload):
 
 - `/data.unity3d`

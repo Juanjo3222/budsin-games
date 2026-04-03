@@ -49,10 +49,19 @@
 
   <script>
     var statusNode = document.getElementById("status");
+    var UNITY_BUILD = {
+      // Si solo tienes archivos .jsgz/.memgz/.datagz, déjalo así:
+      // el loader intenta primero webgl.js/webgl.mem/webgl.data
+      // y hace fallback automático a webgl.jsgz/webgl.memgz/webgl.datagz.
+      code: "webgl.js",
+      memory: "webgl.mem",
+      data: "webgl.data"
+    };
+
     var Module = {
-      dataUrl: "webgl.data",
-      codeUrl: "webgl.js",
-      memUrl: "webgl.mem",
+      dataUrl: UNITY_BUILD.data,
+      codeUrl: UNITY_BUILD.code,
+      memUrl: UNITY_BUILD.memory,
       TOTAL_MEMORY: 268435456,
       compatibilitycheck: null,
       setStatus: function (text) {
