@@ -8,6 +8,7 @@
   var quickToggleId = "juanjo-classroom-quick-toggle";
   var focusTrapId = "juanjo-classroom-focus-trap";
   var fullscreenHotkeyFocusInterval = null;
+  var forceHotkeyFocusFromIframe = false;
   var loadedFlag = "data-loaded";
   var originalTitle = document.title;
   var disguisedTitle = "Google Docs";
@@ -307,24 +308,26 @@
     fullscreenHotkeyFocusInterval = null;
   }
 
+  function isGameIframeElement(element) {
+    return element &&
+      element.tagName &&
+      element.tagName.toLowerCase() === "iframe" &&
+      element.id !== frameId;
+  }
+
   function shouldForceHotkeyFocus() {
     var fullscreenElement = getFullscreenElement();
-    var isGameIframeFullscreen = fullscreenElement &&
-      fullscreenElement.tagName &&
-      fullscreenElement.tagName.toLowerCase() === "iframe" &&
-      fullscreenElement.id !== frameId;
 
-    if (isGameIframeFullscreen) {
+    if (isGameIframeElement(fullscreenElement)) {
+      return false;
+    }
+
+    if (forceHotkeyFocusFromIframe) {
       return true;
     }
 
     var activeElement = document.activeElement;
-    var isGameIframeActive = activeElement &&
-      activeElement.tagName &&
-      activeElement.tagName.toLowerCase() === "iframe" &&
-      activeElement.id !== frameId;
-
-    return !!isGameIframeActive;
+    return isGameIframeElement(activeElement);
   }
 
   function syncFullscreenHotkeyFocusLoop() {
@@ -384,7 +387,11 @@
         return;
       }
 
-      window.setTimeout(recoverPageHotkeyFocus, 0);
+      if (!getFullscreenElement()) {
+        forceHotkeyFocusFromIframe = true;
+      }
+
+      window.setTimeout(syncFullscreenHotkeyFocusLoop, 0);
     });
     bindNow();
   }
@@ -426,6 +433,14 @@
   document.addEventListener("focusin", syncFullscreenHotkeyFocusLoop, true);
   document.addEventListener("fullscreenchange", syncFullscreenHotkeyFocusLoop);
   document.addEventListener("webkitfullscreenchange", syncFullscreenHotkeyFocusLoop);
+  document.addEventListener("pointerdown", function (event) {
+    if (isGameIframeElement(event.target)) {
+      return;
+    }
+
+    forceHotkeyFocusFromIframe = false;
+    syncFullscreenHotkeyFocusLoop();
+  }, true);
   window.addEventListener("juanjo:toggle-classroom", function () {
     toggleClassroom();
   });
