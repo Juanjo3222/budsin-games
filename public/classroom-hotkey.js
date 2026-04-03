@@ -6,6 +6,7 @@
   var frameId = "juanjo-classroom-frame";
   var closeId = "juanjo-classroom-close";
   var quickToggleId = "juanjo-classroom-quick-toggle";
+  var focusTrapId = "juanjo-classroom-focus-trap";
   var loadedFlag = "data-loaded";
   var originalTitle = document.title;
   var disguisedTitle = "Google Docs";
@@ -258,6 +259,44 @@
     document.body.appendChild(button);
   }
 
+  function ensureFocusTrap() {
+    var focusTrap = document.getElementById(focusTrapId);
+
+    if (focusTrap) {
+      return focusTrap;
+    }
+
+    focusTrap = document.createElement("button");
+    focusTrap.id = focusTrapId;
+    focusTrap.type = "button";
+    focusTrap.setAttribute("aria-hidden", "true");
+    focusTrap.tabIndex = -1;
+    focusTrap.style.position = "fixed";
+    focusTrap.style.left = "-9999px";
+    focusTrap.style.top = "-9999px";
+    focusTrap.style.width = "1px";
+    focusTrap.style.height = "1px";
+    focusTrap.style.opacity = "0";
+    focusTrap.style.pointerEvents = "none";
+
+    document.body.appendChild(focusTrap);
+    return focusTrap;
+  }
+
+  function recoverPageHotkeyFocus() {
+    var focusTrap = ensureFocusTrap();
+
+    if (!focusTrap || typeof focusTrap.focus !== "function") {
+      return;
+    }
+
+    try {
+      focusTrap.focus({ preventScroll: true });
+    } catch (error) {
+      focusTrap.focus();
+    }
+  }
+
   function attachHotkeyToIframe(iframe) {
     if (!iframe || iframe.__juanjoHotkeyBound) {
       return;
@@ -290,6 +329,13 @@
     }
 
     iframe.addEventListener("load", bindNow);
+    iframe.addEventListener("pointerdown", function () {
+      if (iframe.id === frameId || getFullscreenElement()) {
+        return;
+      }
+
+      window.setTimeout(recoverPageHotkeyFocus, 0);
+    });
     bindNow();
   }
 
