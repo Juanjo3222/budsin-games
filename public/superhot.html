@@ -159,6 +159,9 @@
 
     .frame-shell {
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.82);
       border-radius: 34px;
@@ -172,10 +175,14 @@
 
     #game-frame {
       display: block;
-      width: 100%;
-      height: 100%;
+      width: 1366px;
+      height: 768px;
+      max-width: none;
+      max-height: none;
       border: 0;
       background: #000;
+      transform-origin: center center;
+      will-change: transform;
     }
 
     .loading {
@@ -306,11 +313,32 @@
   <script>
     (function () {
       var frame = document.getElementById("game-frame");
+      var frameShell = document.querySelector(".frame-shell");
       var loader = document.getElementById("loading-overlay");
+      var BASE_WIDTH = 1366;
+      var BASE_HEIGHT = 768;
+
+      function resizeFrame() {
+        if (!frameShell) return;
+        var shellWidth = frameShell.clientWidth;
+        var shellHeight = frameShell.clientHeight;
+        if (!shellWidth || !shellHeight) return;
+
+        var scale = Math.min(shellWidth / BASE_WIDTH, shellHeight / BASE_HEIGHT);
+        frame.style.transform = "scale(" + scale + ")";
+      }
+
       frame.src = atob("aHR0cHM6Ly90cnVmZmxlZC5sb2wvZ2FtZXMvc3VwZXJob3QvaW5kZXguaHRtbA==");
+      resizeFrame();
       frame.addEventListener("load", function () {
         loader.classList.add("is-hidden");
+        resizeFrame();
       });
+
+      window.addEventListener("resize", resizeFrame);
+      document.addEventListener("fullscreenchange", resizeFrame);
+      document.addEventListener("webkitfullscreenchange", resizeFrame);
+
       setTimeout(function () {
         loader.classList.add("is-hidden");
       }, 7000);
