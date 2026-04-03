@@ -566,6 +566,9 @@
     }
 
     .app-transition.is-open {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
       opacity: 1;
       pointer-events: all;
     }
@@ -577,6 +580,13 @@
       border: 4px solid rgba(255,255,255,.24);
       border-top-color: var(--surface-strong);
       animation: spin .8s linear infinite;
+    }
+
+    .app-transition-text {
+      margin: 0;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: .03em;
     }
 
     @keyframes spin {
@@ -811,6 +821,7 @@
 
   <div id="appTransition" class="app-transition" aria-hidden="true">
     <div class="loader-dot" aria-label="Cargando"></div>
+    <p class="app-transition-text">Cargando página...</p>
   </div>
 
   <main class="shell">
@@ -1246,9 +1257,12 @@
       sortGamesByRanking(false);
     }
 
-    function openAppTransition(url) {
+    function openAppTransition() {
       appTransition.classList.add("is-open");
       appTransition.setAttribute("aria-hidden", "false");
+    }
+
+    function navigateToGame(url) {
       window.setTimeout(() => {
         window.location.href = url;
       }, 260);
@@ -1275,6 +1289,7 @@
         event.preventDefault();
         const href = card.getAttribute("href");
         const gameName = card.querySelector("strong").textContent;
+        openAppTransition();
         popularityState[href] = (Number(popularityState[href]) || 0) + 1;
         saveLocalPopularity();
         renderShelves();
@@ -1282,7 +1297,7 @@
         if (!success) {
           queueRemoteIncrement(href, gameName, 1);
         }
-        openAppTransition(href);
+        navigateToGame(href);
       });
     });
 
