@@ -14,7 +14,21 @@
     
     <meta charset="UTF-8">
     <title>Soundboard</title>
-    <link rel="icon" type="image/jpeg" href="/images.jpeg">
+    <script>
+        (function () {
+            var pageUrl = window.location.href.split('#')[0];
+            pageUrl = pageUrl.split('?')[0];
+            var assetBase = pageUrl.substring(0, pageUrl.lastIndexOf('/') + 1);
+            var favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            favicon.type = 'image/jpeg';
+            favicon.href = assetBase + 'images.jpeg';
+            document.head.appendChild(favicon);
+            var hotkeyScript = document.createElement('script');
+            hotkeyScript.src = assetBase + 'classroom-hotkey.js';
+            document.head.appendChild(hotkeyScript);
+        })();
+    </script>
     <script src="sounds.js" type="module"></script>
     <script src="main.js" type="module"></script>
     <link href="style.css" rel="stylesheet">
@@ -28,7 +42,6 @@
         <input id="searchInput" type="text" placeholder="Search sounds...">
     </div>
     <div id="soundboard"></div>
-    <script src="/classroom-hotkey.js"></script>
 </body>
 
 </html>
