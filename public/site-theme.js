@@ -244,6 +244,43 @@
     });
   }
 
+  function localizeCommonPageText(language) {
+    var lang = resolveLanguage(language);
+
+    document.querySelectorAll("a.back").forEach(function (link) {
+      if (!link.dataset.i18nOriginalText) {
+        link.dataset.i18nOriginalText = (link.textContent || "").trim();
+      }
+      link.textContent = lang === "en" ? "Back to portal" : (link.dataset.i18nOriginalText || "Volver al portal");
+    });
+
+    document.querySelectorAll(".topbar .title span").forEach(function (subtitle) {
+      if (!subtitle.dataset.i18nOriginalText) {
+        subtitle.dataset.i18nOriginalText = (subtitle.textContent || "").trim();
+      }
+
+      if (lang !== "en") {
+        subtitle.textContent = subtitle.dataset.i18nOriginalText || subtitle.textContent;
+        return;
+      }
+
+      var titleNode = subtitle.closest(".title") && subtitle.closest(".title").querySelector("strong");
+      var gameName = titleNode ? (titleNode.textContent || "").trim() : "this game";
+      subtitle.textContent = "Play " + gameName + " from its dedicated page in the Budsin portal.";
+    });
+
+    document.querySelectorAll(".note").forEach(function (note) {
+      if (!note.dataset.i18nOriginalText) {
+        note.dataset.i18nOriginalText = (note.textContent || "").trim();
+      }
+      if (lang === "en") {
+        note.textContent = "If the game does not load, check that your browser allows the remote scripts used by this version.";
+      } else {
+        note.textContent = note.dataset.i18nOriginalText || note.textContent;
+      }
+    });
+  }
+
   function updateButton(theme) {
     var button = document.getElementById(BUTTON_ID);
     if (!button) return;
@@ -391,6 +428,7 @@
     var language = getCurrentLanguage();
     document.documentElement.lang = resolveLanguage(language);
     syncInternalLinksWithLanguage(language);
+    localizeCommonPageText(language);
     ensureStyle();
     markPageType();
     ensureButton();
