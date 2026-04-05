@@ -171,7 +171,7 @@ Todos los juegos pertenecen a sus respectivos creadores.
 ## 🤝 Contribuciones
 
 ¿Ideas o mejoras?
-👉 https://forms.gle
+👉 [Aquì](https://forms.gle/bUHTy8Lt6Kz1qkAx8)
 
 ---
 
