@@ -1119,7 +1119,11 @@
     let firebaseDb = null;
     let firebaseEnabled = false;
     let rankingReady = false;
-    const defaultCardOrder = new Map(cards.map((card, index) => [card.getAttribute("href"), index]));
+    function getCardHref(card) {
+      return card.dataset.baseHref || card.getAttribute("href") || "";
+    }
+
+    const defaultCardOrder = new Map(cards.map((card, index) => [getCardHref(card), index]));
 
     function logFirebase(message, error) {
       if (error) {
@@ -1265,8 +1269,8 @@
 
       const previousRects = withAnimation ? captureCardRects() : null;
       const sortedCards = cards.slice().sort((cardA, cardB) => {
-        const hrefA = cardA.getAttribute("href");
-        const hrefB = cardB.getAttribute("href");
+        const hrefA = getCardHref(cardA);
+        const hrefB = getCardHref(cardB);
 
         if (!rankingReady) {
           return (defaultCardOrder.get(hrefA) || 0) - (defaultCardOrder.get(hrefB) || 0);
@@ -1400,6 +1404,14 @@
         if (favoriteButton) {
           favoriteButton.setAttribute("aria-label", nextLanguage === "en" ? "Add to favorites" : "Agregar a favoritos");
         }
+
+        const baseHref = card.dataset.baseHref || card.getAttribute("href") || "";
+        if (!card.dataset.baseHref) {
+          card.dataset.baseHref = baseHref;
+        }
+        const nextUrl = new URL(baseHref, window.location.href);
+        nextUrl.searchParams.set("lang", nextLanguage);
+        card.setAttribute("href", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
       });
 
       if (languageSelect) {
@@ -1432,7 +1444,7 @@
       const popularity = popularityState;
 
       const favoriteNames = cards
-        .filter(card => favorites.includes(card.getAttribute("href")))
+        .filter(card => favorites.includes(getCardHref(card)))
         .map(card => card.querySelector("strong").textContent);
 
       favoritesList.innerHTML = favoriteNames.length
@@ -1441,7 +1453,7 @@
 
       const ranking = cards
         .map(card => {
-          const href = card.getAttribute("href");
+          const href = getCardHref(card);
           const name = card.querySelector("strong").textContent;
           return { name, hits: popularity[href] || 0 };
         })
@@ -1453,7 +1465,7 @@
         .join("");
 
       cards.forEach(card => {
-        const href = card.getAttribute("href");
+        const href = getCardHref(card);
         const hits = Number(popularity[href] || 0);
         card.querySelector("[data-players]").textContent = `🔥 ${hits}`;
         const favBtn = card.querySelector(".favorite-btn");
@@ -1489,7 +1501,9 @@
 
     function navigateToGame(url) {
       window.setTimeout(() => {
-        window.location.href = url;
+        const destination = new URL(url, window.location.href);
+        destination.searchParams.set("lang", currentLanguage);
+        window.location.href = `${destination.pathname}${destination.search}${destination.hash}`;
       }, 260);
     }
 
@@ -1499,7 +1513,7 @@
         event.preventDefault();
         event.stopPropagation();
         const favorites = readJson(FAVORITES_KEY, []);
-        const href = card.getAttribute("href");
+        const href = getCardHref(card);
         const index = favorites.indexOf(href);
         if (index >= 0) {
           favorites.splice(index, 1);
@@ -1512,7 +1526,7 @@
 
       card.addEventListener("click", async (event) => {
         event.preventDefault();
-        const href = card.getAttribute("href");
+        const href = getCardHref(card);
         const gameName = card.querySelector("strong").textContent;
         openAppTransition();
         popularityState[href] = (Number(popularityState[href]) || 0) + 1;

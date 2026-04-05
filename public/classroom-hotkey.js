@@ -10,8 +10,43 @@
   var fullscreenHotkeyFocusInterval = null;
   var forceHotkeyFocusFromIframe = false;
   var loadedFlag = "data-loaded";
+  var LANGUAGE_KEY = "budsin_language";
   var originalTitle = document.title;
   var disguisedTitle = "Google Docs";
+
+  function resolveLanguage(language) {
+    return language === "en" ? "en" : "es";
+  }
+
+  function getCurrentLanguage() {
+    try {
+      var url = new URL(window.location.href);
+      var fromUrl = url.searchParams.get("lang");
+      if (fromUrl) {
+        var resolvedFromUrl = resolveLanguage(fromUrl);
+        window.localStorage.setItem(LANGUAGE_KEY, resolvedFromUrl);
+        return resolvedFromUrl;
+      }
+      return resolveLanguage(window.localStorage.getItem(LANGUAGE_KEY) || "es");
+    } catch (error) {
+      return "es";
+    }
+  }
+
+  function getLocaleText() {
+    if (getCurrentLanguage() === "en") {
+      return {
+        closeLabel: "Close cover mode",
+        quickToggle: "Hide",
+        quickToggleAria: "Toggle hidden mode"
+      };
+    }
+    return {
+      closeLabel: "Cerrar modo oculto",
+      quickToggle: "Ocultar",
+      quickToggleAria: "Activar modo ocultar"
+    };
+  }
 
   function shouldIgnoreTarget(target) {
     if (!target) return false;
@@ -102,7 +137,7 @@
     var close = document.createElement("button");
     close.id = closeId;
     close.type = "button";
-    close.setAttribute("aria-label", "Cerrar Canva");
+    close.setAttribute("aria-label", getLocaleText().closeLabel);
     close.textContent = "×";
     close.addEventListener("click", toggleClassroom);
 
@@ -250,8 +285,8 @@
     var button = document.createElement("button");
     button.id = quickToggleId;
     button.type = "button";
-    button.textContent = "Ocultar";
-    button.setAttribute("aria-label", "Activar modo ocultar");
+    button.textContent = getLocaleText().quickToggle;
+    button.setAttribute("aria-label", getLocaleText().quickToggleAria);
     button.addEventListener("click", function (event) {
       event.preventDefault();
       event.stopPropagation();

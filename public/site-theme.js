@@ -2,7 +2,9 @@
   "use strict";
 
   var STORAGE_KEY = "budsin_site_theme";
+  var LANGUAGE_KEY = "budsin_language";
   var DEFAULT_THEME = "light";
+  var DEFAULT_LANGUAGE = "es";
   var STYLE_ID = "budsin-theme-style";
   var BUTTON_ID = "budsin-theme-toggle";
   var FULLSCREEN_ID = "budsin-fullscreen-toggle";
@@ -45,6 +47,71 @@
       "--shadow-soft": "0 16px 36px rgba(0, 0, 0, 0.3)"
     }
   };
+
+  function resolveLanguage(language) {
+    return language === "en" ? "en" : "es";
+  }
+
+  function getLanguageFromUrl() {
+    try {
+      var url = new URL(window.location.href);
+      var langParam = url.searchParams.get("lang");
+      if (!langParam) return null;
+      return resolveLanguage(langParam);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function getStoredLanguage() {
+    try {
+      return resolveLanguage(window.localStorage.getItem(LANGUAGE_KEY) || DEFAULT_LANGUAGE);
+    } catch (error) {
+      return DEFAULT_LANGUAGE;
+    }
+  }
+
+  function saveLanguage(language) {
+    try {
+      window.localStorage.setItem(LANGUAGE_KEY, resolveLanguage(language));
+    } catch (error) {}
+  }
+
+  function getCurrentLanguage() {
+    var fromUrl = getLanguageFromUrl();
+    if (fromUrl) {
+      saveLanguage(fromUrl);
+      return fromUrl;
+    }
+    return getStoredLanguage();
+  }
+
+  function getLocaleText() {
+    var language = getCurrentLanguage();
+    if (language === "en") {
+      return {
+        themeDark: "Dark mode",
+        themeLight: "Light mode",
+        themeDarkAria: "Switch to dark mode",
+        themeLightAria: "Switch to light mode",
+        fullscreenOpen: "Fullscreen",
+        fullscreenOpenAria: "Open in fullscreen",
+        fullscreenExit: "Exit fullscreen",
+        fullscreenExitAria: "Exit fullscreen"
+      };
+    }
+
+    return {
+      themeDark: "Modo oscuro",
+      themeLight: "Modo claro",
+      themeDarkAria: "Cambiar a modo oscuro",
+      themeLightAria: "Cambiar a modo claro",
+      fullscreenOpen: "Pantalla completa",
+      fullscreenOpenAria: "Abrir en pantalla completa",
+      fullscreenExit: "Salir de pantalla completa",
+      fullscreenExitAria: "Salir de pantalla completa"
+    };
+  }
 
   function resolveTheme(theme) {
     return theme === "dark" ? "dark" : "light";
@@ -157,13 +224,34 @@
     root.style.colorScheme = theme;
   }
 
+  function syncInternalLinksWithLanguage(language) {
+    var lang = resolveLanguage(language);
+    var links = document.querySelectorAll("a[href]");
+    links.forEach(function (link) {
+      var href = link.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) {
+        return;
+      }
+
+      try {
+        var targetUrl = new URL(href, window.location.href);
+        if (targetUrl.origin !== window.location.origin) {
+          return;
+        }
+        targetUrl.searchParams.set("lang", lang);
+        link.setAttribute("href", targetUrl.pathname + targetUrl.search + targetUrl.hash);
+      } catch (error) {}
+    });
+  }
+
   function updateButton(theme) {
     var button = document.getElementById(BUTTON_ID);
     if (!button) return;
+    var locale = getLocaleText();
     var nextTheme = theme === "dark" ? "light" : "dark";
-    button.textContent = nextTheme === "dark" ? "Modo oscuro" : "Modo claro";
-    button.setAttribute("aria-label", nextTheme === "dark" ? "Cambiar a modo oscuro" : "Cambiar a modo claro");
-    button.setAttribute("title", nextTheme === "dark" ? "Cambiar a modo oscuro" : "Cambiar a modo claro");
+    button.textContent = nextTheme === "dark" ? locale.themeDark : locale.themeLight;
+    button.setAttribute("aria-label", nextTheme === "dark" ? locale.themeDarkAria : locale.themeLightAria);
+    button.setAttribute("title", nextTheme === "dark" ? locale.themeDarkAria : locale.themeLightAria);
   }
 
   function getFullscreenElement() {
@@ -220,11 +308,12 @@
   function updateFullscreenButton() {
     var button = document.getElementById(FULLSCREEN_ID);
     if (!button) return;
+    var locale = getLocaleText();
 
     var isFullscreen = !!getFullscreenElement();
-    button.textContent = isFullscreen ? "Salir de pantalla completa" : "Pantalla completa";
-    button.setAttribute("aria-label", isFullscreen ? "Salir de pantalla completa" : "Abrir en pantalla completa");
-    button.setAttribute("title", isFullscreen ? "Salir de pantalla completa" : "Abrir en pantalla completa");
+    button.textContent = isFullscreen ? locale.fullscreenExit : locale.fullscreenOpen;
+    button.setAttribute("aria-label", isFullscreen ? locale.fullscreenExitAria : locale.fullscreenOpenAria);
+    button.setAttribute("title", isFullscreen ? locale.fullscreenExitAria : locale.fullscreenOpenAria);
   }
 
   function ensureFullscreenButton() {
@@ -299,6 +388,9 @@
   }
 
   function init() {
+    var language = getCurrentLanguage();
+    document.documentElement.lang = resolveLanguage(language);
+    syncInternalLinksWithLanguage(language);
     ensureStyle();
     markPageType();
     ensureButton();
