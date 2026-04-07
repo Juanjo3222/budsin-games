@@ -439,6 +439,14 @@
   }
 
   function isToggleHotkey(event) {
+    function isToggleHotkey(event) {
+  return (
+    event.key === "º" ||
+    event.key === "°" ||
+    event.code === "Backquote" ||
+    event.key.toLowerCase() === "k"
+  );
+}
     var key = event.key || "";
     var code = event.code || "";
 
