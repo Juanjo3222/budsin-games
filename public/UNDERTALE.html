@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cargando UNDERTALE...</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .loader {
+      border: 4px solid #333;
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .text {
+      opacity: 0.8;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: white;
+      color: black;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="loader"></div>
+<div class="text">Cargando UNDERTALE...</div>
+
+<button onclick="window.location.replace('https://pkeioxdclksntsdagfxabsxbafwm7osh.ui.nabu.casa/local/UNDERTALE.html')">
+  Si no carga, haz click aquí
+</button>
+
+<script>
+  setTimeout(() => {
+    window.location.replace("https://pkeioxdclksntsdagfxabsxbafwm7osh.ui.nabu.casa/local/UNDERTALE.html");
+  }, 1500);
+</script>
+
+</body>
+</html>
