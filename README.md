@@ -29,7 +29,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 ## ✨ Features
 
-* 🎮 **25 juegos jugables al instante**
+* 🎮 **27 juegos jugables al instante**
 * ⚡ **Sin descargas ni instalación**
 * 🧩 **UI tipo consola (portadas interactivas)**
 * ⭐ **Sistema de favoritos (localStorage)**
