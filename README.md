@@ -147,7 +147,7 @@ Fácil de modificar, clonar o expandir.
 ## 📝 Changelog
 
 ### v4.2.0
-* Se agregó una página/sección de **Ajustes** en `index` para editar la URL usada por `classroom-hotkey.js`.
+* Se agregó una **página separada de Ajustes** para editar la URL usada por `classroom-hotkey.js`.
 * La URL personalizada ahora se guarda en `localStorage` y se mantiene al recargar.
 * Soporte completo en **español e inglés** para el módulo de ajustes.
 

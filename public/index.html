@@ -765,69 +765,20 @@
       cursor: pointer;
     }
 
-    .settings-panel {
-      margin: 0 0 24px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: var(--surface);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .settings-panel h3 {
-      margin: 0 0 8px;
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 1.9rem;
-      letter-spacing: .04em;
-    }
-
-    .settings-panel p {
-      margin: 0 0 14px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .settings-form {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: minmax(0, 1fr) auto auto;
+    .settings-link {
+      display: inline-flex;
       align-items: center;
-    }
-
-    .settings-form input {
-      width: 100%;
-      min-height: 48px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: var(--surface-strong);
-      color: var(--text);
-      padding: 0 12px;
-      font: inherit;
-    }
-
-    .settings-btn {
-      min-height: 48px;
-      border: 0;
-      border-radius: 14px;
+      justify-content: center;
+      min-height: 42px;
       padding: 0 14px;
-      font: inherit;
-      font-weight: 800;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(135deg, #ef3f45, #ff8c55);
-    }
-
-    .settings-btn.secondary {
-      color: var(--text);
-      background: var(--surface-strong);
+      border-radius: 999px;
       border: 1px solid var(--line);
-    }
-
-    .settings-status {
-      margin: 8px 0 0;
-      min-height: 1.3em;
-      font-size: .9rem;
-      color: var(--muted);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow-soft);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 700;
     }
 
     html[data-site-theme="dark"] .language-picker {
@@ -835,7 +786,7 @@
       border-color: rgba(148, 163, 184, 0.28);
     }
 
-    html[data-site-theme="dark"] .settings-panel {
+    html[data-site-theme="dark"] .settings-link {
       background: rgba(9, 15, 28, 0.92);
       border-color: rgba(148, 163, 184, 0.28);
     }
@@ -875,9 +826,6 @@
         grid-template-columns: 1fr;
       }
 
-      .settings-form {
-        grid-template-columns: 1fr;
-      }
     }
 
     @media (max-width: 680px) {
@@ -928,7 +876,7 @@
       <h2 id="changelogTitle" data-i18n="changelogTitle">Novedades de Budsin Games</h2>
       <p data-i18n="changelogDesc">Este popup solo aparece una vez por versión o la primera vez que entras al sitio.</p>
       <ul class="changelog-list">
-        <li data-i18n="changelogItem1">Se agregó una sección de Ajustes en el inicio para cambiar la URL de Classroom Hotkey.</li>
+        <li data-i18n="changelogItem1">Se agregó una página de Ajustes separada para cambiar la URL de Classroom Hotkey.</li>
         <li data-i18n="changelogItem2">La URL personalizada ahora se guarda en localStorage y se conserva entre sesiones.</li>
         <li data-i18n="changelogItem3">La nueva sección está disponible en español e inglés con validación de URL y botón de restablecer.</li>
       </ul>
@@ -943,6 +891,7 @@
   <main class="shell">
     <section class="title">
       <div class="title-top">
+        <a id="settingsPageLink" class="settings-link" href="settings.html" data-i18n="settingsPageLink">⚙️ Ajustes</a>
         <label class="language-picker" for="languageSelect">
           <span aria-hidden="true">🌐</span>
           <select id="languageSelect" aria-label="Seleccionar idioma">
@@ -974,17 +923,6 @@
           </article>
         </div>
       </div>
-    </section>
-
-    <section class="settings-panel" aria-labelledby="settingsTitle">
-      <h3 id="settingsTitle" data-i18n="settingsTitle">Ajustes</h3>
-      <p data-i18n="settingsDescription">Modifica la URL que usa Classroom Hotkey y guárdala en este navegador.</p>
-      <form id="classroomSettingsForm" class="settings-form">
-        <input id="classroomUrlInput" type="url" required>
-        <button id="saveClassroomUrlButton" class="settings-btn" type="submit" data-i18n="saveButton">Guardar URL</button>
-        <button id="resetClassroomUrlButton" class="settings-btn secondary" type="button" data-i18n="resetButton">Restablecer</button>
-      </form>
-      <p id="classroomSettingsStatus" class="settings-status" aria-live="polite"></p>
     </section>
 
     <section class="library">
@@ -1106,13 +1044,8 @@
     const popularList = document.getElementById("popularList");
     const appTransition = document.getElementById("appTransition");
     const languageSelect = document.getElementById("languageSelect");
-    const classroomSettingsForm = document.getElementById("classroomSettingsForm");
-    const classroomUrlInput = document.getElementById("classroomUrlInput");
-    const classroomSettingsStatus = document.getElementById("classroomSettingsStatus");
-    const resetClassroomUrlButton = document.getElementById("resetClassroomUrlButton");
+    const settingsPageLink = document.getElementById("settingsPageLink");
     const LANGUAGE_KEY = "budsin_language";
-    const CLASSROOM_URL_KEY = "budsin_classroom_url";
-    const CLASSROOM_DEFAULT_URL = "https://docs.google.com/document/d/1gwlAb1OGRGyBkAvdOzILU-i9UquM4nauJ6X3uSnyUXE/edit?usp=sharing";
     const TRANSLATIONS = {
       es: {
         htmlLang: "es",
@@ -1152,17 +1085,10 @@
         closeNotification: "Cerrar notificación",
         changelogTitle: "Novedades de Budsin Games",
         changelogDesc: "Este popup solo aparece una vez por versión o la primera vez que entras al sitio.",
-        changelogItem1: "Se agregó una sección de Ajustes en el inicio para cambiar la URL de Classroom Hotkey.",
+        changelogItem1: "Se agregó una página de Ajustes separada para cambiar la URL de Classroom Hotkey.",
         changelogItem2: "La URL personalizada ahora se guarda en localStorage y se conserva entre sesiones.",
         changelogItem3: "La nueva sección está disponible en español e inglés con validación de URL y botón de restablecer.",
-        settingsTitle: "Ajustes",
-        settingsDescription: "Modifica la URL que usa Classroom Hotkey y guárdala en este navegador.",
-        classroomUrlPlaceholder: "Pega aquí la URL de Classroom/Docs...",
-        saveButton: "Guardar URL",
-        resetButton: "Restablecer",
-        saveSuccess: "URL guardada correctamente.",
-        resetSuccess: "URL restablecida a la predeterminada.",
-        saveError: "La URL no es válida. Revisa e inténtalo de nuevo.",
+        settingsPageLink: "⚙️ Ajustes",
         resultsCount: (count) => `${count} juegos`,
         favoriteSaved: "Guardado",
         playersLabel: "jugadores"
@@ -1205,17 +1131,10 @@
         closeNotification: "Close notification",
         changelogTitle: "What's new in Budsin Games",
         changelogDesc: "This popup appears only once per version or the first time you enter the site.",
-        changelogItem1: "A new Settings section was added on the home page to change the Classroom Hotkey URL.",
+        changelogItem1: "A separate Settings page was added to change the Classroom Hotkey URL.",
         changelogItem2: "The custom URL is now saved in localStorage and persists across sessions.",
         changelogItem3: "The new section is available in Spanish and English with URL validation and a reset button.",
-        settingsTitle: "Settings",
-        settingsDescription: "Change the URL used by Classroom Hotkey and save it in this browser.",
-        classroomUrlPlaceholder: "Paste the Classroom/Docs URL here...",
-        saveButton: "Save URL",
-        resetButton: "Reset",
-        saveSuccess: "URL saved successfully.",
-        resetSuccess: "URL reset to the default value.",
-        saveError: "Invalid URL. Please check it and try again.",
+        settingsPageLink: "⚙️ Settings",
         resultsCount: (count) => `${count} games`,
         favoriteSaved: "Saved",
         playersLabel: "players"
@@ -1467,27 +1386,6 @@
       return TRANSLATIONS[currentLanguage] || TRANSLATIONS.es;
     }
 
-    function readStoredClassroomUrl() {
-      try {
-        return localStorage.getItem(CLASSROOM_URL_KEY) || CLASSROOM_DEFAULT_URL;
-      } catch (error) {
-        return CLASSROOM_DEFAULT_URL;
-      }
-    }
-
-    function saveClassroomUrl(url) {
-      localStorage.setItem(CLASSROOM_URL_KEY, url);
-    }
-
-    function isValidAbsoluteUrl(value) {
-      try {
-        const parsed = new URL(value);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
-      } catch (error) {
-        return false;
-      }
-    }
-
     function applyLanguage(language) {
       const nextLanguage = TRANSLATIONS[language] ? language : "es";
       currentLanguage = nextLanguage;
@@ -1514,8 +1412,9 @@
       if (searchInput) {
         searchInput.placeholder = t.searchPlaceholder;
       }
-      if (classroomUrlInput) {
-        classroomUrlInput.placeholder = t.classroomUrlPlaceholder;
+      if (settingsPageLink) {
+        settingsPageLink.textContent = t.settingsPageLink;
+        settingsPageLink.setAttribute("href", "settings.html?lang=" + nextLanguage);
       }
 
       cards.forEach((card) => {
@@ -1719,36 +1618,12 @@
 
     const preferredLanguage = loadLanguagePreference();
     applyLanguage(preferredLanguage);
-    if (classroomUrlInput) {
-      classroomUrlInput.value = readStoredClassroomUrl();
-    }
 
     if (languageSelect) {
       languageSelect.addEventListener("change", (event) => {
         const selectedLanguage = event.target.value;
         saveLanguagePreference(selectedLanguage);
         applyLanguage(selectedLanguage);
-      });
-    }
-
-    if (classroomSettingsForm && classroomUrlInput && classroomSettingsStatus) {
-      classroomSettingsForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const rawValue = (classroomUrlInput.value || "").trim();
-        if (!isValidAbsoluteUrl(rawValue)) {
-          classroomSettingsStatus.textContent = getTranslations().saveError;
-          return;
-        }
-        saveClassroomUrl(rawValue);
-        classroomSettingsStatus.textContent = getTranslations().saveSuccess;
-      });
-    }
-
-    if (resetClassroomUrlButton && classroomUrlInput && classroomSettingsStatus) {
-      resetClassroomUrlButton.addEventListener("click", () => {
-        classroomUrlInput.value = CLASSROOM_DEFAULT_URL;
-        saveClassroomUrl(CLASSROOM_DEFAULT_URL);
-        classroomSettingsStatus.textContent = getTranslations().resetSuccess;
       });
     }
 

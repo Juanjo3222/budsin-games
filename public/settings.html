@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Budsin Games Settings">
+  <title>Budsin Games · Ajustes</title>
+  <link rel="icon" type="image/jpeg" href="images.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #edf1f5;
+      --bg-2: #dfe6ee;
+      --surface: rgba(255, 255, 255, 0.92);
+      --line: rgba(18, 24, 38, 0.1);
+      --text: #111827;
+      --muted: #5c6678;
+      --shadow: 0 24px 64px rgba(15, 23, 42, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Sora", sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #f7fafc 0%, var(--bg) 55%, var(--bg-2) 100%);
+    }
+    .shell {
+      width: min(920px, calc(100% - 32px));
+      margin: 26px auto;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 32px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .back-link {
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: #fff;
+    }
+    .language-picker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 10px 12px;
+      font-weight: 700;
+    }
+    .language-picker select { border: 0; background: transparent; font: inherit; }
+    h1 {
+      margin: 0 0 6px;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(2.1rem, 7vw, 3.3rem);
+      letter-spacing: .04em;
+    }
+    p { color: var(--muted); margin: 0 0 16px; line-height: 1.65; }
+    .form {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .form input {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      padding: 0 12px;
+      font: inherit;
+    }
+    .btn {
+      min-height: 48px;
+      border-radius: 14px;
+      border: 0;
+      padding: 0 14px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #ef3f45, #ff8c55);
+    }
+    .btn.alt {
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .status {
+      margin: 10px 0 0;
+      min-height: 1.3em;
+      font-size: .92rem;
+      color: var(--muted);
+    }
+    @media (max-width: 740px) {
+      .form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top">
+      <a id="backLink" class="back-link" href="index.html">← Volver al portal</a>
+      <label class="language-picker" for="languageSelect">
+        <span>🌐</span>
+        <select id="languageSelect" aria-label="Seleccionar idioma">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+        </select>
+      </label>
+    </div>
+    <h1 data-i18n="title">Ajustes</h1>
+    <p data-i18n="description">Modifica la URL que usa Classroom Hotkey y guárdala en este navegador.</p>
+    <form id="settingsForm" class="form">
+      <input id="urlInput" type="url" required>
+      <button type="submit" class="btn" data-i18n="saveButton">Guardar URL</button>
+      <button id="resetButton" type="button" class="btn alt" data-i18n="resetButton">Restablecer</button>
+    </form>
+    <p id="status" class="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const LANGUAGE_KEY = "budsin_language";
+    const CLASSROOM_URL_KEY = "budsin_classroom_url";
+    const CLASSROOM_DEFAULT_URL = "https://docs.google.com/document/d/1gwlAb1OGRGyBkAvdOzILU-i9UquM4nauJ6X3uSnyUXE/edit?usp=sharing";
+
+    const languageSelect = document.getElementById("languageSelect");
+    const backLink = document.getElementById("backLink");
+    const settingsForm = document.getElementById("settingsForm");
+    const urlInput = document.getElementById("urlInput");
+    const resetButton = document.getElementById("resetButton");
+    const statusNode = document.getElementById("status");
+
+    const I18N = {
+      es: {
+        htmlLang: "es",
+        title: "Ajustes",
+        description: "Modifica la URL que usa Classroom Hotkey y guárdala en este navegador.",
+        back: "← Volver al portal",
+        placeholder: "Pega aquí la URL de Classroom/Docs...",
+        saveButton: "Guardar URL",
+        resetButton: "Restablecer",
+        saveSuccess: "URL guardada correctamente.",
+        resetSuccess: "URL restablecida a la predeterminada.",
+        saveError: "La URL no es válida. Revisa e inténtalo de nuevo."
+      },
+      en: {
+        htmlLang: "en",
+        title: "Settings",
+        description: "Change the URL used by Classroom Hotkey and save it in this browser.",
+        back: "← Back to portal",
+        placeholder: "Paste the Classroom/Docs URL here...",
+        saveButton: "Save URL",
+        resetButton: "Reset",
+        saveSuccess: "URL saved successfully.",
+        resetSuccess: "URL reset to the default value.",
+        saveError: "Invalid URL. Please check it and try again."
+      }
+    };
+
+    function resolveLanguage(language) {
+      return language === "en" ? "en" : "es";
+    }
+
+    function getLanguageFromUrl() {
+      try {
+        return resolveLanguage(new URL(window.location.href).searchParams.get("lang"));
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function getCurrentLanguage() {
+      const fromUrl = getLanguageFromUrl();
+      if (fromUrl) {
+        localStorage.setItem(LANGUAGE_KEY, fromUrl);
+        return fromUrl;
+      }
+      return resolveLanguage(localStorage.getItem(LANGUAGE_KEY));
+    }
+
+    function applyLanguage(language) {
+      const lang = resolveLanguage(language);
+      const t = I18N[lang];
+      document.documentElement.lang = t.htmlLang;
+      document.title = "Budsin Games · " + t.title;
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        const key = node.dataset.i18n;
+        if (t[key]) node.textContent = t[key];
+      });
+      urlInput.placeholder = t.placeholder;
+      backLink.textContent = t.back;
+      backLink.setAttribute("href", "index.html?lang=" + lang);
+      languageSelect.value = lang;
+    }
+
+    function isValidAbsoluteUrl(value) {
+      try {
+        const parsed = new URL(value);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function readStoredClassroomUrl() {
+      try {
+        return localStorage.getItem(CLASSROOM_URL_KEY) || CLASSROOM_DEFAULT_URL;
+      } catch (error) {
+        return CLASSROOM_DEFAULT_URL;
+      }
+    }
+
+    function saveClassroomUrl(url) {
+      localStorage.setItem(CLASSROOM_URL_KEY, url);
+    }
+
+    const preferredLanguage = getCurrentLanguage();
+    applyLanguage(preferredLanguage);
+    urlInput.value = readStoredClassroomUrl();
+
+    languageSelect.addEventListener("change", (event) => {
+      const lang = resolveLanguage(event.target.value);
+      localStorage.setItem(LANGUAGE_KEY, lang);
+      applyLanguage(lang);
+    });
+
+    settingsForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const value = (urlInput.value || "").trim();
+      const lang = resolveLanguage(languageSelect.value);
+      if (!isValidAbsoluteUrl(value)) {
+        statusNode.textContent = I18N[lang].saveError;
+        return;
+      }
+      saveClassroomUrl(value);
+      statusNode.textContent = I18N[lang].saveSuccess;
+    });
+
+    resetButton.addEventListener("click", () => {
+      const lang = resolveLanguage(languageSelect.value);
+      urlInput.value = CLASSROOM_DEFAULT_URL;
+      saveClassroomUrl(CLASSROOM_DEFAULT_URL);
+      statusNode.textContent = I18N[lang].resetSuccess;
+    });
+  </script>
+  <script src="site-theme.js"></script>
+  <script src="classroom-hotkey.js"></script>
+</body>
+</html>
