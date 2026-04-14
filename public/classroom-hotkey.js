@@ -1,7 +1,8 @@
 (function () {
   "use strict";
 
-  var CLASSROOM_URL = "https://docs.google.com/document/d/1gwlAb1OGRGyBkAvdOzILU-i9UquM4nauJ6X3uSnyUXE/edit?usp=sharing";
+  var CLASSROOM_DEFAULT_URL = "https://docs.google.com/document/d/1gwlAb1OGRGyBkAvdOzILU-i9UquM4nauJ6X3uSnyUXE/edit?usp=sharing";
+  var CLASSROOM_URL_KEY = "budsin_classroom_url";
   var overlayId = "juanjo-classroom-overlay";
   var frameId = "juanjo-classroom-frame";
   var closeId = "juanjo-classroom-close";
@@ -57,6 +58,19 @@
       tag === "select" ||
       target.isContentEditable
     );
+  }
+
+  function getStoredClassroomUrl() {
+    try {
+      var stored = window.localStorage.getItem(CLASSROOM_URL_KEY);
+      if (!stored) {
+        return CLASSROOM_DEFAULT_URL;
+      }
+      var parsed = new URL(stored);
+      return parsed.href;
+    } catch (error) {
+      return CLASSROOM_DEFAULT_URL;
+    }
   }
 
   function createOverlay() {
@@ -259,9 +273,12 @@
     var willOpen = !isOpen;
     var fullscreenElement = getFullscreenElement();
 
-    if (!isOpen && frame && !frame.getAttribute(loadedFlag)) {
-      frame.src = CLASSROOM_URL;
-      frame.setAttribute(loadedFlag, "true");
+    if (!isOpen && frame) {
+      var classroomUrl = getStoredClassroomUrl();
+      if (!frame.getAttribute(loadedFlag) || frame.src !== classroomUrl) {
+        frame.src = classroomUrl;
+        frame.setAttribute(loadedFlag, "true");
+      }
     }
 
     triggerFunkinEscape();

@@ -765,7 +765,28 @@
       cursor: pointer;
     }
 
+    .settings-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow-soft);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
     html[data-site-theme="dark"] .language-picker {
+      background: rgba(9, 15, 28, 0.92);
+      border-color: rgba(148, 163, 184, 0.28);
+    }
+
+    html[data-site-theme="dark"] .settings-link {
       background: rgba(9, 15, 28, 0.92);
       border-color: rgba(148, 163, 184, 0.28);
     }
@@ -804,6 +825,7 @@
       .library-tools {
         grid-template-columns: 1fr;
       }
+
     }
 
     @media (max-width: 680px) {
@@ -850,13 +872,13 @@
   <div id="changelogPopup" class="changelog-popup" aria-hidden="true">
     <div class="changelog-card" role="status" aria-live="polite" aria-labelledby="changelogTitle">
       <button id="closeChangelog" class="changelog-close" type="button" aria-label="Cerrar notificación" data-i18n-aria="closeNotification">×</button>
-      <span>Version 4.0.0</span>
+      <span>Version 4.2.0</span>
       <h2 id="changelogTitle" data-i18n="changelogTitle">Novedades de Budsin Games</h2>
       <p data-i18n="changelogDesc">Este popup solo aparece una vez por versión o la primera vez que entras al sitio.</p>
       <ul class="changelog-list">
-        <li data-i18n="changelogItem1">Se añadió Minecraft 1.21.x al catálogo con su propia página dedicada.</li>
-        <li data-i18n="changelogItem2">Se añadió Bitcoin Clicker al catálogo con su propia página dedicada.</li>
-        <li data-i18n="changelogItem3">Se añadió Friday Night Funkin al catálogo con su propia página dedicada.</li>
+        <li data-i18n="changelogItem1">Se agregó una página de Ajustes separada para cambiar la URL de Classroom Hotkey.</li>
+        <li data-i18n="changelogItem2">La URL personalizada ahora se guarda en localStorage y se conserva entre sesiones.</li>
+        <li data-i18n="changelogItem3">La nueva sección está disponible en español e inglés con validación de URL y botón de restablecer.</li>
       </ul>
     </div>
   </div>
@@ -869,6 +891,7 @@
   <main class="shell">
     <section class="title">
       <div class="title-top">
+        <a id="settingsPageLink" class="settings-link" href="settings.html" data-i18n="settingsPageLink">⚙️ Ajustes</a>
         <label class="language-picker" for="languageSelect">
           <span aria-hidden="true">🌐</span>
           <select id="languageSelect" aria-label="Seleccionar idioma">
@@ -1002,7 +1025,7 @@
     };
   </script>
   <script>
-    const SITE_VERSION = "4.1.0";
+    const SITE_VERSION = "4.2.0";
     const STORAGE_KEY = "juanjos_games_seen_version";
     const ENABLE_CHANGELOG_POPUP = true;
     const FAVORITES_KEY = "budsin_favorites";
@@ -1021,6 +1044,7 @@
     const popularList = document.getElementById("popularList");
     const appTransition = document.getElementById("appTransition");
     const languageSelect = document.getElementById("languageSelect");
+    const settingsPageLink = document.getElementById("settingsPageLink");
     const LANGUAGE_KEY = "budsin_language";
     const TRANSLATIONS = {
       es: {
@@ -1061,9 +1085,10 @@
         closeNotification: "Cerrar notificación",
         changelogTitle: "Novedades de Budsin Games",
         changelogDesc: "Este popup solo aparece una vez por versión o la primera vez que entras al sitio.",
-        changelogItem1: "Se añadió Minecraft 1.21.x al catálogo con su propia página dedicada.",
-        changelogItem2: "Se añadió Bitcoin Clicker al catálogo con su propia página dedicada.",
-        changelogItem3: "Se añadió Friday Night Funkin al catálogo con su propia página dedicada.",
+        changelogItem1: "Se agregó una página de Ajustes separada para cambiar la URL de Classroom Hotkey.",
+        changelogItem2: "La URL personalizada ahora se guarda en localStorage y se conserva entre sesiones.",
+        changelogItem3: "La nueva sección está disponible en español e inglés con validación de URL y botón de restablecer.",
+        settingsPageLink: "⚙️ Ajustes",
         resultsCount: (count) => `${count} juegos`,
         favoriteSaved: "Guardado",
         playersLabel: "jugadores"
@@ -1106,9 +1131,10 @@
         closeNotification: "Close notification",
         changelogTitle: "What's new in Budsin Games",
         changelogDesc: "This popup appears only once per version or the first time you enter the site.",
-        changelogItem1: "Minecraft 1.21.x was added to the catalog with its own dedicated page.",
-        changelogItem2: "Bitcoin Clicker was added to the catalog with its own dedicated page.",
-        changelogItem3: "Friday Night Funkin was added to the catalog with its own dedicated page.",
+        changelogItem1: "A separate Settings page was added to change the Classroom Hotkey URL.",
+        changelogItem2: "The custom URL is now saved in localStorage and persists across sessions.",
+        changelogItem3: "The new section is available in Spanish and English with URL validation and a reset button.",
+        settingsPageLink: "⚙️ Settings",
         resultsCount: (count) => `${count} games`,
         favoriteSaved: "Saved",
         playersLabel: "players"
@@ -1385,6 +1411,10 @@
 
       if (searchInput) {
         searchInput.placeholder = t.searchPlaceholder;
+      }
+      if (settingsPageLink) {
+        settingsPageLink.textContent = t.settingsPageLink;
+        settingsPageLink.setAttribute("href", "settings.html?lang=" + nextLanguage);
       }
 
       cards.forEach((card) => {
