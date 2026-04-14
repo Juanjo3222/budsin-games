@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-27-blue" />
   <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
-  <img src="https://img.shields.io/badge/Version-4.1.0-purple" />
+  <img src="https://img.shields.io/badge/Version-4.2.0-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -36,6 +36,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 * 📊 **Ranking de juegos (en desarrollo)**
 * 🧠 **Filtros por categorías**
 * 🔄 **Actualización dinámica del catálogo**
+* ⚙️ **Ajustes para URL de Classroom Hotkey (guardado local)**
 
 ---
 
@@ -140,6 +141,15 @@ index.html
 
 Proyecto **100% frontend**, sin backend requerido.
 Fácil de modificar, clonar o expandir.
+
+---
+
+## 📝 Changelog
+
+### v4.2.0
+* Se agregó una página/sección de **Ajustes** en `index` para editar la URL usada por `classroom-hotkey.js`.
+* La URL personalizada ahora se guarda en `localStorage` y se mantiene al recargar.
+* Soporte completo en **español e inglés** para el módulo de ajustes.
 
 ---
 
