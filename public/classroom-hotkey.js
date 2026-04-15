@@ -266,6 +266,30 @@
     window.setTimeout(finish, 400);
   }
 
+
+
+  function ensureClassroomFrameUrl(frame) {
+    if (!frame) {
+      return;
+    }
+
+    var classroomUrl = getStoredClassroomUrl();
+    if (!frame.getAttribute(loadedFlag) || frame.src !== classroomUrl) {
+      frame.src = classroomUrl;
+      frame.setAttribute(loadedFlag, "true");
+    }
+  }
+
+  function preloadClassroomUrl() {
+    var frame = document.getElementById(frameId);
+
+    if (!frame) {
+      return;
+    }
+
+    ensureClassroomFrameUrl(frame);
+  }
+
   function toggleClassroom() {
     var overlay = createOverlay();
     var frame = document.getElementById(frameId);
@@ -274,11 +298,7 @@
     var fullscreenElement = getFullscreenElement();
 
     if (!isOpen && frame) {
-      var classroomUrl = getStoredClassroomUrl();
-      if (!frame.getAttribute(loadedFlag) || frame.src !== classroomUrl) {
-        frame.src = classroomUrl;
-        frame.setAttribute(loadedFlag, "true");
-      }
+      ensureClassroomFrameUrl(frame);
     }
 
     triggerFunkinEscape();
@@ -505,6 +525,7 @@
     toggleClassroom();
   });
   createOverlay();
+  window.setTimeout(preloadClassroomUrl, 0);
   ensureQuickToggleButton();
   bindIframeHotkeys();
 })();
