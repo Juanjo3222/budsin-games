@@ -725,6 +725,29 @@
       text-align: center;
     }
 
+    .changelog-close-wrap {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .changelog-countdown {
+      min-width: 74px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(10, 15, 30, 0.72);
+      color: var(--muted-text);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
     .changelog-close:hover,
     .suggestions-link:hover {
       transform: translateY(-2px);
@@ -871,14 +894,14 @@
 <body>
   <div id="changelogPopup" class="changelog-popup" aria-hidden="true">
     <div class="changelog-card" role="status" aria-live="polite" aria-labelledby="changelogTitle">
-      <button id="closeChangelog" class="changelog-close" type="button" aria-label="Cerrar notificación" data-i18n-aria="closeNotification">×</button>
-      <span>Version 4.2.0</span>
+      <div class="changelog-close-wrap"><button id="closeChangelog" class="changelog-close" type="button" aria-label="Cerrar notificación" data-i18n-aria="closeNotification">×</button><span id="changelogCountdown" class="changelog-countdown" aria-live="polite">5.000s</span></div>
+      <span>Version 4.3.0</span>
       <h2 id="changelogTitle" data-i18n="changelogTitle">Novedades de Budsin Games</h2>
       <p data-i18n="changelogDesc">Este popup solo aparece una vez por versión o la primera vez que entras al sitio.</p>
       <ul class="changelog-list">
-        <li data-i18n="changelogItem1">Se agregó una página de Ajustes separada para cambiar la URL de Classroom Hotkey.</li>
-        <li data-i18n="changelogItem2">La URL personalizada ahora se guarda en localStorage y se conserva entre sesiones.</li>
-        <li data-i18n="changelogItem3">La nueva sección está disponible en español e inglés con validación de URL y botón de restablecer.</li>
+        <li data-i18n="changelogItem1">Se agregaron RubDy y Super Mario Bros al portal con portada, ranking y acceso directo.</li>
+        <li data-i18n="changelogItem2">Pac-Man y Super Mario World ahora forman parte del catálogo clásico del portal.</li>
+        <li data-i18n="changelogItem3">Galaga y Centipede Arcade también se añadieron al index con soporte para el sistema de popularidad.</li>
       </ul>
     </div>
   </div>
@@ -1031,7 +1054,7 @@
     };
   </script>
   <script>
-    const SITE_VERSION = "4.2.0";
+    const SITE_VERSION = "4.3.0";
     const STORAGE_KEY = "juanjos_games_seen_version";
     const ENABLE_CHANGELOG_POPUP = true;
     const FAVORITES_KEY = "budsin_favorites";
@@ -1040,6 +1063,11 @@
     const FIREBASE_COLLECTION = "game_popularity";
     const popup = document.getElementById("changelogPopup");
     const closeButton = document.getElementById("closeChangelog");
+    const countdownLabel = document.getElementById("changelogCountdown");
+    const CHANGELOG_CLOSE_DELAY_MS = 5000;
+    let changelogCloseReady = true;
+    let changelogUnlockTimer = null;
+    let changelogCountdownFrame = null;
     const searchInput = document.getElementById("gameSearch");
     const typeFilters = document.getElementById("typeFilters");
     const cards = Array.from(document.querySelectorAll(".game-card"));
@@ -1091,9 +1119,9 @@
         closeNotification: "Cerrar notificación",
         changelogTitle: "Novedades de Budsin Games",
         changelogDesc: "Este popup solo aparece una vez por versión o la primera vez que entras al sitio.",
-        changelogItem1: "Se agregó una página de Ajustes separada para cambiar la URL de Classroom Hotkey.",
-        changelogItem2: "La URL personalizada ahora se guarda en localStorage y se conserva entre sesiones.",
-        changelogItem3: "La nueva sección está disponible en español e inglés con validación de URL y botón de restablecer.",
+        changelogItem1: "Se agregaron RubDy y Super Mario Bros al portal con portada, ranking y acceso directo.",
+        changelogItem2: "Pac-Man y Super Mario World ahora forman parte del catálogo clásico del portal.",
+        changelogItem3: "Galaga y Centipede Arcade también se añadieron al index con soporte para el sistema de popularidad.",
         settingsPageLink: "⚙️ Ajustes",
         resultsCount: (count) => `${count} juegos`,
         favoriteSaved: "Guardado",
@@ -1137,9 +1165,9 @@
         closeNotification: "Close notification",
         changelogTitle: "What's new in Budsin Games",
         changelogDesc: "This popup appears only once per version or the first time you enter the site.",
-        changelogItem1: "A separate Settings page was added to change the Classroom Hotkey URL.",
-        changelogItem2: "The custom URL is now saved in localStorage and persists across sessions.",
-        changelogItem3: "The new section is available in Spanish and English with URL validation and a reset button.",
+        changelogItem1: "RubDy and Super Mario Bros were added to the portal with covers, ranking support, and direct access.",
+        changelogItem2: "Pac-Man and Super Mario World are now part of the portal's classics catalog.",
+        changelogItem3: "Galaga and Centipede Arcade were also added to the index with popularity tracking support.",
         settingsPageLink: "⚙️ Settings",
         resultsCount: (count) => `${count} games`,
         favoriteSaved: "Saved",
@@ -1366,12 +1394,69 @@
       savePendingPopularity(pending);
     }
 
+    function setChangelogCountdown(valueMs) {
+      if (!countdownLabel) return;
+      const safeMs = Math.max(0, Number(valueMs) || 0);
+      countdownLabel.textContent = (safeMs / 1000).toFixed(3) + "s";
+    }
+
+    function showChangelog() {
+      if (!popup) return;
+      popup.classList.add("is-visible");
+      popup.setAttribute("aria-hidden", "false");
+      changelogCloseReady = false;
+      if (closeButton) {
+        closeButton.disabled = true;
+      }
+      const unlockAt = performance.now() + CHANGELOG_CLOSE_DELAY_MS;
+      setChangelogCountdown(CHANGELOG_CLOSE_DELAY_MS);
+      if (changelogCountdownFrame) {
+        window.cancelAnimationFrame(changelogCountdownFrame);
+      }
+      const tickCountdown = () => {
+        const remaining = unlockAt - performance.now();
+        setChangelogCountdown(remaining);
+        if (remaining > 0) {
+          changelogCountdownFrame = window.requestAnimationFrame(tickCountdown);
+          return;
+        }
+        changelogCloseReady = true;
+        if (closeButton) {
+          closeButton.disabled = false;
+        }
+        changelogCountdownFrame = null;
+      };
+      changelogCountdownFrame = window.requestAnimationFrame(tickCountdown);
+      if (changelogUnlockTimer) {
+        window.clearTimeout(changelogUnlockTimer);
+      }
+      changelogUnlockTimer = window.setTimeout(() => {
+        changelogCloseReady = true;
+        if (closeButton) {
+          closeButton.disabled = false;
+        }
+        setChangelogCountdown(0);
+      }, CHANGELOG_CLOSE_DELAY_MS);
+    }
+
     function closeChangelog() {
+      if (!changelogCloseReady) {
+        return;
+      }
       try {
         localStorage.setItem(STORAGE_KEY, SITE_VERSION);
       } catch (error) {
         logFirebase("No se pudo guardar el estado del changelog en localStorage.", error);
       }
+      if (changelogUnlockTimer) {
+        window.clearTimeout(changelogUnlockTimer);
+        changelogUnlockTimer = null;
+      }
+      if (changelogCountdownFrame) {
+        window.cancelAnimationFrame(changelogCountdownFrame);
+        changelogCountdownFrame = null;
+      }
+      setChangelogCountdown(0);
       popup.classList.remove("is-visible");
       popup.setAttribute("aria-hidden", "true");
     }
@@ -1582,13 +1667,11 @@
     try {
       const seenVersion = localStorage.getItem(STORAGE_KEY);
       if (ENABLE_CHANGELOG_POPUP && seenVersion !== SITE_VERSION) {
-        popup.classList.add("is-visible");
-        popup.setAttribute("aria-hidden", "false");
+        showChangelog();
       }
     } catch (error) {
       if (ENABLE_CHANGELOG_POPUP) {
-        popup.classList.add("is-visible");
-        popup.setAttribute("aria-hidden", "false");
+        showChangelog();
       }
     }
 

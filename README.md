@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-27-blue" />
   <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
-  <img src="https://img.shields.io/badge/Version-4.2.0-purple" />
+  <img src="https://img.shields.io/badge/Version-4.3.0-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -146,10 +146,10 @@ Fácil de modificar, clonar o expandir.
 
 ## 📝 Changelog
 
-### v4.2.0
-* Se agregó una **página separada de Ajustes** para editar la URL usada por `classroom-hotkey.js`.
-* La URL personalizada ahora se guarda en `localStorage` y se mantiene al recargar.
-* Soporte completo en **español e inglés** para el módulo de ajustes.
+### v4.3.0
+* Se agregaron **RubDy, Super Mario Bros, Pac-Man, Super Mario World, Galaga y Centipede Arcade** al catálogo del portal.
+* Las nuevas entradas se integraron al **index** y al sistema de **ranking/popularidad**.
+* El changelog del portal ahora se muestra como **v4.3.0** y no puede cerrarse hasta después de 5 segundos.
 
 ---
 
