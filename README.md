@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
-  <img src="https://img.shields.io/badge/Games-27-blue" />
+  <img src="https://img.shields.io/badge/Games-33-blue" />
   <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
   <img src="https://img.shields.io/badge/Version-4.3.0-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
@@ -29,7 +29,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 ## ✨ Features
 
-* 🎮 **27 juegos jugables al instante**
+* 🎮 **33 juegos jugables al instante**
 * ⚡ **Sin descargas ni instalación**
 * 🧩 **UI tipo consola (portadas interactivas)**
 * ⭐ **Sistema de favoritos (localStorage)**
