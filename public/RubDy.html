@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/jpeg" href="images.jpeg">
+    <title>Space Survival: Defensores</title>
+    <script>
+        window.addEventListener("load", function () {
+            alert("¡Advertencia! Este juego fue hecho con IA, lo que puede significar que el juego sea de mala calidad, copycat, o simplemente tenga varios errores. Si hay algún error, por favor envía tu sugerencia en el formulario de la página.");
+        }, { once: true });
+    </script>
+    <style>
+        :root {
+            --bg-color: #000000; /* Fondo completamente negro */
+            --text-color: #c5c6c7;
+            --accent-color: #00ffff;
+            --secondary-color: #008888;
+            --danger-color: #ff2a6d;
+            --gold-color: #ffcc00;
+            --gui-scale: 1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #game-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: none;
+        }
+
+        /* Sistema de UI Escalable */
+        #ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            transform-origin: top left;
+        }
+
+        .gui-auto { transform: scale(min(1, max(0.5, calc(100vw / 1920)))); width: max(100%, 1920px); height: max(100%, 1080px); }
+        .gui-small { transform: scale(0.7); width: 142.8%; height: 142.8%; }
+        .gui-medium { transform: scale(1); width: 100%; height: 100%; }
+        .gui-large { transform: scale(1.3); width: 76.9%; height: 76.9%; }
+
+        /* Menús Generales */
+        .menu-screen {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(11, 12, 16, 0.95);
+            border: 2px solid var(--accent-color);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            pointer-events: auto;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 350px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .menu-screen.active { display: flex; }
+
+        /* --- ESTILO ESPECÍFICO DEL NUEVO MENÚ PRINCIPAL --- */
+        #main-menu {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            width: 100%;
+            align-items: center;
+        }
+
+        .top-coins-badge {
+            display: inline-block;
+            border: 2px solid var(--gold-color);
+            color: var(--gold-color);
+            padding: 10px 30px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            background: rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .neon-title {
+            color: #ffffff;
+            font-family: 'Arial Black', Impact, sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff;
+            margin-bottom: 5px;
+            letter-spacing: 3px;
+            text-align: center;
+        }
+        
+        .menu-screen.active { display: flex; }
+
+        /* --- ESTILO ESPECÍFICO DEL NUEVO MENÚ PRINCIPAL --- */
+        #main-menu {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            width: 100%;
+            align-items: center;
+        }
+
+        .top-coins-badge {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 2px solid var(--gold-color);
+            color: var(--gold-color);
+            padding: 10px 30px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            background: rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .neon-title {
+            color: #ffffff;
+            font-family: 'Arial Black', Impact, sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff;
+            margin-top: 60px;
+            margin-bottom: 5px;
+            letter-spacing: 3px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #888888;
+            font-weight: bold;
+            letter-spacing: 4px;
+            font-size: 1rem;
+            margin-bottom: 40px;
+        }
+
+        .main-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-retro {
+            background: rgba(0, 0, 0, 0.6);
+            width: 320px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+            text-transform: uppercase;
+        }
+
+        .btn-cyan { color: var(--accent-color); border: 2px solid var(--accent-color); }
+        .btn-cyan:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 20px var(--accent-color); transform: scale(1.05); }
+        .btn-pink { color: var(--danger-color); border: 2px solid var(--danger-color); }
+        .btn-pink:hover { background: var(--danger-color); color: #fff; box-shadow: 0 0 20px var(--danger-color); transform: scale(1.05); }
+
+        h2 { color: var(--secondary-color); font-size: 1.8rem; margin-bottom: 10px; }
+        
+        button.default-btn {
+            background: transparent; color: var(--accent-color); border: 2px solid var(--accent-color);
+            padding: 10px 20px; font-size: 1.2rem; cursor: pointer; border-radius: 5px;
+            transition: all 0.3s; font-weight: bold;
+        }
+        button.default-btn:hover { background: var(--accent-color); color: var(--bg-color); }
+
+        .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .col { display: flex; flex-direction: column; gap: 10px; }
+        input, select { background: rgba(0,0,0,0.5); border: 1px solid var(--secondary-color); color: white; padding: 5px; border-radius: 3px; }
+
+        /* HUD */
+        #hud {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: none; padding: 20px;
+        }
+        #hud.active { display: block; }
+        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; font-size: 1.3rem; font-weight: bold; text-shadow: 2px 2px 4px #000; width: 100%; }
+        .level-badge { color: var(--gold-color); }
+        
+        .points-display { 
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--gold-color);
+            font-size: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 5px 25px;
+            border-radius: 10px;
+            border: 2px solid var(--gold-color);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+            text-shadow: none;
+            pointer-events: auto;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        @keyframes floatHud { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); filter: drop-shadow(0 5px 10px rgba(0, 255, 255, 0.3)); } }
+
+        /* Interfaz Vertical de Objetos */
+        .item-dock {
+            position: absolute; bottom: 20px; left: 20px;
+            display: flex; flex-direction: column; gap: 15px; pointer-events: auto;
+        }
+        .item-slot {
+            background: rgba(11, 12, 16, 0.8); border: 2px solid var(--secondary-color);
+            border-radius: 10px; width: 60px; height: 60px; display: flex;
+            justify-content: center; align-items: center; position: relative;
+            cursor: pointer; transition: transform 0.2s, border-color 0.2s;
+            animation: floatHud 3s infinite ease-in-out;
+        }
+        .item-slot:nth-child(1) { animation-delay: 0s; }
+        .item-slot:nth-child(2) { animation-delay: 0.5s; }
+        .item-slot:nth-child(3) { animation-delay: 1s; }
+        .item-slot:hover { transform: scale(1.15) !important; border-color: var(--accent-color); animation-play-state: paused; }
+        
+        .item-slot .key-hint {
+            position: absolute; top: -10px; left: -10px; background: var(--text-color);
+            color: var(--bg-color); font-size: 0.8rem; padding: 2px 6px; border-radius: 50%; font-weight: bold;
+        }
+        .item-slot .count {
+            position: absolute; bottom: -5px; right: -5px; background: var(--accent-color);
+            color: #000; font-size: 0.9rem; padding: 2px 5px; border-radius: 5px; font-weight: bold;
+        }
+        .item-icon { width: 36px; height: 36px; }
+
+        /* Tienda Animada */
+        .shop-layout.active {
+            display: flex; flex-direction: row; width: 850px; max-width: 95vw;
+            padding: 0; overflow: hidden; align-items: stretch; background: rgba(11, 12, 16, 0.98);
+        }
+        .vendor-side {
+            flex: 1; background: radial-gradient(circle at center, rgba(0, 136, 136, 0.2) 0%, rgba(0,0,0,0.6) 100%);
+            padding: 30px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-right: 3px dashed var(--secondary-color); box-shadow: inset -15px 0 20px rgba(0,0,0,0.5); position: relative;
+        }
+        .items-side { flex: 1.2; padding: 30px 25px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+
+        @keyframes cerdonioBreathe { 0%, 100% { transform: scaleY(1) translateY(0); } 50% { transform: scaleY(1.02) translateY(-2px); } }
+        @keyframes cerdonioArm { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
+
+        .cerdonio-anim { width: 220px; height: 220px; filter: drop-shadow(0 15px 10px rgba(0,0,0,0.6)); }
+        .cerdonio-body { transform-origin: center bottom; animation: cerdonioBreathe 1.5s ease-in-out infinite; }
+        .cerdonio-arm-move { transform-origin: 160px 140px; animation: cerdonioArm 1.5s ease-in-out infinite; }
+
+        .vendor-dialogue { 
+            font-style: italic; color: var(--gold-color); margin-top: 15px;
+            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; border: 1px solid var(--gold-color); text-align: center;
+        }
+
+        .shop-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 255, 255, 0.05); padding: 12px; border: 2px solid var(--secondary-color);
+            border-radius: 10px; transition: all 0.3s;
+        }
+        .shop-item:hover { background: rgba(0, 255, 255, 0.15); border-color: var(--accent-color); transform: translateX(10px); }
+        .shop-custom-icon { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 0 5px currentColor); }
+        .shop-item-info { display: flex; align-items: center; gap: 15px; text-align: left; }
+        .shop-item-name { font-weight: bold; color: var(--accent-color); font-size: 1.1rem; }
+        .shop-item-desc { font-size: 0.85rem; color: #ccc; margin-top: 4px; }
+
+        .timer-bar-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 300px; display: flex; flex-direction: column; gap: 5px; }
+        .timer-bar { height: 10px; width: 0%; border-radius: 5px; transition: width 0.1s linear; }
+        .timer-shield { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
+        .timer-cannon { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+
+        /* Botón de Pausa */
+        #pause-btn {
+            position: absolute; top: 20px; right: 20px; width: 50px; height: 50px;
+            background: rgba(11, 12, 16, 0.8); border: 2px solid var(--accent-color);
+            border-radius: 10px; cursor: pointer; pointer-events: auto;
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.2s; z-index: 100;
+        }
+        #pause-btn:hover { background: var(--accent-color); transform: scale(1.1); }
+        #pause-btn svg { width: 25px; height: 25px; fill: var(--accent-color); transition: fill 0.2s; }
+        #pause-btn:hover svg { fill: #000; }
+        
+        /* Animación del Tótem en pantalla */
+        #totem-popup {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 250px; height: 250px;
+            pointer-events: none;
+            z-index: 2000;
+            opacity: 0;
+            filter: drop-shadow(0 0 20px #22c55e) drop-shadow(0 0 50px #eab308);
+        }
+
+        .totem-animate {
+            animation: totemPop 2s ease-out forwards;
+        }
+
+        @keyframes totemPop {
+            0% { transform: translate(-50%, -20%) scale(0.5); opacity: 0; }
+            15% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            25% { transform: translate(-50%, -50%) scale(1.2) rotate(-5deg); opacity: 1; }
+            35% { transform: translate(-50%, -50%) scale(1.3) rotate(5deg); opacity: 1; filter: drop-shadow(0 0 30px #22c55e) drop-shadow(0 0 60px #eab308); }
+            80% { transform: translate(-50%, -50%) scale(1.3) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 30px #22c55e) drop-shadow(0 0 60px #eab308); }
+            100% { transform: translate(-50%, -80%) scale(2); opacity: 0; filter: drop-shadow(0 0 10px #22c55e); }
+        }
+
+        #keybind-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 100;
+            display: none; justify-content: center; align-items: center;
+            color: white; font-size: 2rem; pointer-events: auto;
+        }
+
+        /* Responsividad para evitar colisiones en pantallas pequeñas */
+        @media (max-width: 768px) {
+            .shop-layout.active { flex-direction: column; }
+            .vendor-side { border-right: none; border-bottom: 3px dashed var(--secondary-color); padding: 15px; }
+            .items-side { padding: 15px; }
+            .cerdonio-anim { width: 150px; height: 150px; }
+            .btn-retro { width: 100%; max-width: 320px; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="ui-layer" class="gui-auto">
+    <!-- MENÚ PRINCIPAL -->
+    <div id="main-menu" class="menu-screen active">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+            <div class="top-coins-badge">Monedas: <span id="menu-coins">0</span></div>
+            <h1 class="neon-title">RYBU DOGLE BUDSIN</h1>
+            <p class="subtitle">BlackBoneDel</p>
+            <p class="subtitle">Añadido a la pàgina por Budsin</p>
+            
+            <div class="main-btn-group">
+                <button class="btn-retro btn-cyan" onclick="startGame('survival')">Modo Supervivencia</button>
+                <button class="btn-retro btn-cyan" onclick="openMenu('practice-menu')">Modo Práctica</button>
+                <button class="btn-retro btn-cyan" style="color: #a855f7; border-color: #a855f7;" onclick="openCreatorMenu()">Modo Creador</button>
+                <button class="btn-retro btn-pink" onclick="openMenu('shop-menu')">Tienda de Cerdonio</button>
+                <button class="btn-retro btn-cyan" onclick="openMenu('settings-menu')">Ajustes y Controles</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menú Práctica -->
+    <div id="practice-menu" class="menu-screen">
+        <h2>Modo Práctica</h2>
+        <p>Selecciona el nivel inicial:</p>
+        <div class="col">
+            <button class="default-btn" onclick="startGame('practice', 1)" style="color: #cd7f32; border-color: #cd7f32;">Bronce</button>
+            <button class="default-btn" onclick="startGame('practice', 2)" style="color: #c0c0c0; border-color: #c0c0c0;">Plata</button>
+            <button class="default-btn" onclick="startGame('practice', 3)" style="color: #ffd700; border-color: #ffd700;">Oro</button>
+            <button class="default-btn" onclick="startGame('practice', 4)" style="color: #e5e4e2; border-color: #e5e4e2;">Platino</button>
+            <button class="default-btn" onclick="startGame('practice', 5)" style="color: #b9f2ff; border-color: #b9f2ff;">Diamante</button>
+        </div>
+        <button class="default-btn" onclick="backFromSubMenu()" style="margin-top: 15px;">Volver</button>
+    </div>
+
+    <!-- Tienda -->
+    <div id="shop-menu" class="menu-screen shop-layout">
+        <!-- Lado Izquierdo: Cerdonio Animado -->
+        <div class="vendor-side">
+            <h2 style="font-family: 'Arial Black', sans-serif; font-size: 2rem; color: var(--accent-color); text-shadow: 2px 2px 0 #000; letter-spacing: 2px; margin-bottom: 5px;">CERDONIO</h2>
+            <svg class="cerdonio-anim" viewBox="0 0 250 250">
+                <circle cx="125" cy="115" r="95" fill="none" stroke="var(--accent-color)" stroke-width="4" opacity="0.3"/>
+                <g class="cerdonio-body">
+                    <!-- Overalls / Body -->
+                    <path d="M 50 120 C 30 160, 40 220, 125 220 C 210 220, 220 160, 200 120 Z" fill="#888" stroke="#111" stroke-width="6"/>
+                    <path d="M 70 220 L 70 170 L 180 170 L 180 220 Z" fill="#6b4423" stroke="#111" stroke-width="6"/>
+                    <circle cx="90" cy="185" r="10" fill="#4a3018" stroke="#111" stroke-width="3"/>
+                    <circle cx="160" cy="185" r="10" fill="#4a3018" stroke="#111" stroke-width="3"/>
+                    
+                    <!-- Head -->
+                    <ellipse cx="125" cy="100" rx="65" ry="60" fill="#df9b7a" stroke="#111" stroke-width="6"/>
+                    <!-- Ears -->
+                    <path d="M 75 55 L 55 15 L 95 35 Z" fill="#df9b7a" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
+                    <path d="M 175 55 L 195 15 L 155 35 Z" fill="#df9b7a" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
+                    
+                    <!-- Eye Patch Strap -->
+                    <line x1="60" y1="105" x2="190" y2="75" stroke="#111" stroke-width="7"/>
+                    <!-- Patch -->
+                    <ellipse cx="100" cy="95" rx="18" ry="22" fill="#111" transform="rotate(-15 100 95)"/>
+                    
+                    <!-- Good Eye -->
+                    <ellipse cx="155" cy="90" rx="12" ry="18" fill="#fff" stroke="#111" stroke-width="4"/>
+                    <circle cx="152" cy="90" r="5" fill="#111"/>
+                    <path d="M 140 70 L 170 80" stroke="#111" stroke-width="6" stroke-linecap="round"/>
+                    
+                    <!-- Snout -->
+                    <ellipse cx="140" cy="125" rx="22" ry="18" fill="#fbcfe8" stroke="#111" stroke-width="5"/>
+                    <ellipse cx="132" cy="125" rx="4" ry="8" fill="#111"/>
+                    <ellipse cx="148" cy="125" rx="4" ry="8" fill="#111"/>
+                    
+                    <!-- Mouth/Smirk -->
+                    <path d="M 90 120 C 100 145, 120 140, 130 135" fill="none" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+                </g>
+
+                <!-- Arm Fix -->
+                <g class="cerdonio-arm-move">
+                    <circle cx="160" cy="140" r="18" fill="#888" stroke="#111" stroke-width="6"/>
+                    <path d="M 160 122 Q 240 120 230 180 L 200 190 Q 180 160 160 158 Z" fill="#888" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
+                    <circle cx="160" cy="140" r="14" fill="#888" />
+                    <circle cx="210" cy="190" r="25" fill="#df9b7a" stroke="#111" stroke-width="6"/>
+                    <path d="M 200 180 C 190 190, 200 200, 195 205" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    <path d="M 210 175 C 200 185, 210 195, 205 200" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/>
+                </g>
+            </svg>
+            <div class="vendor-dialogue">
+                "¡Oink, hola humano! Llévate estos juguetes galácticos."<br>
+                <span style="color:var(--gold-color); font-weight:bold; font-size:1.2rem;">🪙 Monedas: <span id="shop-points">0</span></span>
+            </div>
+            <button class="default-btn" onclick="backFromSubMenu()" style="margin-top: 20px; width: 80%;">Abandonar Tienda</button>
+        </div>
+        
+        <!-- Lado Derecho: Objetos -->
+        <div class="items-side">
+            <h2 style="text-align: left; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px;">INVENTARIO</h2>
+            <div class="shop-item">
+                <div class="shop-item-info">
+                    <div class="shop-custom-icon" style="color: #ef4444;">
+                        <svg viewBox="0 0 100 100">
+                            <!-- Cap Shield Design -->
+                            <circle cx="50" cy="50" r="45" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                            <circle cx="50" cy="50" r="35" fill="#f8fafc"/>
+                            <circle cx="50" cy="50" r="25" fill="#ef4444"/>
+                            <circle cx="50" cy="50" r="15" fill="#3b82f6"/>
+                            <polygon points="50,38 53,46 62,46 55,51 58,59 50,54 42,59 45,51 38,46 47,46" fill="#f8fafc"/>
+                            <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="shop-item-name">Escudo del Capitán</div>
+                        <div class="shop-item-desc">Inmortalidad 20s. Resiste golpes.</div>
+                    </div>
+                </div>
+                <button class="default-btn" onclick="buyItem('shield', 500)">500</button>
+            </div>
+            
+            <div class="shop-item">
+                <div class="shop-item-info">
+                    <div class="shop-custom-icon" style="color: #ef4444;">
+                        <svg viewBox="0 0 100 100">
+                            <rect x="25" y="20" width="65" height="20" rx="5" fill="#7f1d1d" stroke="#ef4444" stroke-width="4"/>
+                            <rect x="25" y="60" width="65" height="20" rx="5" fill="#7f1d1d" stroke="#ef4444" stroke-width="4"/>
+                            <path d="M 30 40 L 30 60 M 15 15 L 15 85" stroke="#450a0a" stroke-width="12" stroke-linecap="round"/>
+                            <ellipse cx="80" cy="30" rx="6" ry="10" fill="#fca5a5" filter="blur(1px)"/>
+                            <ellipse cx="80" cy="70" rx="6" ry="10" fill="#fca5a5" filter="blur(1px)"/>
+                            <line x1="40" y1="30" x2="60" y2="30" stroke="#f87171" stroke-width="2"/>
+                            <line x1="40" y1="70" x2="60" y2="70" stroke="#f87171" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="shop-item-name">Blaster Doble Retro</div>
+                        <div class="shop-item-desc">Láseres dobles que aniquilan por 20s.</div>
+                    </div>
+                </div>
+                <button class="default-btn" onclick="buyItem('cannon', 1000)">1000</button>
+            </div>
+
+            <div class="shop-item">
+                <div class="shop-item-info">
+                    <div class="shop-custom-icon" style="color: #eab308;">
+                        <svg viewBox="0 0 100 100" shape-rendering="crispEdges">
+                            <!-- MS Paint Style Totem -->
+                            <rect x="30" y="20" width="40" height="20" fill="#fde047" stroke="#000" stroke-width="3"/>
+                            <rect x="35" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
+                            <rect x="55" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
+                            <rect x="40" y="40" width="20" height="40" fill="#eab308" stroke="#000" stroke-width="3"/>
+                            <rect x="20" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
+                            <rect x="60" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
+                            <rect x="30" y="80" width="40" height="10" fill="#ca8a04" stroke="#000" stroke-width="3"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="shop-item-name">Tótem de la Inmortalidad</div>
+                        <div class="shop-item-desc">Resurrección mágica al caer.</div>
+                    </div>
+                </div>
+                <button class="default-btn" onclick="buyItem('totem', 2500)">2500</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ajustes -->
+    <div id="settings-menu" class="menu-screen">
+        <h2>Ajustes</h2>
+        <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;" class="col">
+            <h3>Controles</h3>
+            <div class="row"><span>Arriba:</span> <button class="default-btn" onclick="captureKey('up')" id="btn-key-up">W</button></div>
+            <div class="row"><span>Abajo:</span> <button class="default-btn" onclick="captureKey('down')" id="btn-key-down">S</button></div>
+            <div class="row"><span>Izquierda:</span> <button class="default-btn" onclick="captureKey('left')" id="btn-key-left">A</button></div>
+            <div class="row"><span>Derecha:</span> <button class="default-btn" onclick="captureKey('right')" id="btn-key-right">D</button></div>
+            <div class="row"><span>Activar Escudo:</span> <button class="default-btn" onclick="captureKey('shield')" id="btn-key-shield">Q</button></div>
+            <div class="row"><span>Activar Cañón:</span> <button class="default-btn" onclick="captureKey('cannon')" id="btn-key-cannon">F</button></div>
+
+            <h3 style="margin-top: 10px;">Interfaz</h3>
+            <div class="row">
+                <span>Tamaño GUI:</span>
+                <select id="gui-scale-select" onchange="changeGUIScale(this.value)">
+                    <option value="auto">Automático</option>
+                    <option value="small">Pequeño</option>
+                    <option value="medium">Mediano</option>
+                    <option value="large">Grande</option>
+                </select>
+            </div>
+            <div class="row">
+                <span>Color Crosshair:</span>
+                <input type="color" id="crosshair-color" value="#ffffff" onchange="updateCrosshairColor(this.value)">
+            </div>
+            
+            <h3 style="margin-top: 10px;">Skins (URLs)</h3>
+            <div class="col">
+                <input type="text" id="skin-ship" placeholder="URL Nave (PNG)">
+                <input type="text" id="skin-meteor" placeholder="URL Meteorito (PNG)">
+                <button class="default-btn" onclick="applySkins()">Aplicar Skins</button>
+            </div>
+        </div>
+        <button class="default-btn" onclick="backFromSubMenu()" style="margin-top: 15px;">Guardar y Volver</button>
+    </div>
+
+    <!-- Menú Creador -->
+    <div id="creator-menu" class="menu-screen">
+        <h2 style="color: #a855f7; font-family: 'Arial Black', sans-serif;">MODO CREADOR</h2>
+        <div style="max-height: 400px; overflow-y: auto; padding-right: 10px; text-align: left;" class="col">
+            <p style="color: #aaa; font-size: 0.85rem; text-align: center; margin-bottom: 10px;">Modifica las reglas del universo a tu antojo.</p>
+
+            <h3 style="color: var(--secondary-color);">Entorno</h3>
+            <div class="row"><span>Color Fondo:</span> <input type="color" id="creator-bg" value="#000000" style="width: 50px; height: 30px;"></div>
+            <div class="row">
+                <span>Nivel Inicial:</span>
+                <select id="creator-level" style="width: 120px;">
+                    <option value="1">Bronce</option>
+                    <option value="2">Plata</option>
+                    <option value="3">Oro</option>
+                    <option value="4">Platino</option>
+                    <option value="5">Diamante</option>
+                </select>
+            </div>
+            <div class="row" style="margin-top: 5px;">
+                <input type="text" id="creator-skin-ship" placeholder="URL Skin Nave (Opcional)" style="flex: 1;">
+            </div>
+
+            <h3 style="color: var(--secondary-color); margin-top: 15px;">Físicas y Dificultad</h3>
+            <div class="col" style="align-items: flex-start;">
+                <label style="font-size: 0.9rem;">Tamaño Meteoritos (x<span id="val-msize">1.0</span>)</label>
+                <input type="range" id="creator-meteor-size" min="0.5" max="4" step="0.1" value="1" oninput="document.getElementById('val-msize').innerText=this.value" style="width: 100%;">
+
+                <label style="font-size: 0.9rem; margin-top: 5px;">Velocidad Meteoritos (x<span id="val-mspeed">1.0</span>)</label>
+                <input type="range" id="creator-meteor-speed" min="0.2" max="3" step="0.1" value="1" oninput="document.getElementById('val-mspeed').innerText=this.value" style="width: 100%;">
+
+                <label style="font-size: 0.9rem; margin-top: 5px;">Velocidad de Nave (x<span id="val-pspeed">1.0</span>)</label>
+                <input type="range" id="creator-player-speed" min="0.5" max="3" step="0.1" value="1" oninput="document.getElementById('val-pspeed').innerText=this.value" style="width: 100%;">
+
+                <label style="font-size: 0.9rem; margin-top: 5px;">Tiempo Recarga Disparo (x<span id="val-cooldown">1.0</span>) <span style="font-size: 0.7rem; color: #aaa;">*Menor=Más rápido</span></label>
+                <input type="range" id="creator-cooldown" min="0.1" max="2" step="0.1" value="1" oninput="document.getElementById('val-cooldown').innerText=this.value" style="width: 100%;">
+            </div>
+
+            <h3 style="color: var(--secondary-color); margin-top: 15px;">Inventario Inicial</h3>
+            <p style="font-size: 0.75rem; color: #ffcc00; text-align: center; margin-bottom: 5px;">Solo disponible si ya lo compraste 1 vez en la tienda.</p>
+            <div class="row"><span>Escudos:</span> <input type="number" id="creator-shields" min="0" value="0" style="width: 60px;"></div>
+            <div class="row"><span>Cañones Dobles:</span> <input type="number" id="creator-cannons" min="0" value="0" style="width: 60px;"></div>
+            <div class="row"><span>Tótems Inmortales:</span> <input type="number" id="creator-totems" min="0" value="0" style="width: 60px;"></div>
+        </div>
+        <div class="row" style="margin-top: 15px; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <button class="default-btn" onclick="backFromSubMenu()">Volver</button>
+            <button class="default-btn" style="border-color: #f59e0b; color: #f59e0b;" onclick="resetCreatorDefaults()">Por Defecto</button>
+            <button class="default-btn" style="background: #a855f7; color: #fff; border-color: #a855f7;" onclick="startCreatorMode()">CREAR Y JUGAR</button>
+        </div>
+    </div>
+
+    <!-- Game Over -->
+    <div id="game-over-menu" class="menu-screen">
+        <h1 style="color: var(--danger-color); text-shadow: 0 0 10px var(--danger-color);">NAVE DESTRUIDA</h1>
+        <h2 id="final-stats">Nivel: Bronce | Monedas: 0</h2>
+        <button class="default-btn" onclick="openMenu('main-menu')">Volver al Menú</button>
+    </div>
+
+    <!-- Menú de Pausa -->
+    <div id="pause-menu" class="menu-screen">
+        <h1 class="neon-title" style="font-size: 3rem;">PAUSA</h1>
+        <div class="main-btn-group">
+            <button class="btn-retro btn-cyan" onclick="resumeGame()">Reanudar Partida</button>
+            <button class="btn-retro btn-cyan" onclick="startGame('survival')">Reiniciar Supervivencia</button>
+            <button class="btn-retro btn-cyan" onclick="openMenu('practice-menu')">Modo Práctica</button>
+            <button class="btn-retro btn-cyan" style="color: #a855f7; border-color: #a855f7;" onclick="openCreatorMenu()">Modo Creador</button>
+            <button class="btn-retro btn-pink" onclick="openMenu('shop-menu')">Tienda de Cerdonio</button>
+            <button class="btn-retro btn-cyan" onclick="openMenu('settings-menu')">Ajustes y Controles</button>
+            <button class="btn-retro btn-pink" style="border-color: var(--danger-color);" onclick="confirmToMainMenu()">Menú Principal</button>
+        </div>
+    </div>
+
+    <div id="keybind-overlay">Presiona una tecla para asignar... (ESC para cancelar)</div>
+
+    <!-- HUD Activo -->
+    <div id="hud">
+        <div id="pause-btn" onclick="togglePause()">
+            <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </div>
+        <div class="top-bar">
+            <div class="hud-stats">
+                Modo: <span id="hud-mode">Supervivencia</span><br>
+                Nivel: <span id="hud-level" class="level-badge">Bronce</span><br>
+                <span id="hud-time" style="font-size: 1rem; color:#aaa;">Tiempo: 0s</span>
+            </div>
+            <div class="points-display">
+                Monedas: <span id="hud-points">0</span>
+            </div>
+            <div style="width: 50px;"></div> <!-- Espaciador para el botón de pausa -->
+        </div>
+
+        <div class="item-dock">
+            <div class="item-slot" onclick="useItem('shield')" title="Activar Escudo">
+                <div class="key-hint" id="hud-key-shield">Q</div>
+                <svg class="item-icon" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+                    <circle cx="50" cy="50" r="35" fill="#f8fafc"/>
+                    <circle cx="50" cy="50" r="25" fill="#ef4444"/>
+                    <circle cx="50" cy="50" r="15" fill="#3b82f6"/>
+                    <polygon points="50,38 53,46 62,46 55,51 58,59 50,54 42,59 45,51 38,46 47,46" fill="#f8fafc"/>
+                </svg>
+                <div class="count" id="hud-count-shield">0</div>
+            </div>
+            <div class="item-slot" onclick="useItem('cannon')" title="Activar Cañón Doble">
+                <div class="key-hint" id="hud-key-cannon">F</div>
+                <svg class="item-icon" viewBox="0 0 100 100">
+                    <rect x="25" y="20" width="65" height="20" rx="5" fill="#7f1d1d" stroke="#ef4444" stroke-width="4"/>
+                    <rect x="25" y="60" width="65" height="20" rx="5" fill="#7f1d1d" stroke="#ef4444" stroke-width="4"/>
+                    <path d="M 30 40 L 30 60 M 15 15 L 15 85" stroke="#450a0a" stroke-width="12" stroke-linecap="round"/>
+                </svg>
+                <div class="count" id="hud-count-cannon">0</div>
+            </div>
+            <div class="item-slot" title="Totem (Automático)">
+                <div class="key-hint" style="background:#10b981;">A</div>
+                <svg class="item-icon" viewBox="0 0 100 100" shape-rendering="crispEdges">
+                    <rect x="30" y="20" width="40" height="20" fill="#fde047" stroke="#000" stroke-width="3"/>
+                    <rect x="35" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
+                    <rect x="55" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
+                    <rect x="40" y="40" width="20" height="40" fill="#eab308" stroke="#000" stroke-width="3"/>
+                    <rect x="20" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
+                    <rect x="60" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
+                    <rect x="30" y="80" width="40" height="10" fill="#ca8a04" stroke="#000" stroke-width="3"/>
+                </svg>
+                <div class="count" id="hud-count-totem">0</div>
+            </div>
+        </div>
+
+        <div class="timer-bar-container">
+            <div id="bar-shield" class="timer-bar timer-shield"></div>
+            <div id="bar-cannon" class="timer-bar timer-cannon"></div>
+        </div>
+    </div>
+
+    <!-- Pop-up del Tótem -->
+    <div id="totem-popup">
+        <svg viewBox="0 0 100 100" shape-rendering="crispEdges">
+            <rect x="30" y="20" width="40" height="20" fill="#fde047" stroke="#000" stroke-width="3"/>
+            <rect x="35" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
+            <rect x="55" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
+            <rect x="40" y="40" width="20" height="40" fill="#eab308" stroke="#000" stroke-width="3"/>
+            <rect x="20" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
+            <rect x="60" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
+            <rect x="30" y="80" width="40" height="10" fill="#ca8a04" stroke="#000" stroke-width="3"/>
+        </svg>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+let animationId;
+let lastTime = 0;
+
+let gameState = 'menu';
+let previousState = 'menu';
+let gameMode = 'survival';
+let timeElapsed = 0;
+let points = 0;
+let levelIndex = 0;
+
+const LEVELS = [
+    { name: 'Bronce', color: '#cd7f32', cooldown: 500, spawnRate: 1500, speedMult: 1 },
+    { name: 'Plata', color: '#c0c0c0', cooldown: 400, spawnRate: 1200, speedMult: 1.2 },
+    { name: 'Oro', color: '#ffd700', cooldown: 300, spawnRate: 900, speedMult: 1.4 },
+    { name: 'Platino', color: '#e5e4e2', cooldown: 200, spawnRate: 600, speedMult: 1.6 },
+    { name: 'Diamante', color: '#b9f2ff', cooldown: 100, spawnRate: 400, speedMult: 2.0 }
+];
+
+let inventory = { shields: 0, cannons: 0, totems: 0 };
+let activeEffects = { shield: 0, cannon: 0, totemInvuln: 0 };
+
+// Seguimiento de compras para el Modo Creador
+let itemsUnlocked = { shields: false, cannons: false, totems: false };
+let creatorSettings = { bgColor: '#000000', meteorSize: 1, meteorSpeed: 1, shootCooldown: 1, playerSpeed: 1 };
+
+let settings = {
+    keys: { up: 'w', down: 's', left: 'a', right: 'd', shield: 'q', cannon: 'f' },
+    crosshairColor: '#ffffff', // Crosshair por defecto blanca
+    guiScale: 'auto'
+};
+
+let images = { ship: null, meteor: null };
+let player;
+let projectiles = [];
+let enemies = [];
+let particles = [];
+let keysPressed = new Set();
+let mouse = { x: 0, y: 0, down: false };
+let lastShotTime = 0;
+let lastSpawnTime = 0;
+
+// Sistema de estrellas de fondo - Más denso y oscuro
+let backgroundStars = [];
+for(let i=0; i<250; i++) {
+    backgroundStars.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: Math.random() * 1.5 + 0.5,
+        speed: Math.random() * 0.3 + 0.05,
+        opacity: Math.random() * 0.8 + 0.2
+    });
+}
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+window.addEventListener('keydown', (e) => {
+    let key = e.key.toLowerCase();
+    keysPressed.add(key);
+    if(gameState === 'playing') {
+        if(key === settings.keys.shield.toLowerCase()) useItem('shield');
+        if(key === settings.keys.cannon.toLowerCase()) useItem('cannon');
+        if(key === 'escape') togglePause();
+    } else if (gameState === 'paused' && key === 'escape') {
+        resumeGame();
+    }
+});
+window.addEventListener('keyup', (e) => keysPressed.delete(e.key.toLowerCase()));
+window.addEventListener('blur', () => keysPressed.clear());
+
+canvas.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+canvas.addEventListener('mousedown', () => mouse.down = true);
+canvas.addEventListener('mouseup', () => mouse.down = false);
+
+class Player {
+    constructor() {
+        this.x = canvas.width / 2; this.y = canvas.height / 2;
+        this.vx = 0; this.vy = 0; this.angle = 0;
+        let speedMult = (gameMode === 'creator') ? creatorSettings.playerSpeed : 1;
+        this.speed = 4.5 * speedMult; this.friction = 0.94; this.radius = 20;
+    }
+    update() {
+        if(keysPressed.has(settings.keys.up.toLowerCase())) this.vy -= 0.8;
+        if(keysPressed.has(settings.keys.down.toLowerCase())) this.vy += 0.8;
+        if(keysPressed.has(settings.keys.left.toLowerCase())) this.vx -= 0.8;
+        if(keysPressed.has(settings.keys.right.toLowerCase())) this.vx += 0.8;
+
+        let mag = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+        if(mag > this.speed) { this.vx = (this.vx / mag) * this.speed; this.vy = (this.vy / mag) * this.speed; }
+
+        this.x += this.vx; this.y += this.vy;
+        this.vx *= this.friction; this.vy *= this.friction;
+
+        this.x = Math.max(this.radius, Math.min(canvas.width - this.radius, this.x));
+        this.y = Math.max(this.radius, Math.min(canvas.height - this.radius, this.y));
+
+        if(keysPressed.has('arrowup') || keysPressed.has('arrowdown') || keysPressed.has('arrowleft') || keysPressed.has('arrowright')) {
+            let dx = 0, dy = 0;
+            if(keysPressed.has('arrowup')) dy -= 1; if(keysPressed.has('arrowdown')) dy += 1;
+            if(keysPressed.has('arrowleft')) dx -= 1; if(keysPressed.has('arrowright')) dx += 1;
+            this.angle = Math.atan2(dy, dx);
+        } else {
+            this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
+        }
+    }
+    draw(ctx) {
+        ctx.save();
+        ctx.translate(this.x, this.y); ctx.rotate(this.angle);
+
+        // Efecto visual de invulnerabilidad por Tótem (Parpadeo dorado)
+        if (activeEffects.totemInvuln > 0) {
+            if (Math.floor(Date.now() / 100) % 2 === 0) {
+                ctx.globalAlpha = 0.5;
+            }
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#eab308';
+        }
+
+        if (activeEffects.shield > 0) {
+            ctx.beginPath(); ctx.arc(0, 0, this.radius + 10, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(59, 130, 246, ${0.3 + Math.sin(Date.now() / 100)*0.1})`; ctx.fill();
+            ctx.lineWidth = 2; ctx.strokeStyle = '#3b82f6'; ctx.stroke();
+        }
+        if (images.ship) {
+            ctx.drawImage(images.ship, -this.radius, -this.radius, this.radius*2, this.radius*2);
+        } else {
+            // Diseño de Nave Mejorado
+            ctx.beginPath();
+            ctx.moveTo(this.radius, 0); 
+            ctx.lineTo(-this.radius * 0.4, this.radius * 0.8); 
+            ctx.lineTo(-this.radius * 0.6, this.radius * 0.4); 
+            ctx.lineTo(-this.radius * 0.8, this.radius * 0.5); 
+            ctx.lineTo(-this.radius * 0.5, 0); 
+            ctx.lineTo(-this.radius * 0.8, -this.radius * 0.5); 
+            ctx.lineTo(-this.radius * 0.6, -this.radius * 0.4); 
+            ctx.lineTo(-this.radius * 0.4, -this.radius * 0.8); 
+            ctx.closePath();
+            
+            ctx.fillStyle = activeEffects.cannon > 0 ? '#ef4444' : '#e2e8f0'; 
+            ctx.fill();
+            ctx.lineWidth = 2; 
+            ctx.strokeStyle = '#00aaff'; 
+            ctx.stroke();
+            
+            // Cabina
+            ctx.beginPath();
+            ctx.ellipse(this.radius * 0.1, 0, this.radius * 0.4, this.radius * 0.2, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#0ea5e9';
+            ctx.fill();
+
+            // Propulsores
+            if (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1) {
+                ctx.beginPath();
+                ctx.moveTo(-this.radius * 0.6, -this.radius * 0.3);
+                ctx.lineTo(-this.radius * (1.2 + Math.random()*0.5), -this.radius * 0.4);
+                ctx.lineTo(-this.radius * 0.6, -this.radius * 0.5);
+                ctx.moveTo(-this.radius * 0.6, this.radius * 0.3);
+                ctx.lineTo(-this.radius * (1.2 + Math.random()*0.5), this.radius * 0.4);
+                ctx.lineTo(-this.radius * 0.6, this.radius * 0.5);
+                ctx.fillStyle = '#00ffff'; 
+                ctx.fill();
+            }
+        }
+        ctx.restore();
+    }
+}
+
+class Projectile {
+    constructor(x, y, angle, isDouble = false, offset = 0) {
+        this.x = x + Math.cos(angle + offset) * 20; this.y = y + Math.sin(angle + offset) * 20;
+        this.vx = Math.cos(angle) * 14; this.vy = Math.sin(angle) * 14;
+        this.radius = 2.5; // Bala más pequeña
+        this.color = isDouble ? '#0077ff' : '#00aaff'; // Color azul
+    }
+    update() { this.x += this.vx; this.y += this.vy; }
+    draw(ctx) {
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color; ctx.fill();
+        ctx.shadowBlur = 8; ctx.shadowColor = this.color; ctx.fill(); ctx.shadowBlur = 0;
+    }
+}
+
+class Enemy {
+    constructor(x, y, tier) {
+        this.x = x; this.y = y; this.tier = tier; 
+        
+        let sizeMult = (gameMode === 'creator') ? creatorSettings.meteorSize : 1;
+        this.radius = (tier * 15 + 10) * sizeMult;
+        
+        let mSpeedMult = (gameMode === 'creator') ? creatorSettings.meteorSpeed : 1;
+        let speed = (4 - tier) * (0.6 + Math.random() * 0.6) * LEVELS[levelIndex].speedMult * mSpeedMult;
+        let moveAngle;
+
+        // 25% de probabilidad de apuntar directamente a la ubicación del jugador
+        if (Math.random() < 0.25 && player) {
+            moveAngle = Math.atan2(player.y - y, player.x - x);
+            this.isTargeting = true; // Lo marcamos para darle un toque visual
+            speed *= 1.2; // Un poco más rápidos para mayor desafío
+        } else {
+            // COMPORTAMIENTO NATURAL: Movimiento a la deriva aleatorio
+            moveAngle = Math.random() * Math.PI * 2;
+            this.isTargeting = false;
+        }
+        
+        this.vx = Math.cos(moveAngle) * speed; 
+        this.vy = Math.sin(moveAngle) * speed;
+        this.rotation = Math.random() * Math.PI * 2; 
+        this.rotSpeed = (Math.random() - 0.5) * 0.04; // Rotación lenta y natural
+
+        this.points = [];
+        let numPoints = 8 + tier * 2;
+        for(let i=0; i<numPoints; i++) {
+            let a = (i/numPoints) * Math.PI * 2;
+            let r = this.radius * (0.7 + Math.random()*0.5); // Formas más irregulares
+            this.points.push({a, r});
+        }
+    }
+    update() { this.x += this.vx; this.y += this.vy; this.rotation += this.rotSpeed; }
+    draw(ctx) {
+        ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
+        if (images.meteor) {
+            ctx.drawImage(images.meteor, -this.radius, -this.radius, this.radius*2, this.radius*2);
+        } else {
+            ctx.beginPath();
+            for(let i=0; i<this.points.length; i++) {
+                let p = this.points[i]; let px = Math.cos(p.a) * p.r; let py = Math.sin(p.a) * p.r;
+                if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.closePath(); ctx.fillStyle = '#0f172a'; ctx.fill(); ctx.lineWidth = 2; 
+            
+            // Borde rojizo si el meteorito va a por ti, sino gris natural
+            ctx.strokeStyle = this.isTargeting ? '#7f1d1d' : '#475569'; 
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+}
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x; this.y = y;
+        let angle = Math.random() * Math.PI * 2; let speed = Math.random() * 5 + 2;
+        this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
+        this.life = 1.0; this.decay = Math.random() * 0.02 + 0.02;
+        this.color = color; this.size = Math.random() * 3 + 1;
+    }
+    update() { this.x += this.vx; this.y += this.vy; this.life -= this.decay; }
+    draw(ctx) {
+        ctx.globalAlpha = Math.max(0, this.life); ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.size, this.size); ctx.globalAlpha = 1.0;
+    }
+}
+
+function spawnEnemy() {
+    let tier = Math.floor(Math.random() * 3) + 1; let x, y;
+    // Spawnean en los bordes para fluir naturalmente hacia adentro
+    if(Math.random() < 0.5) { x = Math.random() < 0.5 ? -50 : canvas.width + 50; y = Math.random() * canvas.height; } 
+    else { x = Math.random() * canvas.width; y = Math.random() < 0.5 ? -50 : canvas.height + 50; }
+    enemies.push(new Enemy(x, y, tier));
+}
+
+function createExplosion(x, y, color, count) {
+    for(let i=0; i<count; i++) particles.push(new Particle(x, y, color));
+}
+
+function createTotemExplosion(x, y, count) {
+    let colors = ['#10b981', '#22c55e', '#eab308', '#fde047'];
+    for(let i=0; i<count; i++) {
+        let color = colors[Math.floor(Math.random() * colors.length)];
+        particles.push(new Particle(x, y, color));
+    }
+}
+
+function triggerTotemAnimation() {
+    const popup = document.getElementById('totem-popup');
+    if(popup) {
+        popup.classList.remove('totem-animate');
+        void popup.offsetWidth; // Forzar reflow para reiniciar la animación
+        popup.classList.add('totem-animate');
+    }
+}
+
+function handleShooting(currentTime) {
+    let currentCooldown = LEVELS[levelIndex].cooldown * (gameMode === 'creator' ? creatorSettings.shootCooldown : 1);
+    
+    if ((mouse.down || keysPressed.has(' ')) && currentTime - lastShotTime > currentCooldown) {
+        if (activeEffects.cannon > 0) {
+            projectiles.push(new Projectile(player.x, player.y, player.angle, true, 0.2));
+            projectiles.push(new Projectile(player.x, player.y, player.angle, true, -0.2));
+        } else { projectiles.push(new Projectile(player.x, player.y, player.angle)); }
+        lastShotTime = currentTime;
+    }
+}
+
+function addPoints(pts) {
+    if (gameMode === 'practice' || gameMode === 'creator') {
+        // Modo práctica o creador: 90% menos de monedas para no desbalancear la tienda
+        pts = Math.max(1, Math.round(pts * 0.1));
+    } else if (gameMode === 'survival') {
+        // Modo supervivencia: Ganas 5 veces más monedas
+        pts = pts * 5;
+    }
+    
+    points += pts;
+    document.getElementById('hud-points').innerText = points;
+    document.getElementById('menu-coins').innerText = points;
+}
+
+function triggerGameOver() {
+    gameState = 'gameover';
+    document.getElementById('hud').classList.remove('active');
+    document.getElementById('final-stats').innerText = `Nivel: ${LEVELS[levelIndex].name} | Monedas: ${points}`;
+    openMenu('game-over-menu');
+}
+
+function handlePlayerHit() {
+    if (activeEffects.totemInvuln > 0) {
+        // Empujar a los enemigos suavemente si eres invulnerable por el tótem (sin quitar escudo ni matarte)
+        enemies.forEach(e => {
+            let dx = e.x - player.x, dy = e.y - player.y; let dist = Math.sqrt(dx*dx + dy*dy);
+            if(dist < 150) { e.x += (dx/dist)*50; e.y += (dy/dist)*50; }
+        });
+        return;
+    }
+
+    if (activeEffects.shield > 0) {
+        activeEffects.shield -= 5; if(activeEffects.shield < 0) activeEffects.shield = 0;
+        createExplosion(player.x, player.y, '#3b82f6', 15);
+        enemies.forEach(e => {
+            let dx = e.x - player.x, dy = e.y - player.y; let dist = Math.sqrt(dx*dx + dy*dy);
+            if(dist < 150) { e.x += (dx/dist)*50; e.y += (dy/dist)*50; }
+        });
+    } else if (inventory.totems > 0) {
+        inventory.totems--; updateInventoryHUD(); 
+        activeEffects.totemInvuln = 5; // 5 segundos de invulnerabilidad (sin escudo azul)
+        createTotemExplosion(player.x, player.y, 80); 
+        triggerTotemAnimation();
+        enemies = enemies.filter(e => {
+            let dx = e.x - player.x, dy = e.y - player.y;
+            if(Math.sqrt(dx*dx + dy*dy) < 200) { addPoints(e.tier === 1 ? 58 : e.tier === 2 ? 23 : 10); return false; }
+            return true;
+        });
+    } else {
+        createExplosion(player.x, player.y, '#ff4c4c', 50);
+        triggerGameOver();
+    }
+}
+
+function update(dt, currentTime) {
+    // Estrellas con Parallax
+    backgroundStars.forEach(s => {
+        let px = gameState === 'playing' ? player.vx * s.speed * 0.2 : 0;
+        let py = gameState === 'playing' ? player.vy * s.speed * 0.2 : 0;
+        
+        s.x -= px; s.y += (s.speed * 0.5) - py;
+        
+        if(s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
+        if(s.y < 0) { s.y = canvas.height; s.x = Math.random() * canvas.width; }
+        if(s.x > canvas.width) { s.x = 0; s.y = Math.random() * canvas.height; }
+        if(s.x < 0) { s.x = canvas.width; s.y = Math.random() * canvas.height; }
+    });
+
+    if (gameState !== 'playing') return;
+
+    if (gameMode === 'survival') {
+        timeElapsed += dt / 1000;
+        document.getElementById('hud-time').innerText = `Tiempo: ${Math.floor(timeElapsed)}s`;
+        let newLevel = Math.min(4, Math.floor(timeElapsed / 30));
+        if(newLevel !== levelIndex) { levelIndex = newLevel; updateHUDLevel(); }
+    }
+
+    if (activeEffects.shield > 0) {
+        activeEffects.shield -= dt / 1000; if(activeEffects.shield < 0) activeEffects.shield = 0;
+        document.getElementById('bar-shield').style.width = `${(activeEffects.shield / 20) * 100}%`;
+    } else { document.getElementById('bar-shield').style.width = `0%`; }
+
+    if (activeEffects.cannon > 0) {
+        activeEffects.cannon -= dt / 1000; if(activeEffects.cannon < 0) activeEffects.cannon = 0;
+        document.getElementById('bar-cannon').style.width = `${(activeEffects.cannon / 20) * 100}%`;
+    } else { document.getElementById('bar-cannon').style.width = `0%`; }
+
+    // Invulnerabilidad del Tótem
+    if (activeEffects.totemInvuln > 0) {
+        activeEffects.totemInvuln -= dt / 1000; if(activeEffects.totemInvuln < 0) activeEffects.totemInvuln = 0;
+    }
+
+    player.update(); handleShooting(currentTime);
+
+    if (enemies.length < 35) {
+        if (currentTime - lastSpawnTime > LEVELS[levelIndex].spawnRate) { spawnEnemy(); lastSpawnTime = currentTime; }
+    }
+
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+        let p = projectiles[i]; p.update();
+        if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) projectiles.splice(i, 1);
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i]; p.update();
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        let e = enemies[i]; e.update();
+        
+        // Screen Wrap (asteroides flotantes clásicos)
+        if (e.x < -e.radius) e.x = canvas.width + e.radius;
+        if (e.x > canvas.width + e.radius) e.x = -e.radius;
+        if (e.y < -e.radius) e.y = canvas.height + e.radius;
+        if (e.y > canvas.height + e.radius) e.y = -e.radius;
+
+        let dx = player.x - e.x, dy = player.y - e.y;
+        if (Math.sqrt(dx*dx + dy*dy) < player.radius + e.radius - 5) {
+            handlePlayerHit();
+            if(gameState === 'playing') { enemies.splice(i, 1); createExplosion(e.x, e.y, '#888', e.tier * 10); }
+            continue;
+        }
+
+        for (let j = projectiles.length - 1; j >= 0; j--) {
+            let p = projectiles[j]; let pdx = p.x - e.x, pdy = p.y - e.y;
+            if (Math.sqrt(pdx*pdx + pdy*pdy) < e.radius + p.radius) {
+                projectiles.splice(j, 1);
+                addPoints(e.tier === 1 ? 58 : e.tier === 2 ? 23 : 10);
+                createExplosion(e.x, e.y, '#00aaff', e.tier * 10);
+                if (e.tier > 1) {
+                    let newTier = e.tier - 1, m1 = new Enemy(e.x, e.y, newTier), m2 = new Enemy(e.x, e.y, newTier);
+                    // FISICA REAL: Heredan momento del padre + impacto del proyectil
+                    m1.vx = e.vx * 0.7 + p.vy * 0.15; 
+                    m1.vy = e.vy * 0.7 - p.vx * 0.15; 
+                    m2.vx = e.vx * 0.7 - p.vy * 0.15; 
+                    m2.vy = e.vy * 0.7 + p.vx * 0.15;
+                    enemies.push(m1, m2);
+                }
+                enemies.splice(i, 1); break;
+            }
+        }
+    }
+}
+
+function draw() {
+    ctx.fillStyle = gameMode === 'creator' ? creatorSettings.bgColor : '#000000'; // Aplica color del modo creador
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#ffffff';
+    backgroundStars.forEach(s => {
+        ctx.globalAlpha = s.opacity; 
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1.0;
+
+    if (gameState === 'playing') {
+        player.draw(ctx);
+        projectiles.forEach(p => p.draw(ctx));
+        enemies.forEach(e => e.draw(ctx));
+        particles.forEach(p => p.draw(ctx));
+    } else {
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    if (gameState === 'playing' || gameState === 'shop') {
+        // Crosshair blanca pequeña
+        ctx.save(); ctx.beginPath();
+        ctx.moveTo(mouse.x - 6, mouse.y); ctx.lineTo(mouse.x + 6, mouse.y);
+        ctx.moveTo(mouse.x, mouse.y - 6); ctx.lineTo(mouse.x, mouse.y + 6);
+        ctx.strokeStyle = settings.crosshairColor; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.restore();
+    }
+}
+
+function loop(currentTime) {
+    let dt = currentTime - lastTime; lastTime = currentTime;
+    update(dt, currentTime); draw();
+    animationId = requestAnimationFrame(loop);
+}
+
+function togglePause() {
+    if (gameState === 'playing') {
+        gameState = 'paused';
+        openMenu('pause-menu');
+    } else if (gameState === 'paused') {
+        resumeGame();
+    }
+}
+
+function resumeGame() {
+    openMenu(null);
+    gameState = 'playing';
+    document.getElementById('hud').classList.add('active');
+}
+
+function confirmToMainMenu() {
+    if(confirm("¿Seguro que quieres salir al menú principal? Perderás el progreso de la partida actual.")) {
+        openMenu('main-menu');
+    }
+}
+
+function backFromSubMenu() {
+    if (previousState === 'paused') {
+        openMenu('pause-menu');
+    } else {
+        openMenu('main-menu');
+    }
+}
+
+function openCreatorMenu() {
+    // Deshabilita los inputs si no se han comprado en la tienda
+    let sInp = document.getElementById('creator-shields');
+    let cInp = document.getElementById('creator-cannons');
+    let tInp = document.getElementById('creator-totems');
+
+    sInp.disabled = !itemsUnlocked.shields;
+    cInp.disabled = !itemsUnlocked.cannons;
+    tInp.disabled = !itemsUnlocked.totems;
+
+    if(!itemsUnlocked.shields) { sInp.value = 0; sInp.title = "Cómpralo en la tienda primero"; }
+    if(!itemsUnlocked.cannons) { cInp.value = 0; cInp.title = "Cómpralo en la tienda primero"; }
+    if(!itemsUnlocked.totems) { tInp.value = 0; tInp.title = "Cómpralo en la tienda primero"; }
+
+    openMenu('creator-menu');
+}
+
+function resetCreatorDefaults() {
+    document.getElementById('creator-bg').value = '#000000';
+    document.getElementById('creator-level').value = '1';
+    document.getElementById('creator-skin-ship').value = '';
+    
+    document.getElementById('creator-meteor-size').value = '1';
+    document.getElementById('val-msize').innerText = '1';
+    
+    document.getElementById('creator-meteor-speed').value = '1';
+    document.getElementById('val-mspeed').innerText = '1';
+    
+    document.getElementById('creator-player-speed').value = '1';
+    document.getElementById('val-pspeed').innerText = '1';
+    
+    document.getElementById('creator-cooldown').value = '1';
+    document.getElementById('val-cooldown').innerText = '1';
+    
+    document.getElementById('creator-shields').value = '0';
+    document.getElementById('creator-cannons').value = '0';
+    document.getElementById('creator-totems').value = '0';
+
+    creatorSettings = { bgColor: '#000000', meteorSize: 1, meteorSpeed: 1, shootCooldown: 1, playerSpeed: 1 };
+}
+
+function startCreatorMode() {
+    // Extraer variables del form
+    creatorSettings.bgColor = document.getElementById('creator-bg').value;
+    creatorSettings.meteorSize = parseFloat(document.getElementById('creator-meteor-size').value);
+    creatorSettings.meteorSpeed = parseFloat(document.getElementById('creator-meteor-speed').value);
+    creatorSettings.shootCooldown = parseFloat(document.getElementById('creator-cooldown').value);
+    creatorSettings.playerSpeed = parseFloat(document.getElementById('creator-player-speed').value);
+
+    let shipUrl = document.getElementById('creator-skin-ship').value;
+    if (shipUrl) { 
+        let img = new Image(); img.crossOrigin = "Anonymous"; img.src = shipUrl; 
+        img.onload = () => images.ship = img; 
+    }
+
+    let startLvl = parseInt(document.getElementById('creator-level').value);
+    startGame('creator', startLvl);
+
+    // Asignar items si están desbloqueados
+    inventory.shields = itemsUnlocked.shields ? (parseInt(document.getElementById('creator-shields').value) || 0) : 0;
+    inventory.cannons = itemsUnlocked.cannons ? (parseInt(document.getElementById('creator-cannons').value) || 0) : 0;
+    inventory.totems = itemsUnlocked.totems ? (parseInt(document.getElementById('creator-totems').value) || 0) : 0;
+    
+    updateInventoryHUD();
+}
+
+function openMenu(menuId) {
+    if (gameState === 'paused' && (menuId === 'settings-menu' || menuId === 'shop-menu' || menuId === 'practice-menu' || menuId === 'creator-menu')) {
+        previousState = 'paused';
+    } else if (gameState === 'menu' || gameState === 'gameover') {
+        previousState = 'menu';
+    }
+
+    document.querySelectorAll('.menu-screen').forEach(el => el.classList.remove('active'));
+    
+    if(menuId) {
+        document.getElementById(menuId).classList.add('active');
+        
+        if (menuId === 'main-menu' || menuId === 'game-over-menu') {
+            gameState = 'menu';
+            document.getElementById('hud').classList.remove('active');
+        } else if (menuId === 'pause-menu') {
+            gameState = 'paused';
+            document.getElementById('hud').classList.remove('active');
+        }
+
+        if(menuId === 'shop-menu') document.getElementById('shop-points').innerText = points;
+        if(menuId === 'main-menu') document.getElementById('menu-coins').innerText = points;
+    }
+}
+
+function startGame(mode, startLevel = 0) {
+    gameMode = mode; levelIndex = mode === 'practice' || mode === 'creator' ? startLevel - 1 : 0; timeElapsed = 0;
+    if(mode === 'survival') points = 0; 
+    
+    player = new Player(); projectiles = []; enemies = []; particles = []; keysPressed.clear();
+    activeEffects.shield = 0; activeEffects.cannon = 0; activeEffects.totemInvuln = 0;
+
+    let modeText = 'Supervivencia';
+    if(mode === 'practice') modeText = 'Práctica';
+    if(mode === 'creator') modeText = 'Creador';
+    document.getElementById('hud-mode').innerText = modeText;
+    
+    updateHUDLevel(); updateInventoryHUD(); 
+    document.getElementById('hud-points').innerText = points;
+    document.getElementById('menu-coins').innerText = points;
+
+    openMenu(null); 
+    document.getElementById('hud').classList.add('active');
+    gameState = 'playing';
+}
+
+function updateHUDLevel() {
+    let el = document.getElementById('hud-level');
+    el.innerText = LEVELS[levelIndex].name; el.style.color = LEVELS[levelIndex].color;
+}
+
+function updateInventoryHUD() {
+    document.getElementById('hud-count-shield').innerText = inventory.shields;
+    document.getElementById('hud-count-cannon').innerText = inventory.cannons;
+    document.getElementById('hud-count-totem').innerText = inventory.totems;
+    document.getElementById('hud-key-shield').innerText = settings.keys.shield.toUpperCase();
+    document.getElementById('hud-key-cannon').innerText = settings.keys.cannon.toUpperCase();
+}
+
+function buyItem(item, cost) {
+    if (points >= cost) {
+        points -= cost; inventory[item + 's']++; 
+        itemsUnlocked[item + 's'] = true; // Desbloqueado para Modo Creador
+        
+        document.getElementById('shop-points').innerText = points;
+        document.getElementById('menu-coins').innerText = points;
+        updateInventoryHUD();
+        
+        let btn = event.target; let originalText = btn.innerText;
+        btn.innerText = "¡Comprado!"; btn.style.background = "#10b981";
+        setTimeout(() => { btn.innerText = originalText; btn.style.background = "transparent"; }, 1000);
+    } else {
+        let btn = event.target; btn.style.borderColor = "var(--danger-color)"; btn.style.color = "var(--danger-color)";
+        setTimeout(() => { btn.style.borderColor = ""; btn.style.color = ""; }, 500);
+    }
+}
+
+function useItem(item) {
+    if(gameState !== 'playing') return;
+    if (item === 'shield' && inventory.shields > 0) { inventory.shields--; activeEffects.shield = 20; } 
+    else if (item === 'cannon' && inventory.cannons > 0) { inventory.cannons--; activeEffects.cannon = 20; }
+    updateInventoryHUD();
+}
+
+let awaitingKey = null;
+function captureKey(action) {
+    awaitingKey = action; document.getElementById('keybind-overlay').style.display = 'flex';
+    const handler = (e) => {
+        e.preventDefault();
+        if (e.key === 'Escape') { closeCapture(); return; }
+        settings.keys[action] = e.key.toLowerCase();
+        document.getElementById(`btn-key-${action}`).innerText = e.key.toUpperCase();
+        closeCapture();
+    };
+    const closeCapture = () => { document.getElementById('keybind-overlay').style.display = 'none'; window.removeEventListener('keydown', handler); awaitingKey = null; updateInventoryHUD(); };
+    window.addEventListener('keydown', handler);
+}
+
+function changeGUIScale(val) {
+    settings.guiScale = val; let ui = document.getElementById('ui-layer');
+    ui.className = ''; ui.classList.add(`gui-${val}`);
+}
+function updateCrosshairColor(color) { settings.crosshairColor = color; }
+
+function applySkins() {
+    let shipUrl = document.getElementById('skin-ship').value;
+    let meteorUrl = document.getElementById('skin-meteor').value;
+    
+    if (shipUrl) { let img = new Image(); img.crossOrigin = "Anonymous"; img.src = shipUrl; img.onload = () => images.ship = img; img.onerror = () => images.ship = null; } 
+    else images.ship = null;
+    if (meteorUrl) { let img = new Image(); img.crossOrigin = "Anonymous"; img.src = meteorUrl; img.onload = () => images.meteor = img; img.onerror = () => images.meteor = null; } 
+    else images.meteor = null;
+    alert("Skins aplicadas.");
+}
+
+requestAnimationFrame(loop);
+</script>
+<script src="classroom-hotkey.js"></script>
+</body>
+</html>
