@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" type="image/jpeg" href="images.jpeg">
     <title>Space Survival: Defensores</title>
     <script>
         window.addEventListener("load", function () {
-            alert("¡Advertencia! Este juego fue hecho con IA, lo que puede significar que el juego sea de mala calidad, copycat, o simplemente tenga varios errores. Si hay algún error, por favor envía tu sugerencia en el formulario de la página.");
+            alert("¡Advertencia! Este juego fue hecho con IA, lo que puede significar que el juego sea de mala calidad, copycat, o simplemente varios errores. Si hay algunb error, porfavor enviar sugerencia el el formulario de la pagina");
         }, { once: true });
     </script>
     <style>
         :root {
-            --bg-color: #000000; /* Fondo completamente negro */
+            --bg-color: #000000;
             --text-color: #c5c6c7;
             --accent-color: #00ffff;
             --secondary-color: #008888;
             --danger-color: #ff2a6d;
             --gold-color: #ffcc00;
-            --gui-scale: 1;
         }
 
         * {
@@ -37,27 +35,34 @@
             height: 100vh;
         }
 
+        /* Lienzo del juego */
         #game-canvas {
             display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            cursor: none;
+            cursor: crosshair; /* Fallback si el cursor personalizado falla */
         }
 
-        /* Sistema de UI Escalable */
+        /* Capa de interfaz de usuario */
         #ui-layer {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            pointer-events: none; /* Deja pasar los clics al canvas cuando no hay menú */
             transform-origin: top left;
+            transition: transform 0.3s ease;
         }
 
+        /* Sistema de Escalado de UI */
         .gui-auto { transform: scale(min(1, max(0.5, calc(100vw / 1920)))); width: max(100%, 1920px); height: max(100%, 1080px); }
         .gui-small { transform: scale(0.7); width: 142.8%; height: 142.8%; }
         .gui-medium { transform: scale(1); width: 100%; height: 100%; }
         .gui-large { transform: scale(1.3); width: 76.9%; height: 76.9%; }
 
-        /* Menús Generales */
+        /* Estilos Base de Menús */
         .menu-screen {
             position: absolute;
             top: 50%; left: 50%;
@@ -74,11 +79,12 @@
             min-width: 350px;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
         }
         
         .menu-screen.active { display: flex; }
 
-        /* --- ESTILO ESPECÍFICO DEL NUEVO MENÚ PRINCIPAL --- */
+        /* Menú Principal Especial */
         #main-menu {
             background: transparent;
             border: none;
@@ -99,7 +105,7 @@
             background: rgba(0, 0, 0, 0.8);
             letter-spacing: 2px;
             box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .neon-title {
@@ -107,48 +113,8 @@
             font-family: 'Arial Black', Impact, sans-serif;
             font-size: clamp(2.5rem, 6vw, 4rem);
             text-transform: uppercase;
-            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff;
-            margin-bottom: 5px;
-            letter-spacing: 3px;
-            text-align: center;
-        }
-        
-        .menu-screen.active { display: flex; }
-
-        /* --- ESTILO ESPECÍFICO DEL NUEVO MENÚ PRINCIPAL --- */
-        #main-menu {
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            width: 100%;
-            align-items: center;
-        }
-
-        .top-coins-badge {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 2px solid var(--gold-color);
-            color: var(--gold-color);
-            padding: 10px 30px;
-            border-radius: 10px;
-            font-weight: 900;
-            font-size: 1.5rem;
-            background: rgba(0, 0, 0, 0.8);
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .neon-title {
-            color: #ffffff;
-            font-family: 'Arial Black', Impact, sans-serif;
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            text-transform: uppercase;
-            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff;
-            margin-top: 60px;
+            text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color), 0 0 40px var(--accent-color);
+            margin-top: 20px;
             margin-bottom: 5px;
             letter-spacing: 3px;
             text-align: center;
@@ -162,11 +128,9 @@
             margin-bottom: 40px;
         }
 
+        /* Botones Principales */
         .main-btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
+            display: flex; flex-direction: column; gap: 15px; align-items: center;
         }
 
         .btn-retro {
@@ -186,6 +150,8 @@
         .btn-cyan:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 20px var(--accent-color); transform: scale(1.05); }
         .btn-pink { color: var(--danger-color); border: 2px solid var(--danger-color); }
         .btn-pink:hover { background: var(--danger-color); color: #fff; box-shadow: 0 0 20px var(--danger-color); transform: scale(1.05); }
+        .btn-purple { color: #a855f7; border: 2px solid #a855f7; }
+        .btn-purple:hover { background: #a855f7; color: #fff; box-shadow: 0 0 20px #a855f7; transform: scale(1.05); }
 
         h2 { color: var(--secondary-color); font-size: 1.8rem; margin-bottom: 10px; }
         
@@ -196,24 +162,23 @@
         }
         button.default-btn:hover { background: var(--accent-color); color: var(--bg-color); }
 
+        /* Utilidades Flex */
         .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .col { display: flex; flex-direction: column; gap: 10px; }
         input, select { background: rgba(0,0,0,0.5); border: 1px solid var(--secondary-color); color: white; padding: 5px; border-radius: 3px; }
+        input[type="range"] { accent-color: var(--accent-color); }
 
-        /* HUD */
+        /* HUD Principal */
         #hud {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; display: none; padding: 20px;
         }
         #hud.active { display: block; }
+        
         .top-bar { display: flex; justify-content: space-between; align-items: flex-start; font-size: 1.3rem; font-weight: bold; text-shadow: 2px 2px 4px #000; width: 100%; }
         .level-badge { color: var(--gold-color); }
         
         .points-display { 
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
             color: var(--gold-color);
             font-size: 2rem;
             background: rgba(0, 0, 0, 0.8);
@@ -224,12 +189,11 @@
             text-shadow: none;
             pointer-events: auto;
             text-align: center;
-            z-index: 1000;
         }
 
+        /* Inventario Visual */
         @keyframes floatHud { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); filter: drop-shadow(0 5px 10px rgba(0, 255, 255, 0.3)); } }
-
-        /* Interfaz Vertical de Objetos */
+        
         .item-dock {
             position: absolute; bottom: 20px; left: 20px;
             display: flex; flex-direction: column; gap: 15px; pointer-events: auto;
@@ -256,7 +220,13 @@
         }
         .item-icon { width: 36px; height: 36px; }
 
-        /* Tienda Animada */
+        /* Barras de Estado (Cooldowns) */
+        .timer-bar-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 300px; display: flex; flex-direction: column; gap: 5px; }
+        .timer-bar { height: 10px; width: 0%; border-radius: 5px; transition: width 0.1s linear; }
+        .timer-shield { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
+        .timer-cannon { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+
+        /* Tienda Layout */
         .shop-layout.active {
             display: flex; flex-direction: row; width: 850px; max-width: 95vw;
             padding: 0; overflow: hidden; align-items: stretch; background: rgba(11, 12, 16, 0.98);
@@ -268,9 +238,9 @@
         }
         .items-side { flex: 1.2; padding: 30px 25px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
 
+        /* Animación Cerdonio */
         @keyframes cerdonioBreathe { 0%, 100% { transform: scaleY(1) translateY(0); } 50% { transform: scaleY(1.02) translateY(-2px); } }
         @keyframes cerdonioArm { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
-
         .cerdonio-anim { width: 220px; height: 220px; filter: drop-shadow(0 15px 10px rgba(0,0,0,0.6)); }
         .cerdonio-body { transform-origin: center bottom; animation: cerdonioBreathe 1.5s ease-in-out infinite; }
         .cerdonio-arm-move { transform-origin: 160px 140px; animation: cerdonioArm 1.5s ease-in-out infinite; }
@@ -285,18 +255,13 @@
             background: rgba(0, 255, 255, 0.05); padding: 12px; border: 2px solid var(--secondary-color);
             border-radius: 10px; transition: all 0.3s;
         }
-        .shop-item:hover { background: rgba(0, 255, 255, 0.15); border-color: var(--accent-color); transform: translateX(10px); }
+        .shop-item:hover { background: rgba(0, 255, 255, 0.15); border-color: var(--accent-color); transform: translateX(5px); }
         .shop-custom-icon { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 0 5px currentColor); }
         .shop-item-info { display: flex; align-items: center; gap: 15px; text-align: left; }
         .shop-item-name { font-weight: bold; color: var(--accent-color); font-size: 1.1rem; }
         .shop-item-desc { font-size: 0.85rem; color: #ccc; margin-top: 4px; }
 
-        .timer-bar-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 300px; display: flex; flex-direction: column; gap: 5px; }
-        .timer-bar { height: 10px; width: 0%; border-radius: 5px; transition: width 0.1s linear; }
-        .timer-shield { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
-        .timer-cannon { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
-
-        /* Botón de Pausa */
+        /* Botón Pausa */
         #pause-btn {
             position: absolute; top: 20px; right: 20px; width: 50px; height: 50px;
             background: rgba(11, 12, 16, 0.8); border: 2px solid var(--accent-color);
@@ -308,41 +273,34 @@
         #pause-btn svg { width: 25px; height: 25px; fill: var(--accent-color); transition: fill 0.2s; }
         #pause-btn:hover svg { fill: #000; }
         
-        /* Animación del Tótem en pantalla */
+        /* Animación de Resurrección Tótem */
         #totem-popup {
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            width: 250px; height: 250px;
-            pointer-events: none;
-            z-index: 2000;
-            opacity: 0;
+            width: 250px; height: 250px; pointer-events: none;
+            z-index: 2000; opacity: 0;
             filter: drop-shadow(0 0 20px #22c55e) drop-shadow(0 0 50px #eab308);
         }
-
-        .totem-animate {
-            animation: totemPop 2s ease-out forwards;
-        }
-
+        .totem-animate { animation: totemPop 2s ease-out forwards; }
         @keyframes totemPop {
             0% { transform: translate(-50%, -20%) scale(0.5); opacity: 0; }
             15% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
             25% { transform: translate(-50%, -50%) scale(1.2) rotate(-5deg); opacity: 1; }
             35% { transform: translate(-50%, -50%) scale(1.3) rotate(5deg); opacity: 1; filter: drop-shadow(0 0 30px #22c55e) drop-shadow(0 0 60px #eab308); }
-            80% { transform: translate(-50%, -50%) scale(1.3) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 30px #22c55e) drop-shadow(0 0 60px #eab308); }
+            80% { transform: translate(-50%, -50%) scale(1.3) rotate(0deg); opacity: 1; }
             100% { transform: translate(-50%, -80%) scale(2); opacity: 0; filter: drop-shadow(0 0 10px #22c55e); }
         }
 
+        /* Overlay Captura de Teclas */
         #keybind-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 100;
+            background: rgba(0,0,0,0.9); z-index: 9999;
             display: none; justify-content: center; align-items: center;
             color: white; font-size: 2rem; pointer-events: auto;
         }
 
-        /* Responsividad para evitar colisiones en pantallas pequeñas */
         @media (max-width: 768px) {
-            .shop-layout.active { flex-direction: column; }
+            .shop-layout.active { flex-direction: column; overflow-y: auto; max-height: 95vh; }
             .vendor-side { border-right: none; border-bottom: 3px dashed var(--secondary-color); padding: 15px; }
             .items-side { padding: 15px; }
             .cerdonio-anim { width: 150px; height: 150px; }
@@ -352,81 +310,76 @@
 </head>
 <body>
 
+<!-- Lienzo de renderizado -->
 <canvas id="game-canvas"></canvas>
 
+<!-- Interfaz Gráfica -->
 <div id="ui-layer" class="gui-auto">
-    <!-- MENÚ PRINCIPAL -->
+    
+    <!-- Menú Principal -->
     <div id="main-menu" class="menu-screen active">
         <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
             <div class="top-coins-badge">Monedas: <span id="menu-coins">0</span></div>
             <h1 class="neon-title">RYBU DOGLE BUDSIN</h1>
             <p class="subtitle">BlackBoneDel</p>
-            <p class="subtitle">Añadido a la pàgina por Budsin</p>
+            <p class="subtitle">Puesto en la página por Budsin</p>
             
             <div class="main-btn-group">
-                <button class="btn-retro btn-cyan" onclick="startGame('survival')">Modo Supervivencia</button>
-                <button class="btn-retro btn-cyan" onclick="openMenu('practice-menu')">Modo Práctica</button>
-                <button class="btn-retro btn-cyan" style="color: #a855f7; border-color: #a855f7;" onclick="openCreatorMenu()">Modo Creador</button>
-                <button class="btn-retro btn-pink" onclick="openMenu('shop-menu')">Tienda de Cerdonio</button>
-                <button class="btn-retro btn-cyan" onclick="openMenu('settings-menu')">Ajustes y Controles</button>
+                <button class="btn-retro btn-cyan" onclick="GameApp.startGame('survival')">Modo Supervivencia</button>
+                <button class="btn-retro btn-cyan" onclick="UI.openMenu('practice-menu')">Modo Práctica</button>
+                <button class="btn-retro btn-purple" onclick="UI.openCreatorMenu()">Modo Creador</button>
+                <button class="btn-retro btn-pink" onclick="UI.openMenu('shop-menu')">Tienda de Cerdonio</button>
+                <button class="btn-retro btn-cyan" onclick="UI.openMenu('settings-menu')">Ajustes y Controles</button>
             </div>
         </div>
     </div>
 
-    <!-- Menú Práctica -->
+    <!-- Menú de Práctica -->
     <div id="practice-menu" class="menu-screen">
         <h2>Modo Práctica</h2>
         <p>Selecciona el nivel inicial:</p>
         <div class="col">
-            <button class="default-btn" onclick="startGame('practice', 1)" style="color: #cd7f32; border-color: #cd7f32;">Bronce</button>
-            <button class="default-btn" onclick="startGame('practice', 2)" style="color: #c0c0c0; border-color: #c0c0c0;">Plata</button>
-            <button class="default-btn" onclick="startGame('practice', 3)" style="color: #ffd700; border-color: #ffd700;">Oro</button>
-            <button class="default-btn" onclick="startGame('practice', 4)" style="color: #e5e4e2; border-color: #e5e4e2;">Platino</button>
-            <button class="default-btn" onclick="startGame('practice', 5)" style="color: #b9f2ff; border-color: #b9f2ff;">Diamante</button>
+            <button class="default-btn" onclick="GameApp.startGame('practice', 1)" style="color: #cd7f32; border-color: #cd7f32;">Bronce</button>
+            <button class="default-btn" onclick="GameApp.startGame('practice', 2)" style="color: #c0c0c0; border-color: #c0c0c0;">Plata</button>
+            <button class="default-btn" onclick="GameApp.startGame('practice', 3)" style="color: #ffd700; border-color: #ffd700;">Oro</button>
+            <button class="default-btn" onclick="GameApp.startGame('practice', 4)" style="color: #e5e4e2; border-color: #e5e4e2;">Platino</button>
+            <button class="default-btn" onclick="GameApp.startGame('practice', 5)" style="color: #b9f2ff; border-color: #b9f2ff;">Diamante</button>
         </div>
-        <button class="default-btn" onclick="backFromSubMenu()" style="margin-top: 15px;">Volver</button>
+        <button class="default-btn" onclick="UI.backFromSubMenu()" style="margin-top: 15px;">Volver</button>
     </div>
 
-    <!-- Tienda -->
+    <!-- Tienda de Cerdonio -->
     <div id="shop-menu" class="menu-screen shop-layout">
-        <!-- Lado Izquierdo: Cerdonio Animado -->
         <div class="vendor-side">
             <h2 style="font-family: 'Arial Black', sans-serif; font-size: 2rem; color: var(--accent-color); text-shadow: 2px 2px 0 #000; letter-spacing: 2px; margin-bottom: 5px;">CERDONIO</h2>
             <svg class="cerdonio-anim" viewBox="0 0 250 250">
                 <circle cx="125" cy="115" r="95" fill="none" stroke="var(--accent-color)" stroke-width="4" opacity="0.3"/>
                 <g class="cerdonio-body">
-                    <!-- Overalls / Body -->
+                    <!-- Overalls / Cuerpo -->
                     <path d="M 50 120 C 30 160, 40 220, 125 220 C 210 220, 220 160, 200 120 Z" fill="#888" stroke="#111" stroke-width="6"/>
                     <path d="M 70 220 L 70 170 L 180 170 L 180 220 Z" fill="#6b4423" stroke="#111" stroke-width="6"/>
                     <circle cx="90" cy="185" r="10" fill="#4a3018" stroke="#111" stroke-width="3"/>
                     <circle cx="160" cy="185" r="10" fill="#4a3018" stroke="#111" stroke-width="3"/>
-                    
-                    <!-- Head -->
+                    <!-- Cabeza -->
                     <ellipse cx="125" cy="100" rx="65" ry="60" fill="#df9b7a" stroke="#111" stroke-width="6"/>
-                    <!-- Ears -->
+                    <!-- Orejas -->
                     <path d="M 75 55 L 55 15 L 95 35 Z" fill="#df9b7a" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
                     <path d="M 175 55 L 195 15 L 155 35 Z" fill="#df9b7a" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
-                    
-                    <!-- Eye Patch Strap -->
+                    <!-- Parche del ojo -->
                     <line x1="60" y1="105" x2="190" y2="75" stroke="#111" stroke-width="7"/>
-                    <!-- Patch -->
                     <ellipse cx="100" cy="95" rx="18" ry="22" fill="#111" transform="rotate(-15 100 95)"/>
-                    
-                    <!-- Good Eye -->
+                    <!-- Ojo bueno -->
                     <ellipse cx="155" cy="90" rx="12" ry="18" fill="#fff" stroke="#111" stroke-width="4"/>
                     <circle cx="152" cy="90" r="5" fill="#111"/>
                     <path d="M 140 70 L 170 80" stroke="#111" stroke-width="6" stroke-linecap="round"/>
-                    
-                    <!-- Snout -->
+                    <!-- Hocico -->
                     <ellipse cx="140" cy="125" rx="22" ry="18" fill="#fbcfe8" stroke="#111" stroke-width="5"/>
                     <ellipse cx="132" cy="125" rx="4" ry="8" fill="#111"/>
                     <ellipse cx="148" cy="125" rx="4" ry="8" fill="#111"/>
-                    
-                    <!-- Mouth/Smirk -->
+                    <!-- Boca -->
                     <path d="M 90 120 C 100 145, 120 140, 130 135" fill="none" stroke="#111" stroke-width="5" stroke-linecap="round"/>
                 </g>
-
-                <!-- Arm Fix -->
+                <!-- Brazo Animado -->
                 <g class="cerdonio-arm-move">
                     <circle cx="160" cy="140" r="18" fill="#888" stroke="#111" stroke-width="6"/>
                     <path d="M 160 122 Q 240 120 230 180 L 200 190 Q 180 160 160 158 Z" fill="#888" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
@@ -440,94 +393,108 @@
                 "¡Oink, hola humano! Llévate estos juguetes galácticos."<br>
                 <span style="color:var(--gold-color); font-weight:bold; font-size:1.2rem;">🪙 Monedas: <span id="shop-points">0</span></span>
             </div>
-            <button class="default-btn" onclick="backFromSubMenu()" style="margin-top: 20px; width: 80%;">Abandonar Tienda</button>
+            <button class="default-btn" onclick="UI.backFromSubMenu()" style="margin-top: 20px; width: 80%;">Abandonar Tienda</button>
         </div>
         
-        <!-- Lado Derecho: Objetos -->
         <div class="items-side">
             <h2 style="text-align: left; border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px;">INVENTARIO</h2>
+            
             <div class="shop-item">
                 <div class="shop-item-info">
                     <div class="shop-custom-icon" style="color: #ef4444;">
                         <svg viewBox="0 0 100 100">
-                            <!-- Cap Shield Design -->
-                            <circle cx="50" cy="50" r="45" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
-                            <circle cx="50" cy="50" r="35" fill="#f8fafc"/>
-                            <circle cx="50" cy="50" r="25" fill="#ef4444"/>
-                            <circle cx="50" cy="50" r="15" fill="#3b82f6"/>
-                            <polygon points="50,38 53,46 62,46 55,51 58,59 50,54 42,59 45,51 38,46 47,46" fill="#f8fafc"/>
-                            <path d="M 15 50 A 35 35 0 0 1 85 50" fill="none" stroke="#ffffff" stroke-width="5" opacity="0.3" stroke-linecap="round"/>
+                            <defs>
+                                <radialGradient id="shieldGradShop" cx="50%" cy="50%" r="50%">
+                                    <stop offset="60%" stop-color="#3b82f6" stop-opacity="0.2"/>
+                                    <stop offset="90%" stop-color="#60a5fa" stop-opacity="0.8"/>
+                                    <stop offset="100%" stop-color="#93c5fd" stop-opacity="1"/>
+                                </radialGradient>
+                            </defs>
+                            <circle cx="50" cy="50" r="45" fill="url(#shieldGradShop)" stroke="#60a5fa" stroke-width="3"/>
+                            <path d="M 50 15 L 80 30 L 80 60 C 80 80, 50 90, 50 90 C 50 90, 20 80, 20 60 L 20 30 Z" fill="none" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
+                            <circle cx="50" cy="45" r="12" fill="#bfdbfe"/>
                         </svg>
                     </div>
                     <div>
                         <div class="shop-item-name">Escudo del Capitán</div>
-                        <div class="shop-item-desc">Inmortalidad 20s. Resiste golpes.</div>
+                        <div class="shop-item-desc">Inmortalidad 20s. Empuja enemigos.</div>
                     </div>
                 </div>
-                <button class="default-btn" onclick="buyItem('shield', 500)">500</button>
+                <button class="default-btn" onclick="GameApp.buyItem('shield', 500, this)">500</button>
             </div>
             
             <div class="shop-item">
                 <div class="shop-item-info">
                     <div class="shop-custom-icon" style="color: #ef4444;">
                         <svg viewBox="0 0 100 100">
-                            <rect x="25" y="20" width="65" height="20" rx="5" fill="#7f1d1d" stroke="#ef4444" stroke-width="4"/>
-                            <rect x="25" y="60" width="65" height="20" rx="5" fill="#7f1d1d" stroke="#ef4444" stroke-width="4"/>
-                            <path d="M 30 40 L 30 60 M 15 15 L 15 85" stroke="#450a0a" stroke-width="12" stroke-linecap="round"/>
-                            <ellipse cx="80" cy="30" rx="6" ry="10" fill="#fca5a5" filter="blur(1px)"/>
-                            <ellipse cx="80" cy="70" rx="6" ry="10" fill="#fca5a5" filter="blur(1px)"/>
-                            <line x1="40" y1="30" x2="60" y2="30" stroke="#f87171" stroke-width="2"/>
-                            <line x1="40" y1="70" x2="60" y2="70" stroke="#f87171" stroke-width="2"/>
+                            <rect x="35" y="70" width="30" height="20" rx="5" fill="#475569"/>
+                            <rect x="25" y="20" width="15" height="60" rx="3" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                            <rect x="60" y="20" width="15" height="60" rx="3" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                            <circle cx="32.5" cy="40" r="4" fill="#fde047"/>
+                            <circle cx="67.5" cy="40" r="4" fill="#fde047"/>
+                            <path d="M 25 20 L 32.5 5 L 40 20 Z" fill="#fca5a5"/>
+                            <path d="M 60 20 L 67.5 5 L 75 20 Z" fill="#fca5a5"/>
                         </svg>
                     </div>
                     <div>
                         <div class="shop-item-name">Blaster Doble Retro</div>
-                        <div class="shop-item-desc">Láseres dobles que aniquilan por 20s.</div>
+                        <div class="shop-item-desc">Láseres dobles para aniquilar por 20s.</div>
                     </div>
                 </div>
-                <button class="default-btn" onclick="buyItem('cannon', 1000)">1000</button>
+                <button class="default-btn" onclick="GameApp.buyItem('cannon', 1000, this)">1000</button>
             </div>
 
             <div class="shop-item">
                 <div class="shop-item-info">
                     <div class="shop-custom-icon" style="color: #eab308;">
-                        <svg viewBox="0 0 100 100" shape-rendering="crispEdges">
-                            <!-- MS Paint Style Totem -->
-                            <rect x="30" y="20" width="40" height="20" fill="#fde047" stroke="#000" stroke-width="3"/>
-                            <rect x="35" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
-                            <rect x="55" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
-                            <rect x="40" y="40" width="20" height="40" fill="#eab308" stroke="#000" stroke-width="3"/>
-                            <rect x="20" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
-                            <rect x="60" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
-                            <rect x="30" y="80" width="40" height="10" fill="#ca8a04" stroke="#000" stroke-width="3"/>
+                        <svg viewBox="0 0 100 100">
+                            <defs>
+                                <linearGradient id="goldGradShop" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#fef08a"/>
+                                    <stop offset="50%" stop-color="#eab308"/>
+                                    <stop offset="100%" stop-color="#a16207"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M 50 40 L 10 20 L 25 50 Z" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+                            <path d="M 50 40 L 90 20 L 75 50 Z" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+                            <rect x="35" y="25" width="30" height="55" rx="5" fill="url(#goldGradShop)" stroke="#713f12" stroke-width="3"/>
+                            <circle cx="50" cy="45" r="8" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                            <circle cx="50" cy="45" r="3" fill="#a7f3d0"/>
+                            <path d="M 40 65 L 60 65 M 45 75 L 55 75" stroke="#713f12" stroke-width="3" stroke-linecap="round"/>
                         </svg>
                     </div>
                     <div>
                         <div class="shop-item-name">Tótem de la Inmortalidad</div>
-                        <div class="shop-item-desc">Resurrección mágica al caer.</div>
+                        <div class="shop-item-desc">Resurrección mágica automática al caer.</div>
                     </div>
                 </div>
-                <button class="default-btn" onclick="buyItem('totem', 2500)">2500</button>
+                <button class="default-btn" onclick="GameApp.buyItem('totem', 2500, this)">2500</button>
             </div>
         </div>
     </div>
 
-    <!-- Ajustes -->
+    <!-- Menú Ajustes -->
     <div id="settings-menu" class="menu-screen">
-        <h2>Ajustes</h2>
+        <h2>Ajustes y Controles</h2>
         <div style="max-height: 400px; overflow-y: auto; padding-right: 10px;" class="col">
-            <h3>Controles</h3>
-            <div class="row"><span>Arriba:</span> <button class="default-btn" onclick="captureKey('up')" id="btn-key-up">W</button></div>
-            <div class="row"><span>Abajo:</span> <button class="default-btn" onclick="captureKey('down')" id="btn-key-down">S</button></div>
-            <div class="row"><span>Izquierda:</span> <button class="default-btn" onclick="captureKey('left')" id="btn-key-left">A</button></div>
-            <div class="row"><span>Derecha:</span> <button class="default-btn" onclick="captureKey('right')" id="btn-key-right">D</button></div>
-            <div class="row"><span>Activar Escudo:</span> <button class="default-btn" onclick="captureKey('shield')" id="btn-key-shield">Q</button></div>
-            <div class="row"><span>Activar Cañón:</span> <button class="default-btn" onclick="captureKey('cannon')" id="btn-key-cannon">F</button></div>
+            <h3>Controles Teclado</h3>
+            <div class="row"><span>Arriba:</span> <button class="default-btn" onclick="UI.captureKey('up')" id="btn-key-up">W</button></div>
+            <div class="row"><span>Abajo:</span> <button class="default-btn" onclick="UI.captureKey('down')" id="btn-key-down">S</button></div>
+            <div class="row"><span>Izquierda:</span> <button class="default-btn" onclick="UI.captureKey('left')" id="btn-key-left">A</button></div>
+            <div class="row"><span>Derecha:</span> <button class="default-btn" onclick="UI.captureKey('right')" id="btn-key-right">D</button></div>
+            <div class="row"><span>Activar Escudo:</span> <button class="default-btn" onclick="UI.captureKey('shield')" id="btn-key-shield">Q</button></div>
+            <div class="row"><span>Activar Cañón:</span> <button class="default-btn" onclick="UI.captureKey('cannon')" id="btn-key-cannon">F</button></div>
 
-            <h3 style="margin-top: 10px;">Interfaz</h3>
+            <h3 style="margin-top: 10px;">Audio</h3>
+            <div class="row">
+                <span>Música de Fondo (8-bits):</span>
+                <input type="checkbox" id="toggle-music" onchange="GameApp.audio.toggle(this.checked)" style="width: 20px; height: 20px;">
+            </div>
+
+            <h3 style="margin-top: 10px;">Interfaz Visual</h3>
             <div class="row">
                 <span>Tamaño GUI:</span>
-                <select id="gui-scale-select" onchange="changeGUIScale(this.value)">
+                <select id="gui-scale-select" onchange="UI.changeGUIScale(this.value)">
                     <option value="auto">Automático</option>
                     <option value="small">Pequeño</option>
                     <option value="medium">Mediano</option>
@@ -535,25 +502,25 @@
                 </select>
             </div>
             <div class="row">
-                <span>Color Crosshair:</span>
-                <input type="color" id="crosshair-color" value="#ffffff" onchange="updateCrosshairColor(this.value)">
+                <span>Color Mirilla:</span>
+                <input type="color" id="crosshair-color" value="#ffffff" onchange="Config.crosshairColor = this.value">
             </div>
             
-            <h3 style="margin-top: 10px;">Skins (URLs)</h3>
+            <h3 style="margin-top: 10px;">Skins Personalizadas (URLs)</h3>
             <div class="col">
                 <input type="text" id="skin-ship" placeholder="URL Nave (PNG)">
                 <input type="text" id="skin-meteor" placeholder="URL Meteorito (PNG)">
-                <button class="default-btn" onclick="applySkins()">Aplicar Skins</button>
+                <button class="default-btn" onclick="GameApp.applySkins()">Cargar Skins</button>
             </div>
         </div>
-        <button class="default-btn" onclick="backFromSubMenu()" style="margin-top: 15px;">Guardar y Volver</button>
+        <button class="default-btn" onclick="UI.backFromSubMenu()" style="margin-top: 15px;">Guardar y Volver</button>
     </div>
 
-    <!-- Menú Creador -->
+    <!-- Menú Modo Creador -->
     <div id="creator-menu" class="menu-screen">
         <h2 style="color: #a855f7; font-family: 'Arial Black', sans-serif;">MODO CREADOR</h2>
         <div style="max-height: 400px; overflow-y: auto; padding-right: 10px; text-align: left;" class="col">
-            <p style="color: #aaa; font-size: 0.85rem; text-align: center; margin-bottom: 10px;">Modifica las reglas del universo a tu antojo.</p>
+            <p style="color: #aaa; font-size: 0.85rem; text-align: center; margin-bottom: 10px;">Modifica las reglas del universo.</p>
 
             <h3 style="color: var(--secondary-color);">Entorno</h3>
             <div class="row"><span>Color Fondo:</span> <input type="color" id="creator-bg" value="#000000" style="width: 50px; height: 30px;"></div>
@@ -567,64 +534,55 @@
                     <option value="5">Diamante</option>
                 </select>
             </div>
-            <div class="row" style="margin-top: 5px;">
-                <input type="text" id="creator-skin-ship" placeholder="URL Skin Nave (Opcional)" style="flex: 1;">
-            </div>
 
             <h3 style="color: var(--secondary-color); margin-top: 15px;">Físicas y Dificultad</h3>
             <div class="col" style="align-items: flex-start;">
-                <label style="font-size: 0.9rem;">Tamaño Meteoritos (x<span id="val-msize">1.0</span>)</label>
+                <label style="font-size: 0.9rem;">Multiplicador Tamaño Meteoritos: <span id="val-msize">1.0</span>x</label>
                 <input type="range" id="creator-meteor-size" min="0.5" max="4" step="0.1" value="1" oninput="document.getElementById('val-msize').innerText=this.value" style="width: 100%;">
 
-                <label style="font-size: 0.9rem; margin-top: 5px;">Velocidad Meteoritos (x<span id="val-mspeed">1.0</span>)</label>
+                <label style="font-size: 0.9rem; margin-top: 5px;">Velocidad Meteoritos: <span id="val-mspeed">1.0</span>x</label>
                 <input type="range" id="creator-meteor-speed" min="0.2" max="3" step="0.1" value="1" oninput="document.getElementById('val-mspeed').innerText=this.value" style="width: 100%;">
 
-                <label style="font-size: 0.9rem; margin-top: 5px;">Velocidad de Nave (x<span id="val-pspeed">1.0</span>)</label>
+                <label style="font-size: 0.9rem; margin-top: 5px;">Velocidad de Nave: <span id="val-pspeed">1.0</span>x</label>
                 <input type="range" id="creator-player-speed" min="0.5" max="3" step="0.1" value="1" oninput="document.getElementById('val-pspeed').innerText=this.value" style="width: 100%;">
 
-                <label style="font-size: 0.9rem; margin-top: 5px;">Tiempo Recarga Disparo (x<span id="val-cooldown">1.0</span>) <span style="font-size: 0.7rem; color: #aaa;">*Menor=Más rápido</span></label>
+                <label style="font-size: 0.9rem; margin-top: 5px;">Tiempo Recarga Disparo: <span id="val-cooldown">1.0</span>x <small style="color: #aaa;">(Menor = Rápido)</small></label>
                 <input type="range" id="creator-cooldown" min="0.1" max="2" step="0.1" value="1" oninput="document.getElementById('val-cooldown').innerText=this.value" style="width: 100%;">
             </div>
 
             <h3 style="color: var(--secondary-color); margin-top: 15px;">Inventario Inicial</h3>
-            <p style="font-size: 0.75rem; color: #ffcc00; text-align: center; margin-bottom: 5px;">Solo disponible si ya lo compraste 1 vez en la tienda.</p>
+            <p style="font-size: 0.75rem; color: #ffcc00; text-align: center; margin-bottom: 5px;">Solo disponible si ya lo compraste en la tienda.</p>
             <div class="row"><span>Escudos:</span> <input type="number" id="creator-shields" min="0" value="0" style="width: 60px;"></div>
             <div class="row"><span>Cañones Dobles:</span> <input type="number" id="creator-cannons" min="0" value="0" style="width: 60px;"></div>
             <div class="row"><span>Tótems Inmortales:</span> <input type="number" id="creator-totems" min="0" value="0" style="width: 60px;"></div>
         </div>
         <div class="row" style="margin-top: 15px; justify-content: center; gap: 15px; flex-wrap: wrap;">
-            <button class="default-btn" onclick="backFromSubMenu()">Volver</button>
-            <button class="default-btn" style="border-color: #f59e0b; color: #f59e0b;" onclick="resetCreatorDefaults()">Por Defecto</button>
-            <button class="default-btn" style="background: #a855f7; color: #fff; border-color: #a855f7;" onclick="startCreatorMode()">CREAR Y JUGAR</button>
+            <button class="default-btn" onclick="UI.backFromSubMenu()">Volver</button>
+            <button class="default-btn" style="border-color: #f59e0b; color: #f59e0b;" onclick="GameApp.resetCreatorDefaults()">Por Defecto</button>
+            <button class="default-btn btn-purple" onclick="GameApp.startCreatorMode()">CREAR Y JUGAR</button>
         </div>
     </div>
 
-    <!-- Game Over -->
+    <!-- Pantalla Fin de Juego -->
     <div id="game-over-menu" class="menu-screen">
         <h1 style="color: var(--danger-color); text-shadow: 0 0 10px var(--danger-color);">NAVE DESTRUIDA</h1>
         <h2 id="final-stats">Nivel: Bronce | Monedas: 0</h2>
-        <button class="default-btn" onclick="openMenu('main-menu')">Volver al Menú</button>
+        <button class="default-btn" onclick="UI.openMenu('main-menu')">Volver al Menú</button>
     </div>
 
-    <!-- Menú de Pausa -->
+    <!-- Menú Pausa -->
     <div id="pause-menu" class="menu-screen">
         <h1 class="neon-title" style="font-size: 3rem;">PAUSA</h1>
         <div class="main-btn-group">
-            <button class="btn-retro btn-cyan" onclick="resumeGame()">Reanudar Partida</button>
-            <button class="btn-retro btn-cyan" onclick="startGame('survival')">Reiniciar Supervivencia</button>
-            <button class="btn-retro btn-cyan" onclick="openMenu('practice-menu')">Modo Práctica</button>
-            <button class="btn-retro btn-cyan" style="color: #a855f7; border-color: #a855f7;" onclick="openCreatorMenu()">Modo Creador</button>
-            <button class="btn-retro btn-pink" onclick="openMenu('shop-menu')">Tienda de Cerdonio</button>
-            <button class="btn-retro btn-cyan" onclick="openMenu('settings-menu')">Ajustes y Controles</button>
-            <button class="btn-retro btn-pink" style="border-color: var(--danger-color);" onclick="confirmToMainMenu()">Menú Principal</button>
+            <button class="btn-retro btn-cyan" onclick="GameApp.resumeGame()">Reanudar Partida</button>
+            <button class="btn-retro btn-cyan" onclick="GameApp.startGame('survival')">Reiniciar Supervivencia</button>
+            <button class="btn-retro btn-pink" style="border-color: var(--danger-color);" onclick="UI.confirmToMainMenu()">Menú Principal</button>
         </div>
     </div>
 
-    <div id="keybind-overlay">Presiona una tecla para asignar... (ESC para cancelar)</div>
-
-    <!-- HUD Activo -->
+    <!-- HUD Activo Durante el Juego -->
     <div id="hud">
-        <div id="pause-btn" onclick="togglePause()">
+        <div id="pause-btn" onclick="GameApp.togglePause()">
             <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
         </div>
         <div class="top-bar">
@@ -636,40 +594,55 @@
             <div class="points-display">
                 Monedas: <span id="hud-points">0</span>
             </div>
-            <div style="width: 50px;"></div> <!-- Espaciador para el botón de pausa -->
+            <div style="width: 50px;"></div>
         </div>
 
         <div class="item-dock">
-            <div class="item-slot" onclick="useItem('shield')" title="Activar Escudo">
+            <div class="item-slot" onclick="GameApp.useItem('shield')" title="Activar Escudo">
                 <div class="key-hint" id="hud-key-shield">Q</div>
                 <svg class="item-icon" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
-                    <circle cx="50" cy="50" r="35" fill="#f8fafc"/>
-                    <circle cx="50" cy="50" r="25" fill="#ef4444"/>
-                    <circle cx="50" cy="50" r="15" fill="#3b82f6"/>
-                    <polygon points="50,38 53,46 62,46 55,51 58,59 50,54 42,59 45,51 38,46 47,46" fill="#f8fafc"/>
+                    <defs>
+                        <radialGradient id="shieldGradHud" cx="50%" cy="50%" r="50%">
+                            <stop offset="60%" stop-color="#3b82f6" stop-opacity="0.2"/>
+                            <stop offset="90%" stop-color="#60a5fa" stop-opacity="0.8"/>
+                            <stop offset="100%" stop-color="#93c5fd" stop-opacity="1"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="45" fill="url(#shieldGradHud)" stroke="#60a5fa" stroke-width="3"/>
+                    <path d="M 50 15 L 80 30 L 80 60 C 80 80, 50 90, 50 90 C 50 90, 20 80, 20 60 L 20 30 Z" fill="none" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
+                    <circle cx="50" cy="45" r="12" fill="#bfdbfe"/>
                 </svg>
                 <div class="count" id="hud-count-shield">0</div>
             </div>
-            <div class="item-slot" onclick="useItem('cannon')" title="Activar Cañón Doble">
+            <div class="item-slot" onclick="GameApp.useItem('cannon')" title="Activar Cañón Doble">
                 <div class="key-hint" id="hud-key-cannon">F</div>
                 <svg class="item-icon" viewBox="0 0 100 100">
-                    <rect x="25" y="20" width="65" height="20" rx="5" fill="#7f1d1d" stroke="#ef4444" stroke-width="4"/>
-                    <rect x="25" y="60" width="65" height="20" rx="5" fill="#7f1d1d" stroke="#ef4444" stroke-width="4"/>
-                    <path d="M 30 40 L 30 60 M 15 15 L 15 85" stroke="#450a0a" stroke-width="12" stroke-linecap="round"/>
+                    <rect x="35" y="70" width="30" height="20" rx="5" fill="#475569"/>
+                    <rect x="25" y="20" width="15" height="60" rx="3" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                    <rect x="60" y="20" width="15" height="60" rx="3" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                    <circle cx="32.5" cy="40" r="4" fill="#fde047"/>
+                    <circle cx="67.5" cy="40" r="4" fill="#fde047"/>
+                    <path d="M 25 20 L 32.5 5 L 40 20 Z" fill="#fca5a5"/>
+                    <path d="M 60 20 L 67.5 5 L 75 20 Z" fill="#fca5a5"/>
                 </svg>
                 <div class="count" id="hud-count-cannon">0</div>
             </div>
             <div class="item-slot" title="Totem (Automático)">
                 <div class="key-hint" style="background:#10b981;">A</div>
-                <svg class="item-icon" viewBox="0 0 100 100" shape-rendering="crispEdges">
-                    <rect x="30" y="20" width="40" height="20" fill="#fde047" stroke="#000" stroke-width="3"/>
-                    <rect x="35" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
-                    <rect x="55" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
-                    <rect x="40" y="40" width="20" height="40" fill="#eab308" stroke="#000" stroke-width="3"/>
-                    <rect x="20" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
-                    <rect x="60" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
-                    <rect x="30" y="80" width="40" height="10" fill="#ca8a04" stroke="#000" stroke-width="3"/>
+                <svg class="item-icon" viewBox="0 0 100 100">
+                    <defs>
+                        <linearGradient id="goldGradHud" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fef08a"/>
+                            <stop offset="50%" stop-color="#eab308"/>
+                            <stop offset="100%" stop-color="#a16207"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M 50 40 L 10 20 L 25 50 Z" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+                    <path d="M 50 40 L 90 20 L 75 50 Z" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+                    <rect x="35" y="25" width="30" height="55" rx="5" fill="url(#goldGradHud)" stroke="#713f12" stroke-width="3"/>
+                    <circle cx="50" cy="45" r="8" fill="#10b981" stroke="#047857" stroke-width="2"/>
+                    <circle cx="50" cy="45" r="3" fill="#a7f3d0"/>
+                    <path d="M 40 65 L 60 65 M 45 75 L 55 75" stroke="#713f12" stroke-width="3" stroke-linecap="round"/>
                 </svg>
                 <div class="count" id="hud-count-totem">0</div>
             </div>
@@ -681,154 +654,215 @@
         </div>
     </div>
 
-    <!-- Pop-up del Tótem -->
+    <!-- Pop-up Tótem -->
     <div id="totem-popup">
-        <svg viewBox="0 0 100 100" shape-rendering="crispEdges">
-            <rect x="30" y="20" width="40" height="20" fill="#fde047" stroke="#000" stroke-width="3"/>
-            <rect x="35" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
-            <rect x="55" y="25" width="10" height="10" fill="#22c55e" stroke="#000" stroke-width="2"/>
-            <rect x="40" y="40" width="20" height="40" fill="#eab308" stroke="#000" stroke-width="3"/>
-            <rect x="20" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
-            <rect x="60" y="40" width="20" height="15" fill="#fde047" stroke="#000" stroke-width="3"/>
-            <rect x="30" y="80" width="40" height="10" fill="#ca8a04" stroke="#000" stroke-width="3"/>
+        <svg viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="goldGradPop" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#fef08a"/>
+                    <stop offset="50%" stop-color="#eab308"/>
+                    <stop offset="100%" stop-color="#a16207"/>
+                </linearGradient>
+            </defs>
+            <path d="M 50 40 L 10 20 L 25 50 Z" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+            <path d="M 50 40 L 90 20 L 75 50 Z" fill="#fde047" stroke="#ca8a04" stroke-width="2"/>
+            <rect x="35" y="25" width="30" height="55" rx="5" fill="url(#goldGradPop)" stroke="#713f12" stroke-width="3"/>
+            <circle cx="50" cy="45" r="8" fill="#10b981" stroke="#047857" stroke-width="2"/>
+            <circle cx="50" cy="45" r="3" fill="#a7f3d0"/>
+            <path d="M 40 65 L 60 65 M 45 75 L 55 75" stroke="#713f12" stroke-width="3" stroke-linecap="round"/>
         </svg>
     </div>
+
+    <!-- Overlay Captura Tecla -->
+    <div id="keybind-overlay">Presiona una tecla para asignar... (ESC para cancelar)</div>
 </div>
 
 <script>
-const canvas = document.getElementById('game-canvas');
-const ctx = canvas.getContext('2d');
-let animationId;
-let lastTime = 0;
+/**
+ * REESCRITURA COMPLETA - SPACE SURVIVAL
+ * Código estructurado y limpio sin variables globales sueltas.
+ */
 
-let gameState = 'menu';
-let previousState = 'menu';
-let gameMode = 'survival';
-let timeElapsed = 0;
-let points = 0;
-let levelIndex = 0;
-
-const LEVELS = [
-    { name: 'Bronce', color: '#cd7f32', cooldown: 500, spawnRate: 1500, speedMult: 1 },
-    { name: 'Plata', color: '#c0c0c0', cooldown: 400, spawnRate: 1200, speedMult: 1.2 },
-    { name: 'Oro', color: '#ffd700', cooldown: 300, spawnRate: 900, speedMult: 1.4 },
-    { name: 'Platino', color: '#e5e4e2', cooldown: 200, spawnRate: 600, speedMult: 1.6 },
-    { name: 'Diamante', color: '#b9f2ff', cooldown: 100, spawnRate: 400, speedMult: 2.0 }
-];
-
-let inventory = { shields: 0, cannons: 0, totems: 0 };
-let activeEffects = { shield: 0, cannon: 0, totemInvuln: 0 };
-
-// Seguimiento de compras para el Modo Creador
-let itemsUnlocked = { shields: false, cannons: false, totems: false };
-let creatorSettings = { bgColor: '#000000', meteorSize: 1, meteorSpeed: 1, shootCooldown: 1, playerSpeed: 1 };
-
-let settings = {
+// --- 1. CONFIGURACIÓN Y ESTADO CENTRAL ---
+const Config = {
     keys: { up: 'w', down: 's', left: 'a', right: 'd', shield: 'q', cannon: 'f' },
-    crosshairColor: '#ffffff', // Crosshair por defecto blanca
-    guiScale: 'auto'
+    crosshairColor: '#ffffff',
+    guiScale: 'auto',
+    images: { ship: null, meteor: null },
+    levels: [
+        { name: 'Bronce', color: '#cd7f32', cooldown: 0.5, spawnRate: 1.5, speedMult: 1 },
+        { name: 'Plata', color: '#c0c0c0', cooldown: 0.4, spawnRate: 1.2, speedMult: 1.2 },
+        { name: 'Oro', color: '#ffd700', cooldown: 0.3, spawnRate: 0.9, speedMult: 1.4 },
+        { name: 'Platino', color: '#e5e4e2', cooldown: 0.2, spawnRate: 0.6, speedMult: 1.6 },
+        { name: 'Diamante', color: '#b9f2ff', cooldown: 0.1, spawnRate: 0.4, speedMult: 2.0 }
+    ]
 };
 
-let images = { ship: null, meteor: null };
-let player;
-let projectiles = [];
-let enemies = [];
-let particles = [];
-let keysPressed = new Set();
-let mouse = { x: 0, y: 0, down: false };
-let lastShotTime = 0;
-let lastSpawnTime = 0;
+const State = {
+    game: 'menu', // menu, playing, paused, gameover, shop
+    previous: 'menu',
+    mode: 'survival', // survival, practice, creator
+    levelIndex: 0,
+    timeElapsed: 0,
+    points: 0,
+    lastSpawnTime: 0,
+    lastShotTime: 0,
+    
+    // Inventario y mejoras activas
+    inventory: { shield: 0, cannon: 0, totem: 0 },
+    creatorInventory: { shield: 0, cannon: 0, totem: 0 },
+    unlocked: { shield: false, cannon: false, totem: false },
+    activeBuffs: { shield: 0, cannon: 0, totemInvuln: 0 },
+    
+    // Configuraciones modo creador
+    creator: { bg: '#000000', mSize: 1, mSpeed: 1, pSpeed: 1, pCooldown: 1 },
+    
+    // Entidades del juego
+    player: null,
+    projectiles: [],
+    enemies: [],
+    particles: [],
+    stars: []
+};
 
-// Sistema de estrellas de fondo - Más denso y oscuro
-let backgroundStars = [];
-for(let i=0; i<250; i++) {
-    backgroundStars.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        size: Math.random() * 1.5 + 0.5,
-        speed: Math.random() * 0.3 + 0.05,
-        opacity: Math.random() * 0.8 + 0.2
-    });
-}
+// --- 2. SISTEMA DE ENTRADA (INPUT) SEGURA ---
+const Input = {
+    keysPressed: new Set(),
+    mouse: { x: 0, y: 0, down: false },
+    
+    init() {
+        window.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            
+            // Evitar que al mantener pulsada la tecla se gasten todos los items al mismo tiempo
+            if (!this.keysPressed.has(key)) {
+                if(State.game === 'playing') {
+                    if(key === Config.keys.shield.toLowerCase()) GameApp.useItem('shield');
+                    if(key === Config.keys.cannon.toLowerCase()) GameApp.useItem('cannon');
+                    if(key === 'escape') GameApp.togglePause();
+                } else if (State.game === 'paused' && key === 'escape') {
+                    GameApp.resumeGame();
+                }
+            }
+            
+            this.keysPressed.add(key);
+        });
+        
+        window.addEventListener('keyup', (e) => this.keysPressed.delete(e.key.toLowerCase()));
+        window.addEventListener('blur', () => this.keysPressed.clear()); // Evitar teclas pegadas
 
-function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resize);
-resize();
-
-window.addEventListener('keydown', (e) => {
-    let key = e.key.toLowerCase();
-    keysPressed.add(key);
-    if(gameState === 'playing') {
-        if(key === settings.keys.shield.toLowerCase()) useItem('shield');
-        if(key === settings.keys.cannon.toLowerCase()) useItem('cannon');
-        if(key === 'escape') togglePause();
-    } else if (gameState === 'paused' && key === 'escape') {
-        resumeGame();
+        const canvas = document.getElementById('game-canvas');
+        canvas.addEventListener('mousemove', (e) => {
+            // Mapeo seguro utilizando las coordenadas visuales del cliente
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
+        canvas.addEventListener('mousedown', () => this.mouse.down = true);
+        canvas.addEventListener('mouseup', () => this.mouse.down = false);
     }
-});
-window.addEventListener('keyup', (e) => keysPressed.delete(e.key.toLowerCase()));
-window.addEventListener('blur', () => keysPressed.clear());
+};
 
-canvas.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-canvas.addEventListener('mousedown', () => mouse.down = true);
-canvas.addEventListener('mouseup', () => mouse.down = false);
-
-class Player {
-    constructor() {
-        this.x = canvas.width / 2; this.y = canvas.height / 2;
-        this.vx = 0; this.vy = 0; this.angle = 0;
-        let speedMult = (gameMode === 'creator') ? creatorSettings.playerSpeed : 1;
-        this.speed = 4.5 * speedMult; this.friction = 0.94; this.radius = 20;
-    }
-    update() {
-        if(keysPressed.has(settings.keys.up.toLowerCase())) this.vy -= 0.8;
-        if(keysPressed.has(settings.keys.down.toLowerCase())) this.vy += 0.8;
-        if(keysPressed.has(settings.keys.left.toLowerCase())) this.vx -= 0.8;
-        if(keysPressed.has(settings.keys.right.toLowerCase())) this.vx += 0.8;
-
-        let mag = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
-        if(mag > this.speed) { this.vx = (this.vx / mag) * this.speed; this.vy = (this.vy / mag) * this.speed; }
-
-        this.x += this.vx; this.y += this.vy;
-        this.vx *= this.friction; this.vy *= this.friction;
-
-        this.x = Math.max(this.radius, Math.min(canvas.width - this.radius, this.x));
-        this.y = Math.max(this.radius, Math.min(canvas.height - this.radius, this.y));
-
-        if(keysPressed.has('arrowup') || keysPressed.has('arrowdown') || keysPressed.has('arrowleft') || keysPressed.has('arrowright')) {
-            let dx = 0, dy = 0;
-            if(keysPressed.has('arrowup')) dy -= 1; if(keysPressed.has('arrowdown')) dy += 1;
-            if(keysPressed.has('arrowleft')) dx -= 1; if(keysPressed.has('arrowright')) dx += 1;
-            this.angle = Math.atan2(dy, dx);
+// --- 3. AUDIO PROCEDURAL (Seguro) ---
+const AudioEngine = {
+    ctx: null, isPlaying: false, timer: null, step: 0,
+    notes: [220, 261.63, 329.63, 440, 329.63, 261.63, 196, 164.81, 220, 261.63, 329.63, 440, 493.88, 440, 329.63, 261.63],
+    
+    init() {
+        if (!this.ctx) {
+            try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } 
+            catch(e) { console.warn("Audio Context no soportado."); }
+        }
+    },
+    playNote() {
+        if (!this.isPlaying || !this.ctx) return;
+        try {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(this.notes[this.step], this.ctx.currentTime);
+            
+            gain.gain.setValueAtTime(0.02, this.ctx.currentTime); // Volumen muy bajo
+            gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.1);
+            
+            osc.connect(gain); gain.connect(this.ctx.destination);
+            osc.start(); osc.stop(this.ctx.currentTime + 0.15);
+            this.step = (this.step + 1) % this.notes.length;
+        } catch(e) { /* Ignorar errores por navegador bloqueando audio */ }
+    },
+    toggle(on) {
+        this.init();
+        if (on && this.ctx) {
+            if (this.ctx.state === 'suspended') this.ctx.resume();
+            this.isPlaying = true; this.step = 0;
+            if(this.timer) clearInterval(this.timer);
+            this.timer = setInterval(() => this.playNote(), 180);
         } else {
-            this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
+            this.isPlaying = false;
+            if(this.timer) clearInterval(this.timer);
         }
     }
+};
+
+// --- 4. CLASES DE ENTIDADES ---
+class Player {
+    constructor(canvasWidth, canvasHeight) {
+        this.x = canvasWidth / 2; this.y = canvasHeight / 2;
+        this.vx = 0; this.vy = 0; this.angle = 0;
+        
+        let speedMult = (State.mode === 'creator') ? State.creator.pSpeed : 1;
+        this.accel = 0.8 * speedMult;
+        this.maxSpeed = 5 * speedMult;
+        this.friction = 0.92;
+        this.radius = 20;
+    }
+    
+    update(canvasWidth, canvasHeight) {
+        // Aceleración
+        if(Input.keysPressed.has(Config.keys.up.toLowerCase())) this.vy -= this.accel;
+        if(Input.keysPressed.has(Config.keys.down.toLowerCase())) this.vy += this.accel;
+        if(Input.keysPressed.has(Config.keys.left.toLowerCase())) this.vx -= this.accel;
+        if(Input.keysPressed.has(Config.keys.right.toLowerCase())) this.vx += this.accel;
+
+        // Limitar velocidad máxima de forma circular
+        let mag = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+        if(mag > this.maxSpeed) { 
+            this.vx = (this.vx / mag) * this.maxSpeed; 
+            this.vy = (this.vy / mag) * this.maxSpeed; 
+        }
+
+        // Aplicar fricción y movimiento
+        this.vx *= this.friction; this.vy *= this.friction;
+        this.x += this.vx; this.y += this.vy;
+
+        // Limitar posición a los bordes
+        this.x = Math.max(this.radius, Math.min(canvasWidth - this.radius, this.x));
+        this.y = Math.max(this.radius, Math.min(canvasHeight - this.radius, this.y));
+
+        // Rotación
+        this.angle = Math.atan2(Input.mouse.y - this.y, Input.mouse.x - this.x);
+    }
+    
     draw(ctx) {
         ctx.save();
         ctx.translate(this.x, this.y); ctx.rotate(this.angle);
 
-        // Efecto visual de invulnerabilidad por Tótem (Parpadeo dorado)
-        if (activeEffects.totemInvuln > 0) {
-            if (Math.floor(Date.now() / 100) % 2 === 0) {
-                ctx.globalAlpha = 0.5;
-            }
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#eab308';
+        // Efecto visual Tótem (Parpadeo)
+        if (State.activeBuffs.totemInvuln > 0) {
+            ctx.globalAlpha = Math.floor(Date.now() / 150) % 2 === 0 ? 0.5 : 1;
+            ctx.shadowBlur = 20; ctx.shadowColor = '#eab308';
         }
 
-        if (activeEffects.shield > 0) {
-            ctx.beginPath(); ctx.arc(0, 0, this.radius + 10, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(59, 130, 246, ${0.3 + Math.sin(Date.now() / 100)*0.1})`; ctx.fill();
+        // Dibujar escudo
+        if (State.activeBuffs.shield > 0) {
+            ctx.beginPath(); ctx.arc(0, 0, this.radius + 12, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(59, 130, 246, ${0.2 + Math.sin(Date.now() / 150)*0.1})`; ctx.fill();
             ctx.lineWidth = 2; ctx.strokeStyle = '#3b82f6'; ctx.stroke();
         }
-        if (images.ship) {
-            ctx.drawImage(images.ship, -this.radius, -this.radius, this.radius*2, this.radius*2);
+
+        if (Config.images.ship) {
+            ctx.drawImage(Config.images.ship, -this.radius, -this.radius, this.radius*2, this.radius*2);
         } else {
-            // Diseño de Nave Mejorado
+            // Diseño de nave vectorial mejorado
             ctx.beginPath();
             ctx.moveTo(this.radius, 0); 
             ctx.lineTo(-this.radius * 0.4, this.radius * 0.8); 
@@ -840,29 +874,25 @@ class Player {
             ctx.lineTo(-this.radius * 0.4, -this.radius * 0.8); 
             ctx.closePath();
             
-            ctx.fillStyle = activeEffects.cannon > 0 ? '#ef4444' : '#e2e8f0'; 
+            ctx.fillStyle = State.activeBuffs.cannon > 0 ? '#ef4444' : '#e2e8f0'; 
             ctx.fill();
-            ctx.lineWidth = 2; 
-            ctx.strokeStyle = '#00aaff'; 
-            ctx.stroke();
+            ctx.lineWidth = 2; ctx.strokeStyle = '#00aaff'; ctx.stroke();
             
             // Cabina
             ctx.beginPath();
             ctx.ellipse(this.radius * 0.1, 0, this.radius * 0.4, this.radius * 0.2, 0, 0, Math.PI * 2);
-            ctx.fillStyle = '#0ea5e9';
-            ctx.fill();
+            ctx.fillStyle = '#0ea5e9'; ctx.fill();
 
-            // Propulsores
-            if (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1) {
+            // Fuego de propulsor dinámico
+            if (Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5) {
                 ctx.beginPath();
                 ctx.moveTo(-this.radius * 0.6, -this.radius * 0.3);
-                ctx.lineTo(-this.radius * (1.2 + Math.random()*0.5), -this.radius * 0.4);
+                ctx.lineTo(-this.radius * (1.2 + Math.random()*0.6), -this.radius * 0.4);
                 ctx.lineTo(-this.radius * 0.6, -this.radius * 0.5);
                 ctx.moveTo(-this.radius * 0.6, this.radius * 0.3);
-                ctx.lineTo(-this.radius * (1.2 + Math.random()*0.5), this.radius * 0.4);
+                ctx.lineTo(-this.radius * (1.2 + Math.random()*0.6), this.radius * 0.4);
                 ctx.lineTo(-this.radius * 0.6, this.radius * 0.5);
-                ctx.fillStyle = '#00ffff'; 
-                ctx.fill();
+                ctx.fillStyle = '#00ffff'; ctx.fill();
             }
         }
         ctx.restore();
@@ -870,38 +900,47 @@ class Player {
 }
 
 class Projectile {
-    constructor(x, y, angle, isDouble = false, offset = 0) {
-        this.x = x + Math.cos(angle + offset) * 20; this.y = y + Math.sin(angle + offset) * 20;
-        this.vx = Math.cos(angle) * 14; this.vy = Math.sin(angle) * 14;
-        this.radius = 2.5; // Bala más pequeña
-        this.color = isDouble ? '#0077ff' : '#00aaff'; // Color azul
+    constructor(x, y, angle, isDouble, offset) {
+        this.x = x + Math.cos(angle + offset) * 20;
+        this.y = y + Math.sin(angle + offset) * 20;
+        this.vx = Math.cos(angle) * 15;
+        this.vy = Math.sin(angle) * 15;
+        this.radius = 3;
+        this.color = isDouble ? '#0077ff' : '#00ffff';
     }
-    update() { this.x += this.vx; this.y += this.vy; }
+    update(dt) {
+        // dt based movement (normalized to 60fps)
+        let timeScale = dt * 60;
+        this.x += this.vx * timeScale; 
+        this.y += this.vy * timeScale; 
+    }
     draw(ctx) {
         ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color; ctx.fill();
-        ctx.shadowBlur = 8; ctx.shadowColor = this.color; ctx.fill(); ctx.shadowBlur = 0;
+        ctx.fillStyle = this.color; ctx.shadowBlur = 10; ctx.shadowColor = this.color; ctx.fill(); 
+        ctx.shadowBlur = 0;
     }
 }
 
 class Enemy {
-    constructor(x, y, tier) {
+    constructor(x, y, tier, canvasWidth, canvasHeight) {
         this.x = x; this.y = y; this.tier = tier; 
         
-        let sizeMult = (gameMode === 'creator') ? creatorSettings.meteorSize : 1;
+        let sizeMult = (State.mode === 'creator') ? State.creator.mSize : 1;
         this.radius = (tier * 15 + 10) * sizeMult;
         
-        let mSpeedMult = (gameMode === 'creator') ? creatorSettings.meteorSpeed : 1;
-        let speed = (4 - tier) * (0.6 + Math.random() * 0.6) * LEVELS[levelIndex].speedMult * mSpeedMult;
+        let mSpeedMult = (State.mode === 'creator') ? State.creator.mSpeed : 1;
+        let baseSpeed = (4 - tier) * (0.8 + Math.random() * 0.5);
+        let speed = baseSpeed * Config.levels[State.levelIndex].speedMult * mSpeedMult;
+        
         let moveAngle;
 
-        // 25% de probabilidad de apuntar directamente a la ubicación del jugador
-        if (Math.random() < 0.25 && player) {
-            moveAngle = Math.atan2(player.y - y, player.x - x);
-            this.isTargeting = true; // Lo marcamos para darle un toque visual
-            speed *= 1.2; // Un poco más rápidos para mayor desafío
+        // 20% probabilidad de perseguir al jugador (Comportamiento Agresivo)
+        if (Math.random() < 0.20 && State.player) {
+            moveAngle = Math.atan2(State.player.y - y, State.player.x - x);
+            this.isTargeting = true;
+            speed *= 1.3;
         } else {
-            // COMPORTAMIENTO NATURAL: Movimiento a la deriva aleatorio
+            // Movimiento errático flotante clásico
             moveAngle = Math.random() * Math.PI * 2;
             this.isTargeting = false;
         }
@@ -909,31 +948,45 @@ class Enemy {
         this.vx = Math.cos(moveAngle) * speed; 
         this.vy = Math.sin(moveAngle) * speed;
         this.rotation = Math.random() * Math.PI * 2; 
-        this.rotSpeed = (Math.random() - 0.5) * 0.04; // Rotación lenta y natural
+        this.rotSpeed = (Math.random() - 0.5) * 0.05;
 
+        // Generar forma irregular
         this.points = [];
         let numPoints = 8 + tier * 2;
         for(let i=0; i<numPoints; i++) {
             let a = (i/numPoints) * Math.PI * 2;
-            let r = this.radius * (0.7 + Math.random()*0.5); // Formas más irregulares
+            let r = this.radius * (0.7 + Math.random()*0.4);
             this.points.push({a, r});
         }
     }
-    update() { this.x += this.vx; this.y += this.vy; this.rotation += this.rotSpeed; }
+    
+    update(dt, canvasWidth, canvasHeight) { 
+        let timeScale = dt * 60;
+        this.x += this.vx * timeScale; 
+        this.y += this.vy * timeScale; 
+        this.rotation += this.rotSpeed * timeScale; 
+
+        // Wrap around screen
+        if (this.x < -this.radius) this.x = canvasWidth + this.radius;
+        if (this.x > canvasWidth + this.radius) this.x = -this.radius;
+        if (this.y < -this.radius) this.y = canvasHeight + this.radius;
+        if (this.y > canvasHeight + this.radius) this.y = -this.radius;
+    }
+    
     draw(ctx) {
         ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
-        if (images.meteor) {
-            ctx.drawImage(images.meteor, -this.radius, -this.radius, this.radius*2, this.radius*2);
+        if (Config.images.meteor) {
+            ctx.drawImage(Config.images.meteor, -this.radius, -this.radius, this.radius*2, this.radius*2);
         } else {
             ctx.beginPath();
             for(let i=0; i<this.points.length; i++) {
                 let p = this.points[i]; let px = Math.cos(p.a) * p.r; let py = Math.sin(p.a) * p.r;
                 if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
             }
-            ctx.closePath(); ctx.fillStyle = '#0f172a'; ctx.fill(); ctx.lineWidth = 2; 
-            
-            // Borde rojizo si el meteorito va a por ti, sino gris natural
-            ctx.strokeStyle = this.isTargeting ? '#7f1d1d' : '#475569'; 
+            ctx.closePath(); 
+            ctx.fillStyle = '#0f172a'; ctx.fill(); 
+            ctx.lineWidth = 2; 
+            ctx.strokeStyle = this.isTargeting ? '#991b1b' : '#475569'; 
             ctx.stroke();
         }
         ctx.restore();
@@ -943,455 +996,535 @@ class Enemy {
 class Particle {
     constructor(x, y, color) {
         this.x = x; this.y = y;
-        let angle = Math.random() * Math.PI * 2; let speed = Math.random() * 5 + 2;
-        this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
-        this.life = 1.0; this.decay = Math.random() * 0.02 + 0.02;
-        this.color = color; this.size = Math.random() * 3 + 1;
+        let angle = Math.random() * Math.PI * 2; 
+        let speed = Math.random() * 5 + 1;
+        this.vx = Math.cos(angle) * speed; 
+        this.vy = Math.sin(angle) * speed;
+        this.life = 1.0; 
+        this.decay = Math.random() * 0.02 + 0.01;
+        this.color = color; 
+        this.size = Math.random() * 3 + 1.5;
     }
-    update() { this.x += this.vx; this.y += this.vy; this.life -= this.decay; }
+    update(dt) { 
+        let timeScale = dt * 60;
+        this.x += this.vx * timeScale; 
+        this.y += this.vy * timeScale; 
+        this.life -= this.decay * timeScale; 
+    }
     draw(ctx) {
-        ctx.globalAlpha = Math.max(0, this.life); ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.size, this.size); ctx.globalAlpha = 1.0;
+        ctx.globalAlpha = Math.max(0, this.life); 
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.size, this.size); 
+        ctx.globalAlpha = 1.0;
     }
 }
 
-function spawnEnemy() {
-    let tier = Math.floor(Math.random() * 3) + 1; let x, y;
-    // Spawnean en los bordes para fluir naturalmente hacia adentro
-    if(Math.random() < 0.5) { x = Math.random() < 0.5 ? -50 : canvas.width + 50; y = Math.random() * canvas.height; } 
-    else { x = Math.random() * canvas.width; y = Math.random() < 0.5 ? -50 : canvas.height + 50; }
-    enemies.push(new Enemy(x, y, tier));
-}
+// --- 5. LOGICA PRINCIPAL DEL JUEGO ---
+const GameApp = {
+    canvas: null, ctx: null,
+    lastTime: 0, animationId: null,
+    dpr: window.devicePixelRatio || 1, // Soporte pantallas retina
+    audio: AudioEngine,
 
-function createExplosion(x, y, color, count) {
-    for(let i=0; i<count; i++) particles.push(new Particle(x, y, color));
-}
+    init() {
+        this.canvas = document.getElementById('game-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        
+        Input.init();
+        window.addEventListener('resize', () => this.resize());
+        this.resize();
+        
+        // Generar Estrellas iniciales
+        for(let i=0; i<200; i++) this.createStar();
 
-function createTotemExplosion(x, y, count) {
-    let colors = ['#10b981', '#22c55e', '#eab308', '#fde047'];
-    for(let i=0; i<count; i++) {
-        let color = colors[Math.floor(Math.random() * colors.length)];
-        particles.push(new Particle(x, y, color));
-    }
-}
+        this.lastTime = performance.now();
+        this.loop(this.lastTime);
+    },
 
-function triggerTotemAnimation() {
-    const popup = document.getElementById('totem-popup');
-    if(popup) {
-        popup.classList.remove('totem-animate');
-        void popup.offsetWidth; // Forzar reflow para reiniciar la animación
-        popup.classList.add('totem-animate');
-    }
-}
+    resize() {
+        // Escalar de acuerdo a densidad de pixeles para evitar borrosidad
+        this.dpr = window.devicePixelRatio || 1;
+        
+        // Set CSS Size
+        this.canvas.style.width = window.innerWidth + 'px';
+        this.canvas.style.height = window.innerHeight + 'px';
+        
+        // Set Internal Size
+        this.canvas.width = window.innerWidth * this.dpr;
+        this.canvas.height = window.innerHeight * this.dpr;
+        
+        // Normalizar dibujado
+        this.ctx.scale(this.dpr, this.dpr);
+    },
 
-function handleShooting(currentTime) {
-    let currentCooldown = LEVELS[levelIndex].cooldown * (gameMode === 'creator' ? creatorSettings.shootCooldown : 1);
+    createStar() {
+        State.stars.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            size: Math.random() * 1.5 + 0.5,
+            speed: Math.random() * 0.4 + 0.05,
+            opacity: Math.random() * 0.8 + 0.2
+        });
+    },
+
+    startGame(mode, startLevel = 1) {
+        State.mode = mode; 
+        State.levelIndex = (mode === 'practice' || mode === 'creator') ? startLevel - 1 : 0; 
+        State.timeElapsed = 0;
+        if(mode === 'survival') State.points = 0;
+        
+        State.player = new Player(window.innerWidth, window.innerHeight);
+        State.projectiles = []; State.enemies = []; State.particles = [];
+        State.activeBuffs = { shield: 0, cannon: 0, totemInvuln: 0 };
+        
+        Input.keysPressed.clear();
+        
+        UI.updateHUD();
+        UI.openMenu(null);
+        State.game = 'playing';
+    },
+
+    startCreatorMode() {
+        State.creator.bg = document.getElementById('creator-bg').value;
+        State.creator.mSize = parseFloat(document.getElementById('creator-meteor-size').value) || 1;
+        State.creator.mSpeed = parseFloat(document.getElementById('creator-meteor-speed').value) || 1;
+        State.creator.pSpeed = parseFloat(document.getElementById('creator-player-speed').value) || 1;
+        State.creator.pCooldown = parseFloat(document.getElementById('creator-cooldown').value) || 1;
+        
+        State.creatorInventory.shield = State.unlocked.shield ? (parseInt(document.getElementById('creator-shields').value) || 0) : 0;
+        State.creatorInventory.cannon = State.unlocked.cannon ? (parseInt(document.getElementById('creator-cannons').value) || 0) : 0;
+        State.creatorInventory.totem = State.unlocked.totem ? (parseInt(document.getElementById('creator-totems').value) || 0) : 0;
+
+        const lvl = parseInt(document.getElementById('creator-level').value) || 1;
+        this.startGame('creator', lvl);
+    },
+
+    resetCreatorDefaults() {
+        document.getElementById('creator-bg').value = '#000000';
+        document.getElementById('creator-level').value = '1';
+        ['meteor-size', 'meteor-speed', 'player-speed', 'cooldown'].forEach(id => {
+            const el = document.getElementById(`creator-${id}`);
+            el.value = '1'; el.dispatchEvent(new Event('input')); // Forzar actualización de span
+        });
+        ['shields', 'cannons', 'totems'].forEach(id => document.getElementById(`creator-${id}`).value = '0');
+    },
+
+    togglePause() {
+        if (State.game === 'playing') {
+            State.game = 'paused';
+            UI.openMenu('pause-menu');
+        } else if (State.game === 'paused') {
+            this.resumeGame();
+        }
+    },
+
+    resumeGame() {
+        UI.openMenu(null);
+        State.game = 'playing';
+        Input.keysPressed.clear(); // Prevenir movimientos fantasma
+    },
+
+    triggerGameOver() {
+        State.game = 'gameover';
+        document.getElementById('hud').classList.remove('active');
+        document.getElementById('final-stats').innerText = `Nivel: ${Config.levels[State.levelIndex].name} | Monedas: ${State.points}`;
+        UI.openMenu('game-over-menu');
+    },
+
+    buyItem(itemType, cost, btnElement) {
+        if (State.points >= cost) {
+            State.points -= cost;
+            State.inventory[itemType]++;
+            State.unlocked[itemType] = true;
+            
+            UI.updateHUD();
+            
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "¡Listo!";
+            btnElement.style.background = "#10b981";
+            btnElement.style.color = "#fff";
+            setTimeout(() => { 
+                btnElement.innerText = originalText; 
+                btnElement.style.background = "transparent"; 
+                btnElement.style.color = "var(--accent-color)";
+            }, 1000);
+        } else {
+            btnElement.style.borderColor = "var(--danger-color)"; 
+            btnElement.style.color = "var(--danger-color)";
+            setTimeout(() => { 
+                btnElement.style.borderColor = "var(--accent-color)"; 
+                btnElement.style.color = "var(--accent-color)"; 
+            }, 500);
+        }
+    },
+
+    useItem(item) {
+        if(State.game !== 'playing') return;
+        let currentInv = State.mode === 'creator' ? State.creatorInventory : State.inventory;
+
+        // Asegurar que solo se gasta si hay en inventario Y el buff NO está activo actualmente
+        if (item === 'shield' && currentInv.shield > 0 && State.activeBuffs.shield <= 0) { 
+            currentInv.shield--; 
+            State.activeBuffs.shield = 20; 
+        } 
+        else if (item === 'cannon' && currentInv.cannon > 0 && State.activeBuffs.cannon <= 0) { 
+            currentInv.cannon--; 
+            State.activeBuffs.cannon = 20; 
+        }
+        UI.updateHUD();
+    },
+
+    handleShooting(currentTime) {
+        let baseCooldown = Config.levels[State.levelIndex].cooldown;
+        let cooldown = baseCooldown * (State.mode === 'creator' ? State.creator.pCooldown : 1);
+        
+        if ((Input.mouse.down || Input.keysPressed.has(' ')) && currentTime - State.lastShotTime > (cooldown * 1000)) {
+            if (State.activeBuffs.cannon > 0) {
+                State.projectiles.push(new Projectile(State.player.x, State.player.y, State.player.angle, true, 0.2));
+                State.projectiles.push(new Projectile(State.player.x, State.player.y, State.player.angle, true, -0.2));
+            } else { 
+                State.projectiles.push(new Projectile(State.player.x, State.player.y, State.player.angle, false, 0)); 
+            }
+            State.lastShotTime = currentTime;
+        }
+    },
+
+    addPoints(pts) {
+        // Balance de economía
+        let finalPts = (State.mode === 'practice' || State.mode === 'creator') ? Math.max(1, Math.round(pts * 0.1)) : pts * 5;
+        State.points += finalPts;
+        UI.updateHUD();
+    },
+
+    applySkins() {
+        const loadImg = (id, prop) => {
+            const url = document.getElementById(id).value;
+            if (url) {
+                let img = new Image(); 
+                img.crossOrigin = "Anonymous"; 
+                img.src = url; 
+                img.onload = () => Config.images[prop] = img; 
+                img.onerror = () => Config.images[prop] = null;
+            } else { Config.images[prop] = null; }
+        };
+        loadImg('skin-ship', 'ship');
+        loadImg('skin-meteor', 'meteor');
+        alert("¡Ajustes visuales aplicados!");
+    },
+
+    // Generador de Efectos
+    createExplosion(x, y, color, count) {
+        for(let i=0; i<count; i++) State.particles.push(new Particle(x, y, color));
+    },
     
-    if ((mouse.down || keysPressed.has(' ')) && currentTime - lastShotTime > currentCooldown) {
-        if (activeEffects.cannon > 0) {
-            projectiles.push(new Projectile(player.x, player.y, player.angle, true, 0.2));
-            projectiles.push(new Projectile(player.x, player.y, player.angle, true, -0.2));
-        } else { projectiles.push(new Projectile(player.x, player.y, player.angle)); }
-        lastShotTime = currentTime;
-    }
-}
+    handlePlayerHit() {
+        let currentInv = State.mode === 'creator' ? State.creatorInventory : State.inventory;
 
-function addPoints(pts) {
-    if (gameMode === 'practice' || gameMode === 'creator') {
-        // Modo práctica o creador: 90% menos de monedas para no desbalancear la tienda
-        pts = Math.max(1, Math.round(pts * 0.1));
-    } else if (gameMode === 'survival') {
-        // Modo supervivencia: Ganas 5 veces más monedas
-        pts = pts * 5;
-    }
-    
-    points += pts;
-    document.getElementById('hud-points').innerText = points;
-    document.getElementById('menu-coins').innerText = points;
-}
-
-function triggerGameOver() {
-    gameState = 'gameover';
-    document.getElementById('hud').classList.remove('active');
-    document.getElementById('final-stats').innerText = `Nivel: ${LEVELS[levelIndex].name} | Monedas: ${points}`;
-    openMenu('game-over-menu');
-}
-
-function handlePlayerHit() {
-    if (activeEffects.totemInvuln > 0) {
-        // Empujar a los enemigos suavemente si eres invulnerable por el tótem (sin quitar escudo ni matarte)
-        enemies.forEach(e => {
-            let dx = e.x - player.x, dy = e.y - player.y; let dist = Math.sqrt(dx*dx + dy*dy);
-            if(dist < 150) { e.x += (dx/dist)*50; e.y += (dy/dist)*50; }
-        });
-        return;
-    }
-
-    if (activeEffects.shield > 0) {
-        activeEffects.shield -= 5; if(activeEffects.shield < 0) activeEffects.shield = 0;
-        createExplosion(player.x, player.y, '#3b82f6', 15);
-        enemies.forEach(e => {
-            let dx = e.x - player.x, dy = e.y - player.y; let dist = Math.sqrt(dx*dx + dy*dy);
-            if(dist < 150) { e.x += (dx/dist)*50; e.y += (dy/dist)*50; }
-        });
-    } else if (inventory.totems > 0) {
-        inventory.totems--; updateInventoryHUD(); 
-        activeEffects.totemInvuln = 5; // 5 segundos de invulnerabilidad (sin escudo azul)
-        createTotemExplosion(player.x, player.y, 80); 
-        triggerTotemAnimation();
-        enemies = enemies.filter(e => {
-            let dx = e.x - player.x, dy = e.y - player.y;
-            if(Math.sqrt(dx*dx + dy*dy) < 200) { addPoints(e.tier === 1 ? 58 : e.tier === 2 ? 23 : 10); return false; }
-            return true;
-        });
-    } else {
-        createExplosion(player.x, player.y, '#ff4c4c', 50);
-        triggerGameOver();
-    }
-}
-
-function update(dt, currentTime) {
-    // Estrellas con Parallax
-    backgroundStars.forEach(s => {
-        let px = gameState === 'playing' ? player.vx * s.speed * 0.2 : 0;
-        let py = gameState === 'playing' ? player.vy * s.speed * 0.2 : 0;
-        
-        s.x -= px; s.y += (s.speed * 0.5) - py;
-        
-        if(s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
-        if(s.y < 0) { s.y = canvas.height; s.x = Math.random() * canvas.width; }
-        if(s.x > canvas.width) { s.x = 0; s.y = Math.random() * canvas.height; }
-        if(s.x < 0) { s.x = canvas.width; s.y = Math.random() * canvas.height; }
-    });
-
-    if (gameState !== 'playing') return;
-
-    if (gameMode === 'survival') {
-        timeElapsed += dt / 1000;
-        document.getElementById('hud-time').innerText = `Tiempo: ${Math.floor(timeElapsed)}s`;
-        let newLevel = Math.min(4, Math.floor(timeElapsed / 30));
-        if(newLevel !== levelIndex) { levelIndex = newLevel; updateHUDLevel(); }
-    }
-
-    if (activeEffects.shield > 0) {
-        activeEffects.shield -= dt / 1000; if(activeEffects.shield < 0) activeEffects.shield = 0;
-        document.getElementById('bar-shield').style.width = `${(activeEffects.shield / 20) * 100}%`;
-    } else { document.getElementById('bar-shield').style.width = `0%`; }
-
-    if (activeEffects.cannon > 0) {
-        activeEffects.cannon -= dt / 1000; if(activeEffects.cannon < 0) activeEffects.cannon = 0;
-        document.getElementById('bar-cannon').style.width = `${(activeEffects.cannon / 20) * 100}%`;
-    } else { document.getElementById('bar-cannon').style.width = `0%`; }
-
-    // Invulnerabilidad del Tótem
-    if (activeEffects.totemInvuln > 0) {
-        activeEffects.totemInvuln -= dt / 1000; if(activeEffects.totemInvuln < 0) activeEffects.totemInvuln = 0;
-    }
-
-    player.update(); handleShooting(currentTime);
-
-    if (enemies.length < 35) {
-        if (currentTime - lastSpawnTime > LEVELS[levelIndex].spawnRate) { spawnEnemy(); lastSpawnTime = currentTime; }
-    }
-
-    for (let i = projectiles.length - 1; i >= 0; i--) {
-        let p = projectiles[i]; p.update();
-        if (p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) projectiles.splice(i, 1);
-    }
-
-    for (let i = particles.length - 1; i >= 0; i--) {
-        let p = particles[i]; p.update();
-        if (p.life <= 0) particles.splice(i, 1);
-    }
-
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        let e = enemies[i]; e.update();
-        
-        // Screen Wrap (asteroides flotantes clásicos)
-        if (e.x < -e.radius) e.x = canvas.width + e.radius;
-        if (e.x > canvas.width + e.radius) e.x = -e.radius;
-        if (e.y < -e.radius) e.y = canvas.height + e.radius;
-        if (e.y > canvas.height + e.radius) e.y = -e.radius;
-
-        let dx = player.x - e.x, dy = player.y - e.y;
-        if (Math.sqrt(dx*dx + dy*dy) < player.radius + e.radius - 5) {
-            handlePlayerHit();
-            if(gameState === 'playing') { enemies.splice(i, 1); createExplosion(e.x, e.y, '#888', e.tier * 10); }
-            continue;
+        if (State.activeBuffs.totemInvuln > 0) {
+            // El totem te hace invulnerable, los enemigos se destruyen al chocar
+            return;
         }
 
-        for (let j = projectiles.length - 1; j >= 0; j--) {
-            let p = projectiles[j]; let pdx = p.x - e.x, pdy = p.y - e.y;
-            if (Math.sqrt(pdx*pdx + pdy*pdy) < e.radius + p.radius) {
-                projectiles.splice(j, 1);
-                addPoints(e.tier === 1 ? 58 : e.tier === 2 ? 23 : 10);
-                createExplosion(e.x, e.y, '#00aaff', e.tier * 10);
-                if (e.tier > 1) {
-                    let newTier = e.tier - 1, m1 = new Enemy(e.x, e.y, newTier), m2 = new Enemy(e.x, e.y, newTier);
-                    // FISICA REAL: Heredan momento del padre + impacto del proyectil
-                    m1.vx = e.vx * 0.7 + p.vy * 0.15; 
-                    m1.vy = e.vy * 0.7 - p.vx * 0.15; 
-                    m2.vx = e.vx * 0.7 - p.vy * 0.15; 
-                    m2.vy = e.vy * 0.7 + p.vx * 0.15;
-                    enemies.push(m1, m2);
-                }
-                enemies.splice(i, 1); break;
+        if (State.activeBuffs.shield > 0) {
+            State.activeBuffs.shield -= 2; // Penalización menor al escudo por absorber el impacto
+            if(State.activeBuffs.shield < 0) State.activeBuffs.shield = 0;
+            this.createExplosion(State.player.x, State.player.y, '#3b82f6', 15);
+            
+            // Efecto de empuje a otros enemigos cercanos al chocar con el escudo
+            State.enemies.forEach(e => {
+                let dx = e.x - State.player.x, dy = e.y - State.player.y; 
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist < 200) { e.x += (dx/dist)*40; e.y += (dy/dist)*40; }
+            });
+        } else if (currentInv.totem > 0) {
+            currentInv.totem--; 
+            State.activeBuffs.totemInvuln = 5; 
+            UI.updateHUD();
+            
+            // Efecto visual tótem
+            let colors = ['#10b981', '#22c55e', '#eab308', '#fde047'];
+            for(let i=0; i<80; i++) this.createExplosion(State.player.x, State.player.y, colors[i%4], 1);
+            
+            const popup = document.getElementById('totem-popup');
+            popup.classList.remove('totem-animate');
+            void popup.offsetWidth; // Reflow
+            popup.classList.add('totem-animate');
+            
+            // Destruir enemigos cercanos sin matarte
+            State.enemies = State.enemies.filter(e => {
+                let dx = e.x - State.player.x, dy = e.y - State.player.y;
+                if(Math.sqrt(dx*dx + dy*dy) < 300) { this.addPoints(10); return false; }
+                return true;
+            });
+        } else {
+            this.createExplosion(State.player.x, State.player.y, '#ff4c4c', 50);
+            this.triggerGameOver();
+        }
+    },
+
+    // --- BUCLE PRINCIPAL (Lógica Matemática Segura) ---
+    update(dt, time) {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        // Estrellas (Parallax) - Siempre se mueven
+        State.stars.forEach(s => {
+            let px = State.game === 'playing' ? State.player.vx * s.speed * 0.1 : 0;
+            let py = State.game === 'playing' ? State.player.vy * s.speed * 0.1 : 0;
+            s.x -= px; s.y += (s.speed * 0.5) - py;
+            
+            if(s.y > h) { s.y = 0; s.x = Math.random() * w; }
+            if(s.y < 0) { s.y = h; s.x = Math.random() * w; }
+            if(s.x > w) { s.x = 0; s.y = Math.random() * h; }
+            if(s.x < 0) { s.x = w; s.y = Math.random() * h; }
+        });
+
+        if (State.game !== 'playing') return;
+
+        // Gestión de Tiempo y Niveles (Supervivencia)
+        if (State.mode === 'survival') {
+            State.timeElapsed += dt;
+            document.getElementById('hud-time').innerText = `Tiempo: ${Math.floor(State.timeElapsed)}s`;
+            let newLevel = Math.min(4, Math.floor(State.timeElapsed / 30));
+            if(newLevel !== State.levelIndex) { 
+                State.levelIndex = newLevel; 
+                UI.updateHUD(); 
             }
         }
-    }
-}
 
-function draw() {
-    ctx.fillStyle = gameMode === 'creator' ? creatorSettings.bgColor : '#000000'; // Aplica color del modo creador
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = '#ffffff';
-    backgroundStars.forEach(s => {
-        ctx.globalAlpha = s.opacity; 
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    ctx.globalAlpha = 1.0;
-
-    if (gameState === 'playing') {
-        player.draw(ctx);
-        projectiles.forEach(p => p.draw(ctx));
-        enemies.forEach(e => e.draw(ctx));
-        particles.forEach(p => p.draw(ctx));
-    } else {
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    if (gameState === 'playing' || gameState === 'shop') {
-        // Crosshair blanca pequeña
-        ctx.save(); ctx.beginPath();
-        ctx.moveTo(mouse.x - 6, mouse.y); ctx.lineTo(mouse.x + 6, mouse.y);
-        ctx.moveTo(mouse.x, mouse.y - 6); ctx.lineTo(mouse.x, mouse.y + 6);
-        ctx.strokeStyle = settings.crosshairColor; ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.restore();
-    }
-}
-
-function loop(currentTime) {
-    let dt = currentTime - lastTime; lastTime = currentTime;
-    update(dt, currentTime); draw();
-    animationId = requestAnimationFrame(loop);
-}
-
-function togglePause() {
-    if (gameState === 'playing') {
-        gameState = 'paused';
-        openMenu('pause-menu');
-    } else if (gameState === 'paused') {
-        resumeGame();
-    }
-}
-
-function resumeGame() {
-    openMenu(null);
-    gameState = 'playing';
-    document.getElementById('hud').classList.add('active');
-}
-
-function confirmToMainMenu() {
-    if(confirm("¿Seguro que quieres salir al menú principal? Perderás el progreso de la partida actual.")) {
-        openMenu('main-menu');
-    }
-}
-
-function backFromSubMenu() {
-    if (previousState === 'paused') {
-        openMenu('pause-menu');
-    } else {
-        openMenu('main-menu');
-    }
-}
-
-function openCreatorMenu() {
-    // Deshabilita los inputs si no se han comprado en la tienda
-    let sInp = document.getElementById('creator-shields');
-    let cInp = document.getElementById('creator-cannons');
-    let tInp = document.getElementById('creator-totems');
-
-    sInp.disabled = !itemsUnlocked.shields;
-    cInp.disabled = !itemsUnlocked.cannons;
-    tInp.disabled = !itemsUnlocked.totems;
-
-    if(!itemsUnlocked.shields) { sInp.value = 0; sInp.title = "Cómpralo en la tienda primero"; }
-    if(!itemsUnlocked.cannons) { cInp.value = 0; cInp.title = "Cómpralo en la tienda primero"; }
-    if(!itemsUnlocked.totems) { tInp.value = 0; tInp.title = "Cómpralo en la tienda primero"; }
-
-    openMenu('creator-menu');
-}
-
-function resetCreatorDefaults() {
-    document.getElementById('creator-bg').value = '#000000';
-    document.getElementById('creator-level').value = '1';
-    document.getElementById('creator-skin-ship').value = '';
-    
-    document.getElementById('creator-meteor-size').value = '1';
-    document.getElementById('val-msize').innerText = '1';
-    
-    document.getElementById('creator-meteor-speed').value = '1';
-    document.getElementById('val-mspeed').innerText = '1';
-    
-    document.getElementById('creator-player-speed').value = '1';
-    document.getElementById('val-pspeed').innerText = '1';
-    
-    document.getElementById('creator-cooldown').value = '1';
-    document.getElementById('val-cooldown').innerText = '1';
-    
-    document.getElementById('creator-shields').value = '0';
-    document.getElementById('creator-cannons').value = '0';
-    document.getElementById('creator-totems').value = '0';
-
-    creatorSettings = { bgColor: '#000000', meteorSize: 1, meteorSpeed: 1, shootCooldown: 1, playerSpeed: 1 };
-}
-
-function startCreatorMode() {
-    // Extraer variables del form
-    creatorSettings.bgColor = document.getElementById('creator-bg').value;
-    creatorSettings.meteorSize = parseFloat(document.getElementById('creator-meteor-size').value);
-    creatorSettings.meteorSpeed = parseFloat(document.getElementById('creator-meteor-speed').value);
-    creatorSettings.shootCooldown = parseFloat(document.getElementById('creator-cooldown').value);
-    creatorSettings.playerSpeed = parseFloat(document.getElementById('creator-player-speed').value);
-
-    let shipUrl = document.getElementById('creator-skin-ship').value;
-    if (shipUrl) { 
-        let img = new Image(); img.crossOrigin = "Anonymous"; img.src = shipUrl; 
-        img.onload = () => images.ship = img; 
-    }
-
-    let startLvl = parseInt(document.getElementById('creator-level').value);
-    startGame('creator', startLvl);
-
-    // Asignar items si están desbloqueados
-    inventory.shields = itemsUnlocked.shields ? (parseInt(document.getElementById('creator-shields').value) || 0) : 0;
-    inventory.cannons = itemsUnlocked.cannons ? (parseInt(document.getElementById('creator-cannons').value) || 0) : 0;
-    inventory.totems = itemsUnlocked.totems ? (parseInt(document.getElementById('creator-totems').value) || 0) : 0;
-    
-    updateInventoryHUD();
-}
-
-function openMenu(menuId) {
-    if (gameState === 'paused' && (menuId === 'settings-menu' || menuId === 'shop-menu' || menuId === 'practice-menu' || menuId === 'creator-menu')) {
-        previousState = 'paused';
-    } else if (gameState === 'menu' || gameState === 'gameover') {
-        previousState = 'menu';
-    }
-
-    document.querySelectorAll('.menu-screen').forEach(el => el.classList.remove('active'));
-    
-    if(menuId) {
-        document.getElementById(menuId).classList.add('active');
+        // Gestión de Buffs (Cooldowns)
+        if (State.activeBuffs.shield > 0) State.activeBuffs.shield = Math.max(0, State.activeBuffs.shield - dt);
+        if (State.activeBuffs.cannon > 0) State.activeBuffs.cannon = Math.max(0, State.activeBuffs.cannon - dt);
+        if (State.activeBuffs.totemInvuln > 0) State.activeBuffs.totemInvuln = Math.max(0, State.activeBuffs.totemInvuln - dt);
         
-        if (menuId === 'main-menu' || menuId === 'game-over-menu') {
-            gameState = 'menu';
-            document.getElementById('hud').classList.remove('active');
-        } else if (menuId === 'pause-menu') {
-            gameState = 'paused';
-            document.getElementById('hud').classList.remove('active');
+        document.getElementById('bar-shield').style.width = `${(State.activeBuffs.shield / 20) * 100}%`;
+        document.getElementById('bar-cannon').style.width = `${(State.activeBuffs.cannon / 20) * 100}%`;
+
+        // Acciones Jugador
+        State.player.update(w, h);
+        this.handleShooting(time);
+
+        // Generar Enemigos
+        let spawnRate = Config.levels[State.levelIndex].spawnRate * 1000;
+        if (State.enemies.length < 40 && time - State.lastSpawnTime > spawnRate) {
+            let tier = Math.floor(Math.random() * 3) + 1;
+            let ex = Math.random() < 0.5 ? (Math.random() < 0.5 ? -50 : w + 50) : Math.random() * w;
+            let ey = Math.random() < 0.5 ? (Math.random() < 0.5 ? -50 : h + 50) : Math.random() * h;
+            State.enemies.push(new Enemy(ex, ey, tier, w, h));
+            State.lastSpawnTime = time;
         }
 
-        if(menuId === 'shop-menu') document.getElementById('shop-points').innerText = points;
-        if(menuId === 'main-menu') document.getElementById('menu-coins').innerText = points;
-    }
-}
+        // Actualizar Proyectiles y colisiones con pared
+        for (let i = State.projectiles.length - 1; i >= 0; i--) {
+            let p = State.projectiles[i]; p.update(dt);
+            if (p.x < 0 || p.x > w || p.y < 0 || p.y > h) State.projectiles.splice(i, 1);
+        }
 
-function startGame(mode, startLevel = 0) {
-    gameMode = mode; levelIndex = mode === 'practice' || mode === 'creator' ? startLevel - 1 : 0; timeElapsed = 0;
-    if(mode === 'survival') points = 0; 
-    
-    player = new Player(); projectiles = []; enemies = []; particles = []; keysPressed.clear();
-    activeEffects.shield = 0; activeEffects.cannon = 0; activeEffects.totemInvuln = 0;
+        // Actualizar Partículas
+        for (let i = State.particles.length - 1; i >= 0; i--) {
+            let p = State.particles[i]; p.update(dt);
+            if (p.life <= 0) State.particles.splice(i, 1);
+        }
 
-    let modeText = 'Supervivencia';
-    if(mode === 'practice') modeText = 'Práctica';
-    if(mode === 'creator') modeText = 'Creador';
-    document.getElementById('hud-mode').innerText = modeText;
-    
-    updateHUDLevel(); updateInventoryHUD(); 
-    document.getElementById('hud-points').innerText = points;
-    document.getElementById('menu-coins').innerText = points;
+        // Actualizar Enemigos y Colisiones
+        for (let i = State.enemies.length - 1; i >= 0; i--) {
+            let e = State.enemies[i]; e.update(dt, w, h);
+            
+            // Colisión con Jugador
+            let dx = State.player.x - e.x, dy = State.player.y - e.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+            
+            // Si el escudo está activo, aumenta el radio de colisión para que el escudo "absorba"
+            let hitRadius = State.player.radius + e.radius - 5;
+            if (State.activeBuffs.shield > 0) hitRadius = State.player.radius + 15 + e.radius;
 
-    openMenu(null); 
-    document.getElementById('hud').classList.add('active');
-    gameState = 'playing';
-}
+            if (dist < hitRadius) {
+                this.handlePlayerHit();
+                if(State.game === 'playing') { 
+                    State.enemies.splice(i, 1); 
+                    // Explosión azul si choca con escudo, dorada si choca con totem, gris normal
+                    let expColor = State.activeBuffs.totemInvuln > 0 ? '#eab308' : (State.activeBuffs.shield > 0 ? '#3b82f6' : '#888');
+                    this.createExplosion(e.x, e.y, expColor, e.tier * 10); 
+                }
+                continue;
+            }
 
-function updateHUDLevel() {
-    let el = document.getElementById('hud-level');
-    el.innerText = LEVELS[levelIndex].name; el.style.color = LEVELS[levelIndex].color;
-}
+            // Colisión con Proyectiles
+            for (let j = State.projectiles.length - 1; j >= 0; j--) {
+                let p = State.projectiles[j]; let pdx = p.x - e.x, pdy = p.y - e.y;
+                if (Math.sqrt(pdx*pdx + pdy*pdy) < e.radius + p.radius) {
+                    State.projectiles.splice(j, 1);
+                    this.addPoints(e.tier === 1 ? 50 : e.tier === 2 ? 20 : 10);
+                    this.createExplosion(e.x, e.y, '#00aaff', e.tier * 10);
+                    
+                    // División de meteoritos
+                    if (e.tier > 1) {
+                        let nT = e.tier - 1, m1 = new Enemy(e.x, e.y, nT, w, h), m2 = new Enemy(e.x, e.y, nT, w, h);
+                        m1.vx = e.vx * 0.6 + p.vy * 0.2; m1.vy = e.vy * 0.6 - p.vx * 0.2;
+                        m2.vx = e.vx * 0.6 - p.vy * 0.2; m2.vy = e.vy * 0.6 + p.vx * 0.2;
+                        State.enemies.push(m1, m2);
+                    }
+                    State.enemies.splice(i, 1); 
+                    break;
+                }
+            }
+        }
+    },
 
-function updateInventoryHUD() {
-    document.getElementById('hud-count-shield').innerText = inventory.shields;
-    document.getElementById('hud-count-cannon').innerText = inventory.cannons;
-    document.getElementById('hud-count-totem').innerText = inventory.totems;
-    document.getElementById('hud-key-shield').innerText = settings.keys.shield.toUpperCase();
-    document.getElementById('hud-key-cannon').innerText = settings.keys.cannon.toUpperCase();
-}
-
-function buyItem(item, cost) {
-    if (points >= cost) {
-        points -= cost; inventory[item + 's']++; 
-        itemsUnlocked[item + 's'] = true; // Desbloqueado para Modo Creador
+    draw() {
+        const w = window.innerWidth; const h = window.innerHeight;
         
-        document.getElementById('shop-points').innerText = points;
-        document.getElementById('menu-coins').innerText = points;
-        updateInventoryHUD();
+        // Limpiar fondo
+        this.ctx.fillStyle = State.mode === 'creator' ? State.creator.bg : '#000000';
+        this.ctx.fillRect(0, 0, w, h);
         
-        let btn = event.target; let originalText = btn.innerText;
-        btn.innerText = "¡Comprado!"; btn.style.background = "#10b981";
-        setTimeout(() => { btn.innerText = originalText; btn.style.background = "transparent"; }, 1000);
-    } else {
-        let btn = event.target; btn.style.borderColor = "var(--danger-color)"; btn.style.color = "var(--danger-color)";
-        setTimeout(() => { btn.style.borderColor = ""; btn.style.color = ""; }, 500);
+        // Dibujar estrellas
+        this.ctx.fillStyle = '#ffffff';
+        State.stars.forEach(s => {
+            this.ctx.globalAlpha = s.opacity; 
+            this.ctx.beginPath(); this.ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); this.ctx.fill();
+        });
+        this.ctx.globalAlpha = 1.0;
+
+        if (State.game === 'playing') {
+            State.player.draw(this.ctx);
+            State.projectiles.forEach(p => p.draw(this.ctx));
+            State.enemies.forEach(e => e.draw(this.ctx));
+            State.particles.forEach(p => p.draw(this.ctx));
+        } else {
+            // Fondo oscuro para menús
+            this.ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            this.ctx.fillRect(0, 0, w, h);
+        }
+
+        // Mirilla personalizada (Crosshair)
+        if (State.game === 'playing' || State.game === 'shop') {
+            this.ctx.save(); this.ctx.beginPath();
+            this.ctx.moveTo(Input.mouse.x - 8, Input.mouse.y); this.ctx.lineTo(Input.mouse.x + 8, Input.mouse.y);
+            this.ctx.moveTo(Input.mouse.x, Input.mouse.y - 8); this.ctx.lineTo(Input.mouse.x, Input.mouse.y + 8);
+            this.ctx.strokeStyle = Config.crosshairColor; this.ctx.lineWidth = 1.5; this.ctx.stroke();
+            this.ctx.restore();
+        }
+    },
+
+    loop(time) {
+        // Delta time seguro capado a max 0.1s (Evita bugs al cambiar de pestaña)
+        let dt = Math.min((time - this.lastTime) / 1000, 0.1); 
+        this.lastTime = time;
+
+        this.update(dt, time);
+        this.draw();
+
+        this.animationId = requestAnimationFrame((t) => this.loop(t));
     }
-}
+};
 
-function useItem(item) {
-    if(gameState !== 'playing') return;
-    if (item === 'shield' && inventory.shields > 0) { inventory.shields--; activeEffects.shield = 20; } 
-    else if (item === 'cannon' && inventory.cannons > 0) { inventory.cannons--; activeEffects.cannon = 20; }
-    updateInventoryHUD();
-}
+// --- 6. GESTIÓN DE INTERFAZ (UI) ---
+const UI = {
+    openMenu(menuId) {
+        // Manejar lógica de retorno seguro
+        if (State.game === 'paused' && ['settings-menu', 'shop-menu', 'practice-menu', 'creator-menu'].includes(menuId)) {
+            State.previous = 'paused';
+        } else if (State.game === 'menu' || State.game === 'gameover') {
+            State.previous = 'menu';
+        }
 
-let awaitingKey = null;
-function captureKey(action) {
-    awaitingKey = action; document.getElementById('keybind-overlay').style.display = 'flex';
-    const handler = (e) => {
-        e.preventDefault();
-        if (e.key === 'Escape') { closeCapture(); return; }
-        settings.keys[action] = e.key.toLowerCase();
-        document.getElementById(`btn-key-${action}`).innerText = e.key.toUpperCase();
-        closeCapture();
-    };
-    const closeCapture = () => { document.getElementById('keybind-overlay').style.display = 'none'; window.removeEventListener('keydown', handler); awaitingKey = null; updateInventoryHUD(); };
-    window.addEventListener('keydown', handler);
-}
+        document.querySelectorAll('.menu-screen').forEach(el => el.classList.remove('active'));
+        
+        if (menuId) {
+            document.getElementById(menuId).classList.add('active');
+            
+            if (menuId === 'main-menu' || menuId === 'game-over-menu') {
+                State.game = 'menu';
+                document.getElementById('hud').classList.remove('active');
+            } else if (menuId === 'pause-menu') {
+                State.game = 'paused';
+                document.getElementById('hud').classList.remove('active');
+            }
 
-function changeGUIScale(val) {
-    settings.guiScale = val; let ui = document.getElementById('ui-layer');
-    ui.className = ''; ui.classList.add(`gui-${val}`);
-}
-function updateCrosshairColor(color) { settings.crosshairColor = color; }
+            // Actualizar textos específicos de menús
+            if(menuId === 'shop-menu') document.getElementById('shop-points').innerText = State.points;
+            if(menuId === 'main-menu') document.getElementById('menu-coins').innerText = State.points;
+        } else {
+            // Si menuId es nulo, estamos jugando
+            document.getElementById('hud').classList.add('active');
+        }
+    },
 
-function applySkins() {
-    let shipUrl = document.getElementById('skin-ship').value;
-    let meteorUrl = document.getElementById('skin-meteor').value;
-    
-    if (shipUrl) { let img = new Image(); img.crossOrigin = "Anonymous"; img.src = shipUrl; img.onload = () => images.ship = img; img.onerror = () => images.ship = null; } 
-    else images.ship = null;
-    if (meteorUrl) { let img = new Image(); img.crossOrigin = "Anonymous"; img.src = meteorUrl; img.onload = () => images.meteor = img; img.onerror = () => images.meteor = null; } 
-    else images.meteor = null;
-    alert("Skins aplicadas.");
-}
+    backFromSubMenu() {
+        if (State.previous === 'paused') this.openMenu('pause-menu');
+        else this.openMenu('main-menu');
+    },
 
-requestAnimationFrame(loop);
+    openCreatorMenu() {
+        // Bloquear selects si no has comprado el ítem en la tienda global
+        ['shield', 'cannon', 'totem'].forEach(item => {
+            const input = document.getElementById(`creator-${item}s`);
+            input.disabled = !State.unlocked[item];
+            if(!State.unlocked[item]) {
+                input.value = 0; input.title = "Cómpralo en la tienda primero";
+            }
+        });
+        this.openMenu('creator-menu');
+    },
+
+    confirmToMainMenu() {
+        if(confirm("¿Seguro que quieres salir al menú principal? Perderás el progreso de la partida actual.")) {
+            this.openMenu('main-menu');
+        }
+    },
+
+    updateHUD() {
+        const lvlData = Config.levels[State.levelIndex];
+        
+        // Textos Superiores
+        document.getElementById('hud-mode').innerText = State.mode === 'practice' ? 'Práctica' : (State.mode === 'creator' ? 'Creador' : 'Supervivencia');
+        const lvlBadge = document.getElementById('hud-level');
+        lvlBadge.innerText = lvlData.name; lvlBadge.style.color = lvlData.color;
+        
+        // Puntos
+        document.getElementById('hud-points').innerText = State.points;
+        document.getElementById('menu-coins').innerText = State.points;
+        document.getElementById('shop-points').innerText = State.points;
+
+        // Inventario Visual
+        let currentInv = State.mode === 'creator' ? State.creatorInventory : State.inventory;
+        document.getElementById('hud-count-shield').innerText = currentInv.shield;
+        document.getElementById('hud-count-cannon').innerText = currentInv.cannon;
+        document.getElementById('hud-count-totem').innerText = currentInv.totem;
+        document.getElementById('hud-key-shield').innerText = Config.keys.shield.toUpperCase();
+        document.getElementById('hud-key-cannon').innerText = Config.keys.cannon.toUpperCase();
+    },
+
+    changeGUIScale(val) {
+        Config.guiScale = val; 
+        let ui = document.getElementById('ui-layer');
+        ui.className = ''; 
+        ui.classList.add(`gui-${val}`);
+    },
+
+    // Sistema seguro de reasignación de teclas
+    captureKey(action) {
+        const overlay = document.getElementById('keybind-overlay');
+        overlay.style.display = 'flex';
+        
+        const handler = (e) => {
+            e.preventDefault();
+            if (e.key !== 'Escape') {
+                Config.keys[action] = e.key.toLowerCase();
+                document.getElementById(`btn-key-${action}`).innerText = e.key.toUpperCase();
+            }
+            overlay.style.display = 'none';
+            window.removeEventListener('keydown', handler);
+            this.updateHUD();
+        };
+        window.addEventListener('keydown', handler);
+    }
+};
+
+// Iniciar Motor
+window.onload = () => GameApp.init();
+
 </script>
-<script src="classroom-hotkey.js"></script>
 </body>
 </html>
