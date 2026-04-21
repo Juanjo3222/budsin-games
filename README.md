@@ -2,9 +2,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
-  <img src="https://img.shields.io/badge/Games-35-blue" />
+  <img src="https://img.shields.io/badge/Games-36-blue" />
   <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
-  <img src="https://img.shields.io/badge/Version-4.3.2-purple" />
+  <img src="https://img.shields.io/badge/Version-4.5-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -146,10 +146,8 @@ Fácil de modificar, clonar o expandir.
 
 ## 📝 Changelog
 
-### v4.3.2
-* Se agregó **Recoil** al catálogo del portal con portada, acceso directo y soporte para ranking/popularidad.
-* **Recoil.html** ahora carga **classroom-hotkey.js** y usa **images.jpeg** como icono del portal.
-* El changelog del portal y la documentación quedaron sincronizados en la versión **v4.3.2**.
+### v4.5
+* Se agregó **Budsin AI** al portal con portada `ai.jpeg`, acceso directo desde el index e integración al sistema de ranking/popularidad.
 
 ### v4.3.0
 * Se agregaron **RubDy, Super Mario Bros, Pac-Man, Super Mario World, Galaga y Centipede Arcade** al catálogo del portal.
