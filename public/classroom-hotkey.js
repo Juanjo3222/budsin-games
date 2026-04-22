@@ -13,7 +13,9 @@
   var loadedFlag = "data-loaded";
   var LANGUAGE_KEY = "budsin_language";
   var originalTitle = document.title;
+  var originalFaviconHref = getFaviconHref();
   var disguisedTitle = "Google Docs";
+  var disguisedFaviconHref = "https://www.google.com/favicon.ico";
 
   function resolveLanguage(language) {
     return language === "en" ? "en" : "es";
@@ -71,6 +73,79 @@
     } catch (error) {
       return CLASSROOM_DEFAULT_URL;
     }
+  }
+
+  function getFaviconElement() {
+    return document.querySelector("link[rel~='icon']") || null;
+  }
+
+  function getFaviconHref() {
+    var faviconElement = getFaviconElement();
+    if (!faviconElement) {
+      return "";
+    }
+
+    return faviconElement.href || faviconElement.getAttribute("href") || "";
+  }
+
+  function setFaviconHref(href) {
+    if (!href) {
+      return;
+    }
+
+    var faviconElement = getFaviconElement();
+    if (faviconElement) {
+      faviconElement.href = href;
+      return;
+    }
+
+    var link = document.createElement("link");
+    link.rel = "icon";
+    link.href = href;
+    document.head.appendChild(link);
+  }
+
+  function resolveDisguisedPageData() {
+    var classroomUrl = getStoredClassroomUrl();
+
+    try {
+      var parsed = new URL(classroomUrl);
+      disguisedTitle = parsed.hostname.replace(/^www\./, "");
+      disguisedFaviconHref = "https://www.google.com/s2/favicons?sz=64&domain_url=" + encodeURIComponent(parsed.origin);
+    } catch (error) {
+      disguisedTitle = "Google Docs";
+      disguisedFaviconHref = "https://www.google.com/favicon.ico";
+    }
+
+    window.fetch(classroomUrl)
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("Could not load disguise page");
+        }
+        return response.text();
+      })
+      .then(function (html) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, "text/html");
+        var remoteTitle = (doc.title || "").trim();
+        var iconElement = doc.querySelector("link[rel~='icon']");
+        var remoteIcon = iconElement ? (iconElement.getAttribute("href") || "").trim() : "";
+
+        if (remoteTitle) {
+          disguisedTitle = remoteTitle;
+        }
+
+        if (remoteIcon) {
+          try {
+            disguisedFaviconHref = new URL(remoteIcon, classroomUrl).href;
+          } catch (error) {
+            // Keep fallback favicon when remote icon URL is invalid.
+          }
+        }
+      })
+      .catch(function () {
+        // Keep hostname title/favicon fallback when metadata is blocked.
+      });
   }
 
   function createOverlay() {
@@ -239,6 +314,7 @@
     document.body.classList.toggle("juanjo-classroom-open", willOpen);
     overlay.setAttribute("aria-hidden", willOpen ? "false" : "true");
     document.title = willOpen ? disguisedTitle : originalTitle;
+    setFaviconHref(willOpen ? disguisedFaviconHref : originalFaviconHref);
   }
 
   function waitForFullscreenExit(callback) {
@@ -476,14 +552,6 @@
   }
 
   function isToggleHotkey(event) {
-    function isToggleHotkey(event) {
-  return (
-    event.key === "º" ||
-    event.key === "°" ||
-    event.code === "Backquote" ||
-    event.key.toLowerCase() === "k"
-  );
-}
     var key = event.key || "";
     var code = event.code || "";
 
@@ -525,6 +593,7 @@
     toggleClassroom();
   });
   createOverlay();
+  resolveDisguisedPageData();
   window.setTimeout(preloadClassroomUrl, 0);
   ensureQuickToggleButton();
   bindIframeHotkeys();
