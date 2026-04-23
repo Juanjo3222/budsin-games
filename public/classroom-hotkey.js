@@ -8,6 +8,8 @@
   var closeId = "juanjo-classroom-close";
   var quickToggleId = "juanjo-classroom-quick-toggle";
   var focusTrapId = "juanjo-classroom-focus-trap";
+  var themeToggleId = "budsin-theme-toggle";
+  var fullscreenToggleId = "budsin-fullscreen-toggle";
   var fullscreenHotkeyFocusInterval = null;
   var forceHotkeyFocusFromIframe = false;
   var loadedFlag = "data-loaded";
@@ -312,9 +314,37 @@
   function applyOverlayState(overlay, willOpen) {
     overlay.classList.toggle("is-open", willOpen);
     document.body.classList.toggle("juanjo-classroom-open", willOpen);
+    syncTemporaryControlDisable(willOpen);
     overlay.setAttribute("aria-hidden", willOpen ? "false" : "true");
     document.title = willOpen ? disguisedTitle : originalTitle;
     setFaviconHref(willOpen ? disguisedFaviconHref : originalFaviconHref);
+  }
+
+  function syncTemporaryControlDisable(willOpen) {
+    var controlIds = [themeToggleId, fullscreenToggleId];
+
+    for (var i = 0; i < controlIds.length; i += 1) {
+      var control = document.getElementById(controlIds[i]);
+      if (!control) {
+        continue;
+      }
+
+      if (willOpen) {
+        control.dataset.juanjoWasDisabled = control.disabled ? "1" : "0";
+        control.disabled = true;
+        control.setAttribute("aria-disabled", "true");
+        continue;
+      }
+
+      if (control.dataset.juanjoWasDisabled === "1") {
+        control.disabled = true;
+      } else {
+        control.disabled = false;
+      }
+
+      control.removeAttribute("aria-disabled");
+      delete control.dataset.juanjoWasDisabled;
+    }
   }
 
   function waitForFullscreenExit(callback) {
