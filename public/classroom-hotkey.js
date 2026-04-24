@@ -534,7 +534,7 @@
     }
 
     function onFrameKeydown(event) {
-      if (event.defaultPrevented || shouldIgnoreTarget(event.target)) {
+      if (event.defaultPrevented) {
         return;
       }
 
@@ -542,6 +542,11 @@
         event.preventDefault();
         event.stopPropagation();
         toggleClassroom();
+        return;
+      }
+
+      if (shouldIgnoreTarget(event.target)) {
+        return;
       }
     }
 
@@ -595,7 +600,7 @@
   }
 
   function handleHotkeyKeydown(event) {
-    if (event.defaultPrevented || shouldIgnoreTarget(event.target)) {
+    if (event.defaultPrevented) {
       return;
     }
 
@@ -603,6 +608,11 @@
       event.preventDefault();
       event.stopPropagation();
       toggleClassroom();
+      return;
+    }
+
+    if (shouldIgnoreTarget(event.target)) {
+      return;
     }
   }
 
