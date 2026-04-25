@@ -3433,6 +3433,92 @@
                 return TRANSLATIONS[currentLanguage] || TRANSLATIONS.es;
             }
 
+            const PT_DESCRIPTIONS = {
+                "minecraft 1.12.2":
+                    "Explore livremente no navegador. Esta edição não inclui multijogador.",
+                "minecraft 1.8":
+                    "A versão recomendada para jogar com multijogador.",
+                "minecraft 1.21.x":
+                    "Um cliente mais novo para explorar no navegador na sua própria página dedicada.",
+                "cookie clicker":
+                    "A versão mais recomendada para jogar e assar sem parar.",
+                "cookie clicker legacy edition":
+                    "Use se a versão nova der problemas com os saves.",
+                "bitcoin clicker":
+                    "Clique, acumule bitcoins e continue crescendo.",
+                "geometry dash":
+                    "Ritmo, reflexos e saltos no limite na sua página dedicada.",
+                "hollow knight":
+                    "Explore Hallownest a partir de sua própria página com carregamento dedicado.",
+                "eggy car":
+                    "Mantenha o equilíbrio e vá o mais longe possível sem quebrar o ovo.",
+                "level devil":
+                    "Supere armadilhas imprevisíveis e níveis enganosos.",
+                "drive mad": "Supere pontes, saltos e veículos impossíveis.",
+                "stickman hook": "Lance a corda e encadeie saltos até o final.",
+                superhot:
+                    "Shooter tático onde o tempo avança quando você se move.",
+                "vex 7": "Corra, pule e supere armadilhas precisas.",
+                recoil: "Shooter arcade de reflexos rápidos onde cada tiro também te impulsiona.",
+                "among us": "Encontre o impostor ou sabote a tripulação.",
+                "fireboy and watergirl 1":
+                    "Jogue cooperativo clássico no Templo da Floresta.",
+                "smash karts":
+                    "Caos de karts multiplayer com power-ups e batalhas rápidas.",
+                "rocket goal":
+                    "Dirija e marque gols em uma arena de carros com foguetes.",
+                "friday night funkin":
+                    "Siga o ritmo e encadeie notas na sua página dedicada.",
+                "subway surfers":
+                    "Corra sem parar, desvie dos trens e colete moedas.",
+                "red ball":
+                    "Role, pule e supere obstáculos nesta aventura clássica.",
+                "snow rider":
+                    "Desça em alta velocidade pela neve e desvie dos obstáculos.",
+                stacktris:
+                    "Empilhe peças com precisão e evite que tudo desmorone.",
+                undertale:
+                    "Entre no subsolo, fale ou lute, e decida o destino de cada encontro.",
+                "we become what we behold":
+                    "Observe e altere a multidão nesta sátira inquietante.",
+                "super mario 64":
+                    "O clássico do Nintendo 64 para jogar direto no navegador.",
+                "super mario bros":
+                    "O clássico original do NES para correr, pular e salvar o reino.",
+                "super mario world":
+                    "Plataformas clássicas com Yoshi, segredos e rotas alternativas.",
+                "pac-man":
+                    "Coma pontos, desvie dos fantasmas e busque a maior pontuação.",
+                galaga: "Arcade espacial puro: ondas rápidas, reflexos e muita precisão.",
+                "centipede arcade":
+                    "Defenda a tela neste arcade clássico de tiros e reflexos.",
+                "half-life":
+                    "Jogue o shooter clássico com sua capa dedicada e acesso direto.",
+                "cooking mama":
+                    "Cozinhe receitas clássicas com minijogos rápidos e estilo Nintendo DS.",
+                "cooking mama 2":
+                    "Mais receitas, mais desafios e o mesmo estilo rápido de culinária arcade.",
+                "cooking mama 3":
+                    "A terceira entrega com mais receitas, loja e sessões de culinária rápidas.",
+                rubdy: "Sobrevivência espacial com combates rápidos e uma capa tipográfica própria.",
+                soundboard:
+                    "Painel de sons com favoritos, busca e controle de reprodução.",
+                "budsin ai":
+                    "Chat do Budsin AI para te ajudar a partir do portal.",
+            };
+
+            const PT_CATEGORIES = {
+                Acción: "Ação",
+                Multiplayer: "Multiplayer",
+                Idle: "Idle",
+                Clásicos: "Clássicos",
+            };
+
+            const PT_LABELS = {
+                Disponible: "Disponível",
+                Alternativa: "Alternativa",
+            };
+
             function applyLanguage(language) {
                 const nextLanguage = TRANSLATIONS[language] ? language : "es";
                 currentLanguage = nextLanguage;
@@ -3440,9 +3526,14 @@
 
                 document.documentElement.lang = t.htmlLang;
                 document.title = t.pageTitle;
+
+                let homeLabel;
+                if (nextLanguage === "en") homeLabel = "Home";
+                else if (nextLanguage === "pt") homeLabel = "Início";
+                else homeLabel = "Inicio";
                 document.documentElement.style.setProperty(
                     "--home-label",
-                    `"${nextLanguage === "en" ? "Home" : "Inicio"}"`,
+                    `"${homeLabel}"`,
                 );
 
                 document.querySelectorAll("[data-i18n]").forEach((node) => {
@@ -3477,40 +3568,58 @@
                         ".content span[data-label-es]",
                     );
                     if (status) {
-                        status.textContent =
-                            nextLanguage === "en"
-                                ? status.dataset.labelEn
-                                : status.dataset.labelEs;
+                        if (nextLanguage === "en") {
+                            status.textContent = status.dataset.labelEn;
+                        } else if (nextLanguage === "pt") {
+                            status.textContent =
+                                PT_LABELS[status.dataset.labelEs] ||
+                                status.dataset.labelEs;
+                        } else {
+                            status.textContent = status.dataset.labelEs;
+                        }
                     }
 
                     const description = card.querySelector(
                         ".content p[data-desc-es]",
                     );
                     if (description) {
-                        description.textContent =
-                            nextLanguage === "en"
-                                ? description.dataset.descEn
-                                : description.dataset.descEs;
+                        if (nextLanguage === "en") {
+                            description.textContent =
+                                description.dataset.descEn;
+                        } else if (nextLanguage === "pt") {
+                            description.textContent =
+                                PT_DESCRIPTIONS[card.dataset.name] ||
+                                description.dataset.descEs;
+                        } else {
+                            description.textContent =
+                                description.dataset.descEs;
+                        }
                     }
 
                     const categoryTag = card.querySelector(
                         ".category-tag[data-es]",
                     );
                     if (categoryTag) {
-                        categoryTag.textContent =
-                            nextLanguage === "en"
-                                ? categoryTag.dataset.en
-                                : categoryTag.dataset.es;
+                        if (nextLanguage === "en") {
+                            categoryTag.textContent = categoryTag.dataset.en;
+                        } else if (nextLanguage === "pt") {
+                            categoryTag.textContent =
+                                PT_CATEGORIES[categoryTag.dataset.es] ||
+                                categoryTag.dataset.es;
+                        } else {
+                            categoryTag.textContent = categoryTag.dataset.es;
+                        }
                     }
 
                     const favoriteButton = card.querySelector(".favorite-btn");
                     if (favoriteButton) {
-                        favoriteButton.setAttribute(
-                            "aria-label",
-                            nextLanguage === "en"
-                                ? "Add to favorites"
-                                : "Agregar a favoritos",
-                        );
+                        let favLabel;
+                        if (nextLanguage === "en")
+                            favLabel = "Add to favorites";
+                        else if (nextLanguage === "pt")
+                            favLabel = "Adicionar aos favoritos";
+                        else favLabel = "Agregar a favoritos";
+                        favoriteButton.setAttribute("aria-label", favLabel);
                     }
 
                     const baseHref =
