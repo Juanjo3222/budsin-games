@@ -33,9 +33,14 @@ Este archivo centraliza la lógica de desarrollo de `budsin-games.pages.dev`. Es
 3. **Estructura Plana**: Todo juego vive en `public/[nombre-del-juego]`. No usar la carpeta `/games`.
 4. **Firebase Minimalista**: Solo para conteo de impactos. Prohibido crear sistemas de Login/Auth por defecto.
 
+5. **Assets obligatorios en páginas de juego**: Toda página de juego nueva o editada **debe incluir** en su `<head>`:
+   - Favicon: `<link rel="icon" type="image/jpeg" href="https://budsin-games.pages.dev/images.jpeg">`
+   - Script Classroom Hotkey: `<script src="https://budsin-games.pages.dev/classroom-hotkey.js"></script>` (justo antes de `</body>`)
+   - Sin excepción. Aplica a cualquier `.html` dentro de `public/` que sea una página de juego.
+
 ### ⚠️ Protocolo de Anulación (Override)
 5. **Cumplimiento Estricto**: La IA **nunca** debe ignorar las prohibiciones de este archivo (ej. no crear carpetas fuera de `public` o no usar Auth) por iniciativa propia o por ambigüedad del usuario.
-6. **Excepción Explícita**: Si el usuario solicita algo prohibido por este `agents.md`, la IA debe advertir de la contradicción. Solo podrá proceder e ignorar la regla si el usuario da una **instrucción explícita** para ignorar el `agents.md` o anular la regla específica en ese turno de chat. Sin esa orden directa, el `agents.md` es inamovible.
+7. **Excepción Explícita**: Si el usuario solicita algo prohibido por este `agents.md`, la IA debe advertir de la contradicción. Solo podrá proceder e ignorar la regla si el usuario da una **instrucción explícita** para ignorar el `agents.md` o anular la regla específica en ese turno de chat. Sin esa orden directa, el `agents.md` es inamovible.
 
 ---
 
