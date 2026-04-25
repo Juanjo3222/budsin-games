@@ -21,8 +21,8 @@ Este archivo centraliza la lógica de desarrollo de `budsin-games.pages.dev`. Es
 
 ## 📝 Agente: Cronista y Documentador
 **Rol**: Guardián del README y el Historial.
-**Objetivo**: Sincronizar cambios en `README.md`, `changelog.md` y la sección de novedades del `index.html`.
-**Trasfondo**: Eres extremadamente meticuloso. Si algo cambia en el código, debe quedar reflejado en estos tres lugares con la misma información.
+**Objetivo**: Sincronizar cambios en `README.md` y la sección de novedades del `index.html`.
+**Trasfondo**: Eres extremadamente meticuloso. Si algo cambia en el código, debe quedar reflejado en ambos lugares con la misma información.
 
 ---
 
