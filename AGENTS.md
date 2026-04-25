@@ -50,18 +50,6 @@ Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse 
 
 ### 🔴 Alta prioridad
 - [ ] **Badge "Nuevo"** (`data-new="true"`): Inyectar via JS un `<span class="new-badge">Nuevo</span>` en las tarjetas con `data-new="true"`. Estilo: píldora verde-azul, esquina inferior-izquierda de la portada. Sin Firebase. Juegos a marcar: **Budsin AI, Recoil, Soundboard, Half-Life**.
-- [ ] **Mejora mobile**: En `@media (max-width: 680px)`, cambiar `.games` de `grid` a `display: flex; overflow-x: auto; scroll-snap-type: x mandatory` con tarjetas de `min-width: 240px`. Eliminar el colapso a 1 columna actual.
-
-### 🟡 Media prioridad
-- [ ] **Jugado recientemente**: Añadir shelf `🕐 Jugado recientemente` en el `index.html`. Usar clave `budsin_recently_played` en localStorage. Guardar el href al hacer clic en una tarjeta (máx. 5). Renderizar junto a Favoritos y Más jugados.
-- [ ] **Búsqueda mejorada**: Ampliar `applyFilters()` para que la búsqueda incluya `card.dataset.category` y el texto de `.content p`, no solo `data-name`.
-- [ ] **Soporte PT (portugués)**: Agregar objeto `pt` en el array `TRANSLATIONS` del `index.html` con todas las claves traducidas al portugués. Añadir `<option value="pt">Português</option>` en el `<select>` de idioma.
-
-### 🟢 Baja prioridad
-- [ ] **Ranking público** (`public/ranking.html`): Página independiente que consulta Firebase (`game_popularity`) y muestra las portadas de los top 10 juegos más jugados. Enlazar desde el `index.html`.
-- [ ] **Dark mode completo**: Añadir reglas CSS para `html[data-site-theme="dark"]` que cubran `.game-card`, `.title`, `.library`, `.content p`, `.cover` y los elementos del hero. Actualmente solo cubre search, chips y shelf.
-- [ ] **PWA instalable**: Crear `public/manifest.json` con nombre, iconos y colores del portal. Crear `public/sw.js` con cache básico de assets. Enlazar el manifest desde el `<head>` del `index.html`.
 
 ---
 *Última actualización: 25 de abril de 2026*
-
