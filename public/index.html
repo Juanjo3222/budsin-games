@@ -615,6 +615,45 @@
                 display: none !important;
             }
 
+            /* Chip especial de Herramientas */
+            .chip--tools {
+                border: 1px dashed rgba(45, 174, 255, 0.45);
+                background: rgba(45, 174, 255, 0.07);
+                color: var(--blue);
+            }
+
+            .chip--tools.active {
+                background: linear-gradient(135deg, var(--blue), #2fc98a);
+                border-color: transparent;
+                color: #fff;
+            }
+
+            /* Portada generica para herramientas sin imagen */
+            .tools-cover {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, rgba(45,174,255,0.14), rgba(47,201,138,0.14));
+            }
+
+            .tools-cover-inner {
+                font-size: 3.5rem;
+                user-select: none;
+            }
+
+            /* Dark mode para herramientas */
+            html[data-site-theme="dark"] .chip--tools {
+                border-color: rgba(45,174,255,0.3);
+                background: rgba(45,174,255,0.1);
+                color: #93dcff;
+            }
+
+            html[data-site-theme="dark"] .chip--tools.active {
+                background: linear-gradient(135deg, #1f7cf0, #2fc98a);
+                border-color: transparent;
+                color: #fff;
+            }
+
             .no-results {
                 display: none;
                 border-radius: 16px;
@@ -1242,6 +1281,14 @@
                         >
                             Clásicos
                         </button>
+                        <button
+                            type="button"
+                            class="chip chip--tools"
+                            data-type="tools"
+                            data-i18n="chipTools"
+                        >
+                            🛠️ Herramientas
+                        </button>
                     </div>
                 </div>
 
@@ -1277,8 +1324,7 @@
 
                 <div class="games-heading">
                     <span data-i18n="visibleCategories"
-                        >Categorías visibles: Acción · Idle · Multiplayer ·
-                        Clásicos</span
+                        >Categorías visibles: Acción · Idle · Multiplayer · Clásicos · 🛠️ Herramientas</span
                     >
                     <span id="resultsCount"></span>
                 </div>
@@ -2827,6 +2873,45 @@
                             </div>
                         </div></a
                     >
+                    <a
+                        class="game-card"
+                        href="comentarios.html"
+                        data-name="comentarios"
+                        data-type="tools"
+                        data-category="Herramientas"
+                        ><button
+                            type="button"
+                            class="favorite-btn"
+                            aria-label="Agregar a favoritos"
+                        >
+                            ☆
+                        </button>
+                        <div class="cover tools-cover">
+                            <div class="tools-cover-inner">💬</div>
+                        </div>
+                        <div class="content">
+                            <span
+                                data-label-es="Herramienta"
+                                data-label-en="Tool"
+                                >Herramienta</span
+                            ><strong>Comentarios</strong>
+                            <p
+                                data-desc-es="Deja tu opinion y sugerencias para el portal a traves del tablero de Padlet."
+                                data-desc-en="Leave your feedback and suggestions for the portal via the Padlet board."
+                            >
+                                Deja tu opinion y sugerencias para el portal a
+                                traves del tablero de Padlet.
+                            </p>
+                            <div class="meta-row">
+                                <span
+                                    class="category-tag"
+                                    data-es="Herramientas"
+                                    data-en="Tools"
+                                    >Herramientas</span
+                                ><span class="players" data-players>🔥 0</span>
+                            </div>
+                        </div></a
+                    >
                 </section>
                 <div id="noResults" class="no-results" data-i18n="noResults">
                     No encontramos juegos con ese filtro. Prueba otra búsqueda.
@@ -2940,11 +3025,12 @@
                     chipMultiplayer: "Multiplayer",
                     chipIdle: "Idle",
                     chipClassic: "Clásicos",
+                    chipTools: "🛠️ Herramientas",
                     shelfPopular: "🔥 Más jugados",
                     shelfFavorites: "🎮 Tus juegos",
                     noFavorites: "Aún no tienes favoritos.",
                     visibleCategories:
-                        "Categorías visibles: Acción · Idle · Multiplayer · Clásicos",
+                        "Categorías visibles: Acción · Idle · Multiplayer · Clásicos · 🛠️ Herramientas",
                     noResults:
                         "No encontramos juegos con ese filtro. Prueba otra búsqueda.",
                     suggestionsLink: "Envia tus sugerencias a Budsin",
@@ -2995,11 +3081,12 @@
                     chipMultiplayer: "Multiplayer",
                     chipIdle: "Idle",
                     chipClassic: "Classics",
+                    chipTools: "🛠️ Tools",
                     shelfPopular: "🔥 Most played",
                     shelfFavorites: "🎮 Your games",
                     noFavorites: "You have no favorites yet.",
                     visibleCategories:
-                        "Visible categories: Action · Idle · Multiplayer · Classics",
+                        "Visible categories: Action · Idle · Multiplayer · Classics · 🛠️ Tools",
                     noResults:
                         "We couldn't find games with that filter. Try another search.",
                     suggestionsLink: "Send your suggestions to Budsin",
@@ -3050,11 +3137,12 @@
                     chipMultiplayer: "Multiplayer",
                     chipIdle: "Idle",
                     chipClassic: "Clássicos",
+                    chipTools: "🛠️ Ferramentas",
                     shelfPopular: "🔥 Mais jogados",
                     shelfFavorites: "🎮 Seus jogos",
                     noFavorites: "Você ainda não tem favoritos.",
                     visibleCategories:
-                        "Categorias visíveis: Ação · Idle · Multiplayer · Clássicos",
+                        "Categorias visíveis: Ação · Idle · Multiplayer · Clássicos · 🛠️ Ferramentas",
                     noResults:
                         "Não encontramos jogos com esse filtro. Tente outra busca.",
                     suggestionsLink: "Envie suas sugestões ao Budsin",
@@ -3505,6 +3593,8 @@
                     "Painel de sons com favoritos, busca e controle de reprodução.",
                 "budsin ai":
                     "Chat do Budsin AI para te ajudar a partir do portal.",
+                "comentarios":
+                    "Deixe sua opiniao e sugestoes para o portal atraves do quadro do Padlet.",
             };
 
             const PT_CATEGORIES = {
@@ -3512,11 +3602,13 @@
                 Multiplayer: "Multiplayer",
                 Idle: "Idle",
                 Clásicos: "Clássicos",
+                Herramientas: "Ferramentas",
             };
 
             const PT_LABELS = {
                 Disponible: "Disponível",
                 Alternativa: "Alternativa",
+                Herramienta: "Ferramenta",
             };
 
             function applyLanguage(language) {
