@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
-  <img src="https://img.shields.io/badge/Games-36-blue" />
+  <img src="https://img.shields.io/badge/Games-39-blue" />
   <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
   <img src="https://img.shields.io/badge/Version-4.5-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
@@ -33,9 +33,10 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 * ⚡ **Sin descargas ni instalación**
 * 🧩 **UI tipo consola (portadas interactivas)**
 * ⭐ **Sistema de favoritos (localStorage)**
-* 📊 **Ranking de juegos (en desarrollo)**
+* 📊 **Ranking de popularidad con Firebase**
 * 🧠 **Filtros por categorías**
-* 🔄 **Actualización dinámica del catálogo**
+* 🔍 **Búsqueda en tiempo real**
+* 🌐 **Soporte multilenguaje (ES / EN)**
 * ⚙️ **Ajustes para URL de Classroom Hotkey (guardado local)**
 
 ---
@@ -43,31 +44,62 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 ## 🗂️ Categorías
 
 * ⚔️ Acción
-* 💤 Idle
+* 💤 Idle / Clicker
 * 🌐 Multiplayer
 * 🧱 Clásicos
 
 ---
 
-## 🎯 Juegos destacados
+## 🎯 Catálogo completo (39 juegos)
 
-| Juego                             | Tipo                 |
-| --------------------------------- | -------------------- |
-| Minecraft (1.8 / 1.12.2 / 1.21.x) | Acción / Multiplayer |
-| Cookie Clicker                    | Idle                 |
-| Geometry Dash                     | Acción               |
-| Hollow Knight                     | Acción               |
-| Among Us                          | Multiplayer          |
-| Subway Surfers                    | Clásico              |
-| Friday Night Funkin               | Clásico              |
-| Superhot                          | Acción               |
+| Juego                          | Categoría   |
+| ------------------------------ | ----------- |
+| Minecraft 1.12.2               | Acción      |
+| Minecraft 1.8                  | Multiplayer |
+| Minecraft 1.21.x               | Acción      |
+| Cookie Clicker                 | Idle        |
+| Cookie Clicker Legacy Edition  | Idle        |
+| Bitcoin Clicker                | Idle        |
+| Geometry Dash                  | Acción      |
+| Hollow Knight                  | Acción      |
+| Eggy Car                       | Acción      |
+| Level Devil                    | Acción      |
+| Drive Mad                      | Acción      |
+| Stickman Hook                  | Acción      |
+| SuperHot                       | Acción      |
+| Vex 7                          | Acción      |
+| Recoil                         | Acción      |
+| Among Us                       | Multiplayer |
+| Fireboy And Watergirl 1        | Multiplayer |
+| Smash Karts                    | Multiplayer |
+| Rocket Goal                    | Multiplayer |
+| Friday Night Funkin            | Clásicos    |
+| Subway Surfers                 | Clásicos    |
+| Red Ball                       | Clásicos    |
+| Snow Rider                     | Clásicos    |
+| Stacktris                      | Clásicos    |
+| UNDERTALE                      | Clásicos    |
+| We Become What We Behold       | Clásicos    |
+| Super Mario 64                 | Clásicos    |
+| Super Mario Bros               | Clásicos    |
+| Super Mario World              | Clásicos    |
+| Pac-Man                        | Clásicos    |
+| Galaga                         | Clásicos    |
+| Centipede Arcade               | Clásicos    |
+| Half-Life                      | Clásicos    |
+| Cooking Mama                   | Clásicos    |
+| Cooking Mama 2                 | Clásicos    |
+| Cooking Mama 3                 | Clásicos    |
+| RubDy                          | Clásicos    |
+| Soundboard                     | Clásicos    |
+| Budsin AI                      | Clásicos    |
 
 ---
 
 ## 📸 Preview
 
 <p align="center">
-  <img src="https://via.placeholder.com/800x400?text=Budsin+Games+Preview" />
+  <img src="Snapshot18-1.jpg" alt="Budsin Games Preview" width="800" />
 </p>
 
 ---
@@ -77,26 +109,37 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 * HTML5
 * CSS3
 * JavaScript (Vanilla)
-* Cloudflare Pages / Firebase Hosting
+* Firebase (conteo de popularidad, sin Auth)
+* Cloudflare Pages
 
 ---
 
-## 📁 Project Structure
+## 📁 Estructura del Proyecto
 
 ```bash
 /
-├── index.html
-├── /games
-│   ├── minecraft-1.8.html
-│   ├── fnf.html
-│   ├── cookie-clicker.html
-│   └── ...
-├── /assets
-│   ├── images
-│   ├── styles
-│   └── scripts
-└── README.md
+├── README.md
+├── AGENTS.md
+├── .firebaserc
+├── firebase.json
+└── public/
+    ├── index.html
+    ├── 404.html
+    ├── settings.html
+    ├── [juego].html          ← Páginas de cada juego (estructura plana)
+    ├── Funkin-HTML-Port-main/  ← Friday Night Funkin (port completo)
+    ├── cookie/               ← Cookie Clicker (port completo)
+    ├── fonts/
+    ├── images/
+    ├── lang/
+    ├── lib/
+    ├── scripts/
+    ├── stylesheets/
+    └── [portadas].jpg/jpeg/webp/avif/png/svg
 ```
+
+> ⚠️ **Regla de estructura**: Todo juego vive en `public/[nombre-del-juego]` (archivo `.html` o subcarpeta).
+> No se usa la carpeta `/games`.
 
 ---
 
@@ -106,19 +149,19 @@ Los usuarios pueden marcar juegos como favoritos ⭐
 Estos se almacenan localmente usando:
 
 ```js
-localStorage.setItem("favorites", JSON.stringify([...]))
+localStorage.setItem("budsin_favorites", JSON.stringify([...]))
 ```
 
 ---
 
-## 📊 Ranking (WIP)
+## 📊 Ranking de Popularidad
 
-Sistema de “Más jugados” en desarrollo.
-Planeado para incluir:
+Sistema de "Más jugados" integrado con Firebase Firestore.
 
-* Conteo de clicks
-* Ranking dinámico
-* Popularidad por juego
+* Conteo atómico de clics por juego
+* Ranking dinámico en tiempo real
+* Sin Login ni Auth — solo contadores anónimos
+* Colección Firebase: `game_popularity`
 
 ---
 
@@ -126,7 +169,7 @@ Planeado para incluir:
 
 ```bash
 git clone https://github.com/tu-usuario/budsin-games.git
-cd budsin-games
+cd budsin-games/public
 ```
 
 Abrir en navegador:
@@ -139,8 +182,8 @@ index.html
 
 ## 🧪 Desarrollo
 
-Proyecto **100% frontend**, sin backend requerido.
-Fácil de modificar, clonar o expandir.
+Proyecto **100% frontend**, sin backend requerido para uso básico.
+Firebase se usa únicamente para el conteo de popularidad.
 
 ---
 
@@ -158,11 +201,11 @@ Fácil de modificar, clonar o expandir.
 
 ## 💡 Roadmap
 
-* 🔍 Buscador de juegos
-* 📊 Ranking funcional
-* 👤 Sistema de cuentas
+* 🔍 Buscador avanzado de juegos
+* 📊 Ranking público visible
+* 👤 Sistema de cuentas (opcional)
 * 🏆 Leaderboards
-* 💾 Guardado de progreso
+* 💾 Guardado de progreso en la nube
 * 🎮 Más juegos
 
 ---
@@ -184,7 +227,7 @@ Todos los juegos pertenecen a sus respectivos creadores.
 ## 🤝 Contribuciones
 
 ¿Ideas o mejoras?
-👉 [Aquì](https://forms.gle/bUHTy8Lt6Kz1qkAx8)
+👉 [Aquí](https://forms.gle/bUHTy8Lt6Kz1qkAx8)
 
 ---
 
