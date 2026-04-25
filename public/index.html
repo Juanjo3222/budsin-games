@@ -1014,23 +1014,13 @@
                 }
 
                 .games {
-                    display: flex;
-                    flex-wrap: nowrap;
-                    overflow-x: auto;
-                    gap: 12px;
-                    padding-bottom: 12px;
-                    scroll-snap-type: x mandatory;
-                    -webkit-overflow-scrolling: touch;
-                    scrollbar-width: thin;
+                    grid-template-columns: 1fr;
                 }
-                .game-card {
-                    min-width: 220px;
-                    flex-shrink: 0;
-                    scroll-snap-align: start;
-                }
+
                 .game-card:nth-child(1) {
-                    min-width: 260px;
+                    grid-column: auto;
                 }
+
                 .game-card:nth-child(1) .cover {
                     aspect-ratio: 16 / 10;
                 }
