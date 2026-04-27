@@ -141,8 +141,17 @@
   // ─────────────────────────────────────────────
   //  Disguise metadata (title + favicon from URL)
   // ─────────────────────────────────────────────
+
+  /**
+   * Sets a stable hostname-based fallback immediately, then tries to read
+   * the real title/favicon from the iframe once it loads (works for same-origin
+   * pages; for cross-origin we at least get the Google favicon service icon).
+   * The old fetch() approach always failed due to CORS, so we dropped it.
+   */
   function resolveDisguisedPageData() {
     var url = getActiveUrl();
+
+    // --- Immediate fallback from URL hostname ---
     try {
       var parsed = new URL(url);
       disguisedTitle       = parsed.hostname.replace(/^www\./, "");
@@ -152,22 +161,49 @@
       disguisedFaviconHref = "https://www.google.com/favicon.ico";
     }
 
-    window.fetch(url)
-      .then(function (res) {
-        if (!res.ok) throw new Error("blocked");
-        return res.text();
-      })
-      .then(function (html) {
-        var doc        = new DOMParser().parseFromString(html, "text/html");
-        var remoteTitle = (doc.title || "").trim();
-        var iconEl     = doc.querySelector("link[rel~='icon']");
-        var remoteIcon = iconEl ? (iconEl.getAttribute("href") || "").trim() : "";
-        if (remoteTitle) disguisedTitle = remoteTitle;
-        if (remoteIcon) {
-          try { disguisedFaviconHref = new URL(remoteIcon, url).href; } catch (_) {}
+    // --- Try to read real data from iframe on load ---
+    function tryReadFromFrame() {
+      var frame = document.getElementById(IDS.FRAME);
+      if (!frame) return;
+
+      frame.addEventListener("load", function onFrameLoad() {
+        // Re-check URL in case user changed it between calls
+        var currentUrl = getActiveUrl();
+        try {
+          var p = new URL(currentUrl);
+          // Always update favicon via Google service (works cross-origin)
+          disguisedFaviconHref = "https://www.google.com/s2/favicons?sz=64&domain_url=" + encodeURIComponent(p.origin);
+
+          // Try to read title/favicon directly (only works if same-origin)
+          try {
+            var iDoc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
+            if (iDoc) {
+              var t = (iDoc.title || "").trim();
+              if (t) disguisedTitle = t;
+
+              var iconEl = iDoc.querySelector("link[rel~='icon']");
+              if (iconEl) {
+                var iconHref = (iconEl.getAttribute("href") || "").trim();
+                if (iconHref) {
+                  disguisedFaviconHref = new URL(iconHref, currentUrl).href;
+                }
+              }
+            }
+          } catch (_) { /* cross-origin — fine, hostname fallback stays */ }
+
+        } catch (_) {}
+
+        // If overlay is currently open, patch the live tab title/favicon immediately
+        var overlay = document.getElementById(IDS.OVERLAY);
+        if (overlay && overlay.classList.contains("is-open")) {
+          document.title = disguisedTitle;
+          setFaviconHref(disguisedFaviconHref);
         }
-      })
-      .catch(function () {});
+      });
+    }
+
+    // The frame may not exist yet at init time; defer one tick
+    window.setTimeout(tryReadFromFrame, 0);
   }
 
   // ─────────────────────────────────────────────
@@ -324,7 +360,13 @@
     var willOpen = !isOpen;
     var fsEl     = getFullscreenElement();
 
-    if (!isOpen && frame) ensureFrameUrl(frame);
+    if (!isOpen && frame) {
+      var prevSrc = frame.src;
+      ensureFrameUrl(frame);
+      // If the URL changed (user updated settings), re-register the load listener
+      // so disguisedTitle / disguisedFaviconHref get refreshed for the new site.
+      if (frame.src !== prevSrc) resolveDisguisedPageData();
+    }
     triggerFunkinEscape();
     resetAutoDisguiseTimer();
 
