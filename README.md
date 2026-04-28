@@ -1,4 +1,4 @@
-# 🎮 Budsin Games
+# 🎮 Budsin Games - osi
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
