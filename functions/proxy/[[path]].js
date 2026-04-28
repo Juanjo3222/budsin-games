@@ -3,14 +3,18 @@
 export async function onRequest(context) {
   const url = new URL(context.request.url);
 
-  // La URL destino viene en el path: /proxy/https://chatgpt.com/...
-  const pathParts = url.pathname.replace(/^\/proxy\//, "");
-  
-  if (!pathParts.startsWith("http")) {
+  // Reconstruir la URL destino desde el path Y el search
+  // El router de CF colapsa https:// → https:/ entonces lo reparamos
+  let raw = url.pathname.replace(/^\/proxy\//, "");
+
+  // Reparar protocolo colapsado: "https:/algo" → "https://algo"
+  raw = raw.replace(/^(https?):\/([^/])/, "$1://$2");
+
+  if (!raw.startsWith("http")) {
     return new Response("URL inválida. Usa: /proxy/https://sitio.com", { status: 400 });
   }
 
-  const targetUrl = pathParts + (url.search || "");
+  const targetUrl = raw + (url.search || "");
 
   let req;
   try {
@@ -39,7 +43,6 @@ export async function onRequest(context) {
     return new Response("Error fetching: " + e.message, { status: 502 });
   }
 
-  // Reescribir URLs en HTML para que los links internos también pasen por el proxy
   const contentType = res.headers.get("content-type") || "";
   const origin = url.origin;
 
@@ -47,7 +50,7 @@ export async function onRequest(context) {
     let html = await res.text();
     const targetOrigin = new URL(targetUrl).origin;
 
-    // Reescribir URLs absolutas del mismo origen
+    // Reescribir URLs absolutas para que pasen por el proxy
     html = html.replaceAll(targetOrigin, `${origin}/proxy/${targetOrigin}`);
 
     const newHeaders = new Headers(res.headers);
@@ -61,7 +64,6 @@ export async function onRequest(context) {
     });
   }
 
-  // Para otros recursos (JS, CSS, imágenes) pasar directo
   const newHeaders = new Headers(res.headers);
   newHeaders.delete("content-security-policy");
   newHeaders.delete("x-frame-options");
