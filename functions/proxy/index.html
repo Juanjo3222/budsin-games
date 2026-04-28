@@ -6,6 +6,8 @@
   <title>Proxy — Budsin Games</title>
   <link rel="icon" type="image/jpeg" href="https://budsin-games.pages.dev/images.jpeg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="/uv/uv.bundle.js"></script>
+  <script src="/uv/uv.config.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -525,6 +527,34 @@
     }, 0);
   });
 </script>
+    <script>
+    // Registrar el Service Worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js", { scope: "/" })
+        .then(() => console.log("✅ Service Worker registrado"))
+        .catch((e) => console.error("❌ SW Error:", e));
+    }
+
+    function navigate() {
+      let input = document.getElementById("url-input").value.trim();
+
+      // Agregar https:// si no tiene protocolo
+      if (!input.startsWith("http")) {
+        input = "https://" + input;
+      }
+
+      // UV encoda la URL y redirige por /service/
+      location.href = __uv$config.prefix + __uv$config.encodeUrl(input);
+    }
+
+    document.getElementById("url-input")
+      .addEventListener("keydown", (e) => {
+        if (e.key === "Enter") navigate();
+      });
+  </script>
+</body>
+</html>
 
 </body>
 </html>
