@@ -4,7 +4,7 @@ self.__uv$config = {
   prefix: "/service/",
 
   // URL de tu bare server en Railway ← CAMBIA ESTO
-  bare: "https://budsin-bare-production.up.railway.app/bare/",
+  bare: "https://budsin-bare.onrender.com/bare/",
 
   encodeUrl: Ultraviolet.codec.xor.encode,
   decodeUrl: Ultraviolet.codec.xor.decode,
