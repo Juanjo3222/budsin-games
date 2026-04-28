@@ -142,68 +142,50 @@
   //  Disguise metadata (title + favicon from URL)
   // ─────────────────────────────────────────────
 
-  /**
-   * Sets a stable hostname-based fallback immediately, then tries to read
-   * the real title/favicon from the iframe once it loads (works for same-origin
-   * pages; for cross-origin we at least get the Google favicon service icon).
-   * The old fetch() approach always failed due to CORS, so we dropped it.
-   */
-  function resolveDisguisedPageData() {
-    var url = getActiveUrl();
+  var FAVICON_SERVICES = [
+    function(u) { return "https://www.google.com/s2/favicons?sz=64&domain=" + encodeURIComponent(u.hostname); },
+    function(u) { return "https://icon.duckduckgo.com/ip3/" + u.hostname + "/favicon.ico"; },
+  ];
 
-    // --- Immediate fallback from URL hostname ---
+  function getFaviconViaService(url) {
+    var u;
+    try { u = new URL(url); } catch (_) { return "https://www.google.com/favicon.ico"; }
+    for (var i = 0; i < FAVICON_SERVICES.length; i++) {
+      try { return FAVICON_SERVICES[i](u); } catch (_) { continue; }
+    }
+    return "https://www.google.com/favicon.ico";
+  }
+
+  function getDisplayTitleFromUrl(url) {
+    var u, path;
     try {
-      var parsed = new URL(url);
-      disguisedTitle       = parsed.hostname.replace(/^www\./, "");
-      disguisedFaviconHref = "https://www.google.com/s2/favicons?sz=64&domain_url=" + encodeURIComponent(parsed.origin);
+      u = new URL(url);
+      path = u.pathname.replace(/^\/+/, "").replace(/\/+$/, "");
+    } catch (_) { return "Documento"; }
+    if (!path || path.length < 2) {
+      return u.hostname.replace(/^www\./, "");
+    }
+    var lastSegment = path.split("/").pop() || "";
+    var name = lastSegment.replace(/[-_]/g, " ").replace(/\.[^.]+$/, "");
+    if (!name) return u.hostname.replace(/^www\./, "");
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
+  function refreshDisguiseMetadata() {
+    var url = getActiveUrl();
+    try {
+      var u = new URL(url);
+      disguisedFaviconHref = getFaviconViaService(url);
+      disguisedTitle = getDisplayTitleFromUrl(url);
     } catch (_) {
-      disguisedTitle       = "Google Docs";
+      disguisedTitle = "Google Docs";
       disguisedFaviconHref = "https://www.google.com/favicon.ico";
     }
-
-    // --- Try to read real data from iframe on load ---
-    function tryReadFromFrame() {
-      var frame = document.getElementById(IDS.FRAME);
-      if (!frame) return;
-
-      frame.addEventListener("load", function onFrameLoad() {
-        // Re-check URL in case user changed it between calls
-        var currentUrl = getActiveUrl();
-        try {
-          var p = new URL(currentUrl);
-          // Always update favicon via Google service (works cross-origin)
-          disguisedFaviconHref = "https://www.google.com/s2/favicons?sz=64&domain_url=" + encodeURIComponent(p.origin);
-
-          // Try to read title/favicon directly (only works if same-origin)
-          try {
-            var iDoc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
-            if (iDoc) {
-              var t = (iDoc.title || "").trim();
-              if (t) disguisedTitle = t;
-
-              var iconEl = iDoc.querySelector("link[rel~='icon']");
-              if (iconEl) {
-                var iconHref = (iconEl.getAttribute("href") || "").trim();
-                if (iconHref) {
-                  disguisedFaviconHref = new URL(iconHref, currentUrl).href;
-                }
-              }
-            }
-          } catch (_) { /* cross-origin — fine, hostname fallback stays */ }
-
-        } catch (_) {}
-
-        // If overlay is currently open, patch the live tab title/favicon immediately
-        var overlay = document.getElementById(IDS.OVERLAY);
-        if (overlay && overlay.classList.contains("is-open")) {
-          document.title = disguisedTitle;
-          setFaviconHref(disguisedFaviconHref);
-        }
-      });
+    var overlay = document.getElementById(IDS.OVERLAY);
+    if (overlay && overlay.classList.contains("is-open")) {
+      document.title = disguisedTitle;
+      setFaviconHref(disguisedFaviconHref);
     }
-
-    // The frame may not exist yet at init time; defer one tick
-    window.setTimeout(tryReadFromFrame, 0);
   }
 
   // ─────────────────────────────────────────────
@@ -365,7 +347,7 @@
       ensureFrameUrl(frame);
       // If the URL changed (user updated settings), re-register the load listener
       // so disguisedTitle / disguisedFaviconHref get refreshed for the new site.
-      if (frame.src !== prevSrc) resolveDisguisedPageData();
+      if (frame.src !== prevSrc) refreshDisguiseMetadata();
     }
     triggerFunkinEscape();
     resetAutoDisguiseTimer();
@@ -577,7 +559,7 @@
   //  Init
   // ─────────────────────────────────────────────
   createOverlay();
-  resolveDisguisedPageData();
+  refreshDisguiseMetadata();
   window.setTimeout(preloadFrame, 0);
   ensureQuickToggleButton();
   bindIframeHotkeys();
