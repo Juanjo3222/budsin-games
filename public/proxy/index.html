@@ -129,7 +129,7 @@
   const goBtn = document.getElementById("go-btn");
   let scramjetController = null;
 
-async function initProxy() {
+ async function initProxy() {
   try {
     const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
 
@@ -151,13 +151,6 @@ async function initProxy() {
     });
     await scramjetController.init();
 
-    // Enviar config al SW explícitamente
-    const sw = reg.active;
-    sw.postMessage({
-      type: "init",
-      config: scramjetController.config
-    });
-
     const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
     await connection.setTransport("/epoxy/index.js", [{ wisp: WISP_URL }]);
 
@@ -170,7 +163,7 @@ async function initProxy() {
     swStatus.textContent = "❌ Error: " + e.message;
     console.error(e);
   }
-}
+ }
   initProxy();
 
   function normalizeUrl(raw) {
