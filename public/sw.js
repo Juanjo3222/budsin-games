@@ -1,6 +1,26 @@
-const VERSION = "2"; // cambia este número cada vez que quieras forzar reset
+const VERSION = "3";
 
 importScripts("/scram/scramjet.all.js");
+
+// Limpiar IndexedDB vieja antes de iniciar
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    new Promise((resolve) => {
+      const req = indexedDB.deleteDatabase("scramjet");
+      req.onsuccess = resolve;
+      req.onerror = resolve;
+      req.onblocked = resolve;
+    }).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
 
 const { ScramjetServiceWorker } = $scramjetLoadWorker();
 const scramjet = new ScramjetServiceWorker();
@@ -13,12 +33,4 @@ self.addEventListener("fetch", (event) => {
     }
     return fetch(event.request);
   })());
-});
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => caches.delete(key)))
-    )
-  );
 });
