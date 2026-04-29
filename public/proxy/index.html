@@ -138,7 +138,7 @@
 
       // 4. Configurar transporte Wisp
       const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-      await connection.setTransport("/baremux/wisp.js", [WISP_URL]);
+      await connection.setTransport("/epoxy/index.js", [{ wisp: WISP_URL }]);
 
       swStatus.className = "sw-status ready";
       swStatus.textContent = "✅ Proxy listo";
