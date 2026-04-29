@@ -4,36 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Claude Interface - Fully Functional</title>
-    <!-- Puter.js with Fallback URLs -->
-    <script src="https://budsin-games.pages.dev/puter.js"></script>
-    <script>
-        // Fallback loading if main CDN fails
-        function loadPuterFallback() {
-            if (typeof puter !== 'undefined') {
-                console.log('✅ Puter.js loaded successfully from main CDN');
-                return;
-            }
-            console.warn('⚠️ Puter.js not loaded from main CDN, trying fallback...');
-            
-            const fallbackURL = 'https://cdn.puter.com/v2/puter.js';
-            const script = document.createElement('script');
-            script.src = fallbackURL;
-            script.onload = () => {
-                console.log('✅ Puter.js loaded from fallback CDN');
-                window.puterLoaded = true;
-            };
-            script.onerror = () => {
-                console.error('❌ Failed to load Puter.js from both sources');
-                window.puterLoadFailed = true;
-            };
-            document.head.appendChild(script);
-        }
-        
-        // Try fallback after 3 seconds
-        setTimeout(() => {
-            loadPuterFallback();
-        }, 3000);
-    </script>
+    <script src="https://js.puter.com/v2/"></script>
     <style>
         * {
             margin: 0;
@@ -868,34 +839,11 @@
             
             try {
                 if (authButton) {
-                    authButton.textContent = '🔄 Checking library...';
+                    authButton.textContent = '🔄 Authenticating...';
                     authButton.disabled = true;
                 }
                 
-                console.log('🔐 Checking if Puter.js is loaded...');
-                
-                // CHECK 1: Is Puter library loaded?
-                if (typeof puter === 'undefined') {
-                    console.warn('⚠️ Puter.js not loaded yet, waiting...');
-                    
-                    // Wait for it to load (max 5 seconds)
-                    let waited = 0;
-                    while (typeof puter === 'undefined' && waited < 5000) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        waited += 500;
-                    }
-                    
-                    // Still not loaded?
-                    if (typeof puter === 'undefined') {
-                        throw new Error('Puter.js library failed to load from CDN. This is likely a network issue.');
-                    }
-                }
-                
-                console.log('✅ Puter.js is available, attempting authentication...');
-                
-                if (authButton) {
-                    authButton.textContent = '🔄 Authenticating...';
-                }
+                console.log('🔐 Manually triggering Puter authentication...');
                 
                 // Trigger authentication with a simple test call
                 const authResponse = await puter.ai.chat("test", {model: 'claude-sonnet-4'});
@@ -921,85 +869,42 @@
                 console.error('❌ Manual authentication failed:', error);
                 
                 if (authButton) {
+                    authButton.textContent = '❌ Auth Failed - Try Guide';
                     authButton.disabled = false;
                     authButton.style.backgroundColor = '#dc2626';
                 }
                 
-                // Determine error type and provide specific guidance
-                let troubleshootGuide = '';
-                
-                if (error.message.includes('Puter.js library failed to load')) {
-                    troubleshootGuide = `
-⚠️ PUTER.JS LIBRARY FAILED TO LOAD
-
-This is a network connectivity issue. The website js.puter.com cannot be reached.
-
---- SOLUTIONS ---
-
-1️⃣ CHECK YOUR INTERNET CONNECTION:
-   • Make sure you have a stable internet connection
-   • Try opening https://puter.com in a new tab
-
-2️⃣ IF INTERNET IS OK:
-   • Try refreshing this page (Ctrl+R or Cmd+R)
-   • Wait 5-10 seconds for the fallback CDN to load
-   • Try again
-
-3️⃣ IF STILL NOT WORKING:
-   • The Puter.js library might be temporarily unavailable
-   • Try again in a few minutes
-   • Or use a VPN if your network blocks CDNs
-
-If you continue to have issues, the problem is with your internet or ISP blocking the CDN.
-`;
-                    if (authButton) {
-                        authButton.textContent = '❌ CDN Not Available';
-                    }
-                } else {
-                    troubleshootGuide = `
+                // --- ENHANCED ERROR MESSAGE ---
+                const troubleshootGuide = `
 ⚠️ AUTHENTICATION FAILED!
 
 This usually happens because of your browser profile settings (extensions, cache, etc.), NOT a bug in the code.
+
+As you noticed, it works in a new Guest or Incognito profile. Here is how to fix it in your MAIN profile:
 
 --- TROUBLESHOOTING GUIDE ---
 
 ✅ QUICKEST FIX (TRY FIRST):
 1.  🥷 Use Incognito/Private Mode:
     • Press Ctrl+Shift+N (Chrome/Edge) or Ctrl+Shift+P (Firefox).
-    • Open this page there and try authenticating.
+    • Open this HTML file there. This is the fastest workaround.
 
 🔧 TO FIX YOUR MAIN PROFILE (TRY IN ORDER):
 2.  🔌 Disable Extensions:
     • Go to your browser's extensions page (e.g., chrome://extensions).
-    • TEMPORARILY disable ALL extensions, especially:
-      - Ad-blockers (uBlock, AdBlock, AdGuard)
-      - Privacy blockers (Privacy Badger, Ghostery)
-      - VPN extensions
+    • TEMPORARILY disable ALL extensions, especially ad-blockers (uBlock, AdBlock) and privacy blockers.
     • Refresh this page and try authenticating again.
 
-3.  🧹 Clear Cookies for Puter:
-    • Go to puter.com in a new tab
-    • Click the 🔒 lock icon in the address bar
-    • Select "Cookies and site data" → "Delete"
-    • Come back to this page and try again.
+3.  🧹 Clear Site Data for Puter:
+    • Go to puter.com, click the 🔒 icon in the address bar -> Site Settings/Cookies and site data -> Delete data.
+    • Refresh this page and try again.
 
 4.  🍪 Allow Third-Party Cookies:
-    • Chrome/Edge: chrome://settings/cookies
-    • Firefox: about:preferences#privacy
-    • Ensure third-party cookies are NOT completely blocked
-    • Or whitelist [*.]puter.com
+    • Go to your browser's cookie settings (e.g., chrome://settings/cookies).
+    • Ensure "Block third-party cookies" is NOT enabled, or add "[*.]puter.com" to the allowed list.
 
-5.  🌐 Check Your Network:
-    • Make sure puter.com is not blocked by your network/ISP/firewall
-    • Try a VPN if it's blocked
-
-If still not working, the issue is definitely with browser settings or network restrictions, not the code.
+If you are running this from a local server (like localhost), the issue is almost certainly extensions or cookie settings.
 `;
-                    if (authButton) {
-                        authButton.textContent = '❌ Auth Failed - Try Guide';
-                    }
-                }
-                
                 alert(troubleshootGuide);
             }
         }
@@ -1176,6 +1081,36 @@ If still not working, the issue is definitely with browser settings or network r
             console.log('🆕 Started new chat, model reset to default.');
         }
 
+        // Proxy URL en Render
+        const PROXY_URL = "https://budsin-puter.onrender.com";
+
+        async function obtenerRespuestaIA(textoUsuario) {
+            try {
+                const response = await fetch(`${PROXY_URL}/puterai/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o',
+                        messages: chatHistory,
+                        stream: false
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.choices && data.choices[0]) {
+                    return data.choices[0].message.content;
+                } else {
+                    throw new Error("Respuesta inesperada del servidor: " + JSON.stringify(data));
+                }
+            } catch (error) {
+                console.error("Error mediante el proxy:", error);
+                throw error;
+            }
+        }
+
         async function sendMessage(message) {
             if (isStreaming) return;
             
@@ -1188,37 +1123,16 @@ If still not working, the issue is definitely with browser settings or network r
             
             try {
                 isStreaming = true;
+                console.log('📡 Llamando al proxy en Render con modelo gpt-4o y el historial completo.');
                 
-                // Check if Puter is available
-                if (typeof puter === 'undefined') {
-                    throw new Error('Puter.js library is not loaded. Please refresh the page and wait for it to load, then authenticate first.');
-                }
+                const fullResponse = await obtenerRespuestaIA(message);
                 
-                console.log('📡 Calling Puter AI with model:', currentModel, 'and full history.');
-                
-                const response = await puter.ai.chat(chatHistory, {
-                    model: currentModel,
-                    stream: true
-                });
-
-                if (response && response.success === false) {
-                    throw new Error('Authentication required. Please click the authenticate button and allow the popup.');
-                }
-                
-                const { messageContent } = addMessage('', 'assistant');
                 hideTypingIndicator();
-                let fullResponse = '';
+                const { messageContent } = addMessage('', 'assistant');
+                renderFormattedMessage(fullResponse, messageContent);
+                scrollToBottom();
                 
-                for await (const part of response) {
-                    if (part?.text) {
-                        fullResponse += part.text;
-                        renderFormattedMessage(fullResponse, messageContent);
-                        scrollToBottom();
-                    }
-                }
-                
-                console.log('✅ Streaming complete.');
-                renderFormattedMessage(fullResponse, messageContent); 
+                console.log('✅ Respuesta recibida correctamente.');
                 
                 chatHistory.push({ role: 'assistant', content: fullResponse });
                 updateCurrentConversation();
@@ -1226,10 +1140,8 @@ If still not working, the issue is definitely with browser settings or network r
             } catch (error) {
                 console.error('❌ Error in sendMessage:', error);
                 hideTypingIndicator();
-                addMessage('Sorry, I encountered an error: ' + (error.message || 'Unknown error.'), 'assistant', true);
+                addMessage('Error: No se pudo conectar con el backend en Render. ' + (error.message || ''), 'assistant', true);
                 
-                // FIX: The API call failed, so the optimistic user message added to the history
-                // resulted in an invalid state. Remove it to allow the user to try again.
                 if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
                     chatHistory.pop();
                 }
