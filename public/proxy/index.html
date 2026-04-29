@@ -131,6 +131,12 @@
 
  async function initProxy() {
   try {
+        await new Promise((resolve) => {
+      const req = indexedDB.deleteDatabase("scramjet");
+      req.onsuccess = resolve;
+      req.onerror = resolve;
+      req.onblocked = resolve;
+    });
     const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
 
     await new Promise((resolve) => {
