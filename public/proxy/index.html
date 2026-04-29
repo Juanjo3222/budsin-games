@@ -129,14 +129,21 @@
   const goBtn = document.getElementById("go-btn");
   let scramjetController = null;
 
- async function initProxy() {
+async function initProxy() {
   try {
-        await new Promise((resolve) => {
-      const req = indexedDB.deleteDatabase("scramjet");
-      req.onsuccess = resolve;
-      req.onerror = resolve;
-      req.onblocked = resolve;
+    // Forzar creación de la DB antes de que Scramjet la abra
+    await new Promise((resolve, reject) => {
+      const req = indexedDB.open("scramjet", 1);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains("config")) {
+          db.createObjectStore("config");
+        }
+      };
+      req.onsuccess = (e) => { e.target.result.close(); resolve(); };
+      req.onerror = reject;
     });
+
     const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
 
     await new Promise((resolve) => {
@@ -169,7 +176,7 @@
     swStatus.textContent = "❌ Error: " + e.message;
     console.error(e);
   }
- }
+}
   initProxy();
 
   function normalizeUrl(raw) {
