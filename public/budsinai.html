@@ -670,7 +670,7 @@
                 <div class="user-info">
                     <div class="user-avatar">H</div>
                     <div class="user-details">
-                        <div class="user-name">Hassan</div>
+                        <div class="user-name">Budsin</div>
                         <div class="user-plan">Pro plan</div>
                     </div>
                     <svg class="chevron-down" viewBox="0 0 24 24" fill="currentColor">
@@ -689,7 +689,7 @@
                         <svg class="sun-icon" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
                         </svg>
-                        Good morning, Hassan
+                        Good morning, Budsin
                     </div>
                     
                     <div class="search-container">
@@ -704,19 +704,7 @@
                         </div>
                     </div>
                     
-                    <div style="max-width: 600px; margin-bottom: 15px; padding: 12px; background-color: #2a2a2a; border-radius: 8px; border: 1px solid #404040;">
-                        <div style="font-size: 13px; color: #b3b3b3; text-align: center; margin-bottom: 10px;">
-                            💡 <strong>First time?</strong> A small popup will appear for authentication - please allow it to enable free Claude access via Puter.js
-                        </div>
-                        <div style="font-size: 12px; color: #808080; text-align: center; margin-bottom: 10px;" id="protocolNotice">
-                            <!-- This will be populated by JS -->
-                        </div>
-                        <div style="text-align: center;">
-                            <button id="authButton" style="background-color: #ff6b35; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                                🔐 Authenticate with Puter
-                            </button>
-                        </div>
-                    </div>
+
                     
                     <div class="model-selector">
                         <button class="model-btn" id="modelSelector">
@@ -815,99 +803,7 @@
             console.log('Initializing Claude interface...');
             initializeInterface();
             updateModelDisplay();
-            updateProtocolNotice();
         });
-
-        function updateProtocolNotice() {
-            const protocolNotice = document.getElementById('protocolNotice');
-            if (protocolNotice) {
-                if (window.location.protocol === 'file:') {
-                    protocolNotice.innerHTML = '✅ <strong>File mode:</strong> Authentication should work perfectly here!';
-                    protocolNotice.style.color = '#22c55e';
-                } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                    protocolNotice.innerHTML = '⚠️ <strong>Server mode:</strong> If auth fails, browser profile issues are likely. See guide below.';
-                    protocolNotice.style.color = '#f59e0b';
-                } else {
-                    protocolNotice.innerHTML = '🌐 <strong>Web mode:</strong> Make sure popups are allowed for this domain.';
-                    protocolNotice.style.color = '#3b82f6';
-                }
-            }
-        }
-
-        async function handleManualAuth() {
-            const authButton = document.getElementById('authButton');
-            
-            try {
-                if (authButton) {
-                    authButton.textContent = '🔄 Authenticating...';
-                    authButton.disabled = true;
-                }
-                
-                console.log('🔐 Manually triggering Puter authentication...');
-                
-                // Trigger authentication with a simple test call
-                const authResponse = await puter.ai.chat("test", {model: 'claude-sonnet-4'});
-                
-                console.log('✅ Raw auth response:', authResponse);
-
-                // Check for a successful response structure
-                if (authResponse && (authResponse.message?.content || authResponse.success !== false)) {
-                     console.log('✅ Authentication successful!');
-                    if (authButton) {
-                        authButton.textContent = '✅ Authenticated';
-                        authButton.style.backgroundColor = '#22c55e';
-                        setTimeout(() => {
-                           const authBox = authButton.closest('div[style*="max-width: 600px"]');
-                           if(authBox) authBox.style.display = 'none';
-                        }, 2000);
-                    }
-                } else {
-                    throw new Error('Authentication response indicates failure.');
-                }
-                
-            } catch (error) {
-                console.error('❌ Manual authentication failed:', error);
-                
-                if (authButton) {
-                    authButton.textContent = '❌ Auth Failed - Try Guide';
-                    authButton.disabled = false;
-                    authButton.style.backgroundColor = '#dc2626';
-                }
-                
-                // --- ENHANCED ERROR MESSAGE ---
-                const troubleshootGuide = `
-⚠️ AUTHENTICATION FAILED!
-
-This usually happens because of your browser profile settings (extensions, cache, etc.), NOT a bug in the code.
-
-As you noticed, it works in a new Guest or Incognito profile. Here is how to fix it in your MAIN profile:
-
---- TROUBLESHOOTING GUIDE ---
-
-✅ QUICKEST FIX (TRY FIRST):
-1.  🥷 Use Incognito/Private Mode:
-    • Press Ctrl+Shift+N (Chrome/Edge) or Ctrl+Shift+P (Firefox).
-    • Open this HTML file there. This is the fastest workaround.
-
-🔧 TO FIX YOUR MAIN PROFILE (TRY IN ORDER):
-2.  🔌 Disable Extensions:
-    • Go to your browser's extensions page (e.g., chrome://extensions).
-    • TEMPORARILY disable ALL extensions, especially ad-blockers (uBlock, AdBlock) and privacy blockers.
-    • Refresh this page and try authenticating again.
-
-3.  🧹 Clear Site Data for Puter:
-    • Go to puter.com, click the 🔒 icon in the address bar -> Site Settings/Cookies and site data -> Delete data.
-    • Refresh this page and try again.
-
-4.  🍪 Allow Third-Party Cookies:
-    • Go to your browser's cookie settings (e.g., chrome://settings/cookies).
-    • Ensure "Block third-party cookies" is NOT enabled, or add "[*.]puter.com" to the allowed list.
-
-If you are running this from a local server (like localhost), the issue is almost certainly extensions or cookie settings.
-`;
-                alert(troubleshootGuide);
-            }
-        }
 
         function initializeInterface() {
             const welcomeInput = document.getElementById('welcomeInput');
@@ -917,9 +813,6 @@ If you are running this from a local server (like localhost), the issue is almos
             const newChatBtn = document.getElementById('newChatBtn');
             const actionBtns = document.querySelectorAll('.action-btn');
             const modelSelectors = document.querySelectorAll('#modelSelector, #chatModelSelector');
-            const authButton = document.getElementById('authButton');
-
-            if (authButton) authButton.addEventListener('click', handleManualAuth);
 
             [welcomeInput, chatInput].forEach(textarea => {
                 if (textarea) {
