@@ -129,46 +129,48 @@
   const goBtn = document.getElementById("go-btn");
   let scramjetController = null;
 
-  async function initProxy() {
-    try {
-      // 1. Registrar Service Worker
-      const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+async function initProxy() {
+  try {
+    const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
 
-      // 2. Esperar que esté activo
-      await new Promise((resolve) => {
-        if (reg.active) { resolve(); return; }
-        const sw = reg.installing || reg.waiting;
-        sw.addEventListener("statechange", () => {
-          if (sw.state === "activated") resolve();
-        });
+    await new Promise((resolve) => {
+      if (reg.active) { resolve(); return; }
+      const sw = reg.installing || reg.waiting;
+      sw.addEventListener("statechange", () => {
+        if (sw.state === "activated") resolve();
       });
+    });
 
-      // 3. Inicializar ScramjetController
-      const { ScramjetController } = $scramjetLoadController();
-      scramjetController = new ScramjetController({
-        files: {
-          wasm: "/scram/scramjet.wasm.wasm",
-          all:  "/scram/scramjet.all.js",
-          sync: "/scram/scramjet.sync.js",
-        }
-      });
-      await scramjetController.init();
+    const { ScramjetController } = $scramjetLoadController();
+    scramjetController = new ScramjetController({
+      files: {
+        wasm: "/scram/scramjet.wasm.wasm",
+        all:  "/scram/scramjet.all.js",
+        sync: "/scram/scramjet.sync.js",
+      }
+    });
+    await scramjetController.init();
 
-      // 4. Configurar transporte Epoxy (Wisp)
-      const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-      await connection.setTransport("/epoxy/index.js", [{ wisp: WISP_URL }]);
+    // Enviar config al SW explícitamente
+    const sw = reg.active;
+    sw.postMessage({
+      type: "init",
+      config: scramjetController.config
+    });
 
-      swStatus.className = "sw-status ready";
-      swStatus.textContent = "✅ Proxy listo";
-      goBtn.disabled = false;
+    const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+    await connection.setTransport("/epoxy/index.js", [{ wisp: WISP_URL }]);
 
-    } catch (e) {
-      swStatus.className = "sw-status error";
-      swStatus.textContent = "❌ Error: " + e.message;
-      console.error(e);
-    }
+    swStatus.className = "sw-status ready";
+    swStatus.textContent = "✅ Proxy listo";
+    goBtn.disabled = false;
+
+  } catch (e) {
+    swStatus.className = "sw-status error";
+    swStatus.textContent = "❌ Error: " + e.message;
+    console.error(e);
   }
-
+}
   initProxy();
 
   function normalizeUrl(raw) {
