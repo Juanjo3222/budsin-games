@@ -1,3 +1,5 @@
+const VERSION = "2"; // cambia este número cada vez que quieras forzar reset
+
 importScripts("/scram/scramjet.all.js");
 
 const { ScramjetServiceWorker } = $scramjetLoadWorker();
@@ -11,4 +13,12 @@ self.addEventListener("fetch", (event) => {
     }
     return fetch(event.request);
   })());
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((key) => caches.delete(key)))
+    )
+  );
 });
