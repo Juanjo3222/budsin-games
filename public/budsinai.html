@@ -314,7 +314,60 @@
         }
         .message-text-part {
             padding: 16px;
-            white-space: pre-wrap;
+            white-space: normal;
+            line-height: 1.6;
+        }
+
+        .message-text-part p { margin: 0 0 8px; }
+        .message-text-part p:last-child { margin-bottom: 0; }
+        .message-text-part strong { font-weight: 700; }
+        .message-text-part em { font-style: italic; }
+        .message-text-part code {
+            background: rgba(255,255,255,0.12);
+            border-radius: 4px;
+            padding: 2px 5px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .message-text-part ul, .message-text-part ol {
+            margin: 6px 0 10px 20px;
+        }
+        .message-text-part li { margin-bottom: 4px; }
+        .message-text-part h1,.message-text-part h2,.message-text-part h3 {
+            margin: 12px 0 6px; font-weight: 700;
+        }
+        .message-text-part h1 { font-size: 1.3em; }
+        .message-text-part h2 { font-size: 1.15em; }
+        .message-text-part h3 { font-size: 1.05em; }
+
+        .md-table-wrapper {
+            overflow-x: auto;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .md-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.9em;
+        }
+        .md-table th {
+            background: rgba(255,107,53,0.25);
+            font-weight: 700;
+            text-align: left;
+            padding: 10px 14px;
+            border: 1px solid rgba(255,255,255,0.15);
+            white-space: nowrap;
+        }
+        .md-table td {
+            padding: 8px 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+            vertical-align: top;
+        }
+        .md-table tr:nth-child(even) td {
+            background: rgba(255,255,255,0.04);
+        }
+        .md-table tr:hover td {
+            background: rgba(255,107,53,0.1);
         }
 
         .message.user .message-content {
@@ -1092,37 +1145,143 @@
             return { messageId, messageContent };
         }
         
+        function parseInlineMarkdown(text) {
+            return text
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>');
+        }
+
+        function parseMarkdownTable(block) {
+            const lines = block.trim().split('\n').filter(l => l.trim());
+            if (lines.length < 2) return null;
+            const sepIndex = lines.findIndex(l => /^\|?[\s\-:]+(\|[\s\-:]+)*\|?$/.test(l));
+            if (sepIndex < 1) return null;
+
+            const headerLine = lines[sepIndex - 1];
+            const dataLines = lines.slice(sepIndex + 1);
+
+            const parseRow = line => line.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+
+            const headers = parseRow(headerLine);
+            const rows = dataLines.map(parseRow);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'md-table-wrapper';
+            const table = document.createElement('table');
+            table.className = 'md-table';
+
+            const thead = document.createElement('thead');
+            const headerTr = document.createElement('tr');
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.innerHTML = parseInlineMarkdown(h);
+                headerTr.appendChild(th);
+            });
+            thead.appendChild(headerTr);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.innerHTML = parseInlineMarkdown(cell);
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            wrapper.appendChild(table);
+            return wrapper;
+        }
+
+        function renderMarkdownBlock(text) {
+            const div = document.createElement('div');
+            div.className = 'message-text-part';
+            const lines = text.split('\n');
+            let html = '';
+            let inUl = false, inOl = false;
+
+            const closeList = () => {
+                if (inUl) { html += '</ul>'; inUl = false; }
+                if (inOl) { html += '</ol>'; inOl = false; }
+            };
+
+            lines.forEach(line => {
+                if (/^#{3}\s/.test(line)) { closeList(); html += `<h3>${parseInlineMarkdown(line.slice(4))}</h3>`; }
+                else if (/^#{2}\s/.test(line)) { closeList(); html += `<h2>${parseInlineMarkdown(line.slice(3))}</h2>`; }
+                else if (/^#\s/.test(line)) { closeList(); html += `<h1>${parseInlineMarkdown(line.slice(2))}</h1>`; }
+                else if (/^[-*]\s/.test(line)) {
+                    if (inOl) { html += '</ol>'; inOl = false; }
+                    if (!inUl) { html += '<ul>'; inUl = true; }
+                    html += `<li>${parseInlineMarkdown(line.slice(2))}</li>`;
+                } else if (/^\d+\.\s/.test(line)) {
+                    if (inUl) { html += '</ul>'; inUl = false; }
+                    if (!inOl) { html += '<ol>'; inOl = true; }
+                    html += `<li>${parseInlineMarkdown(line.replace(/^\d+\.\s/, ''))}</li>`;
+                } else if (line.trim() === '') {
+                    closeList();
+                    html += '<br>';
+                } else {
+                    closeList();
+                    html += `<p>${parseInlineMarkdown(line)}</p>`;
+                }
+            });
+            closeList();
+            div.innerHTML = html;
+            return div;
+        }
+
         function renderFormattedMessage(content, container) {
-            container.innerHTML = ''; // Clear previous content
+            container.innerHTML = '';
+
+            // Split on code blocks first, preserving them
             const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
             let lastIndex = 0;
             let match;
 
             while ((match = codeBlockRegex.exec(content)) !== null) {
                 if (match.index > lastIndex) {
-                    const textPart = document.createElement('div');
-                    textPart.className = 'message-text-part';
-                    textPart.textContent = content.substring(lastIndex, match.index);
-                    container.appendChild(textPart);
+                    renderTextSegment(content.substring(lastIndex, match.index), container);
                 }
-
                 const [fullMatch, language, code] = match;
                 container.appendChild(createArtifactCanvas(code.trim(), language || 'text'));
                 lastIndex = match.index + fullMatch.length;
             }
 
             if (lastIndex < content.length) {
-                 const textPart = document.createElement('div');
-                textPart.className = 'message-text-part';
-                textPart.textContent = content.substring(lastIndex);
-                container.appendChild(textPart);
+                renderTextSegment(content.substring(lastIndex), container);
             }
-            
+
             if (container.children.length === 0 && content) {
-                 const textPart = document.createElement('div');
-                textPart.className = 'message-text-part';
-                textPart.textContent = content;
-                container.appendChild(textPart);
+                renderTextSegment(content, container);
+            }
+        }
+
+        function renderTextSegment(text, container) {
+            // Split text into table blocks and normal text
+            const tableRegex = /((?:^\|.+\n?)+)/gm;
+            let lastIdx = 0;
+            let m;
+
+            while ((m = tableRegex.exec(text)) !== null) {
+                if (m.index > lastIdx) {
+                    container.appendChild(renderMarkdownBlock(text.substring(lastIdx, m.index)));
+                }
+                const tableEl = parseMarkdownTable(m[0]);
+                if (tableEl) {
+                    container.appendChild(tableEl);
+                } else {
+                    container.appendChild(renderMarkdownBlock(m[0]));
+                }
+                lastIdx = m.index + m[0].length;
+            }
+
+            if (lastIdx < text.length) {
+                container.appendChild(renderMarkdownBlock(text.substring(lastIdx)));
             }
         }
 
