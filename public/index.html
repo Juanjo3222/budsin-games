@@ -664,6 +664,119 @@
                 margin-top: 10px;
             }
 
+            /* Tooltip en tarjetas */
+            .card-tooltip {
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%) translateY(6px);
+                z-index: 10;
+                padding: 6px 12px;
+                border-radius: 12px;
+                background: rgba(17, 24, 39, 0.92);
+                color: #fff;
+                font-size: 0.72rem;
+                font-weight: 600;
+                letter-spacing: 0.02em;
+                white-space: nowrap;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease, transform 0.2s ease;
+            }
+            .card-tooltip::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 6px solid transparent;
+                border-top-color: rgba(17, 24, 39, 0.92);
+            }
+            .game-card:hover .card-tooltip {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            html[data-site-theme="dark"] .card-tooltip {
+                background: rgba(3, 8, 18, 0.92);
+            }
+            html[data-site-theme="dark"] .card-tooltip::after {
+                border-top-color: rgba(3, 8, 18, 0.92);
+            }
+
+            /* Historial visual */
+            .recent-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+                gap: 10px;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            .recent-mini {
+                position: relative;
+                border-radius: 14px;
+                overflow: hidden;
+                cursor: pointer;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                aspect-ratio: 16 / 10;
+            }
+            .recent-mini:hover {
+                transform: scale(1.05);
+                box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+            }
+            .recent-mini img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+            .recent-mini-name {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 3px 6px;
+                background: linear-gradient(transparent, rgba(0,0,0,0.75));
+                color: #fff;
+                font-size: 0.62rem;
+                font-weight: 700;
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .recent-empty {
+                color: var(--muted);
+                font-size: 0.9rem;
+            }
+
+            /* Boton aleatorio */
+            .random-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 16px;
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                background: var(--surface-strong);
+                color: var(--text);
+                font: inherit;
+                font-size: 0.86rem;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: var(--shadow-soft);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            .random-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+            }
+            html[data-site-theme="dark"] .random-btn {
+                background: rgba(9, 15, 28, 0.92);
+                border-color: rgba(148, 163, 184, 0.28);
+                color: #e2e8f0;
+            }
+
             .app-transition {
                 position: fixed;
                 inset: 0;
@@ -1119,8 +1232,9 @@
                         directo desde el index e integración al ranking.
                     </li>
                 </ul>
-            </div>
-        </div>
+                    </div>
+                    <div class="chips" id="categoryFilters" aria-label="Filtros por categoría"></div>
+                </div>
 
         <div id="appTransition" class="app-transition" aria-hidden="true">
             <div
@@ -1169,6 +1283,12 @@
                             <span data-i18n="badgeLibrary"
                                 >Biblioteca estilo Switch</span
                             >
+                            <button
+                                type="button"
+                                id="randomGameBtn"
+                                class="random-btn"
+                                data-i18n="randomGame"
+                            >🎲 Juego al azar</button>
                         </div>
                     </div>
                     <div class="hero-showcase">
@@ -1312,13 +1432,8 @@
                         </ul>
                     </section>
                     <section class="shelf" id="recentlyPlayedShelf">
-                        <h3>🕐 Jugado recientemente</h3>
-                        <ul id="recentlyPlayedList" class="shelf-list">
-                            <li>
-                                <span>Aún no has jugado nada.</span
-                                ><span>—</span>
-                            </li>
-                        </ul>
+                        <h3 data-i18n="shelfRecent">🕐 Jugado recientemente</h3>
+                        <div id="recentlyPlayedList" class="recent-grid"></div>
                     </section>
                 </div>
 
@@ -2981,6 +3096,58 @@
                 }
             });
 
+            // Tooltip en cada tarjeta
+            cards.forEach((card) => {
+                const tooltip = document.createElement("span");
+                tooltip.className = "card-tooltip";
+                const cat = card.dataset.category || "";
+                const types = (card.dataset.type || "")
+                    .split(" ")
+                    .filter(Boolean)
+                    .join(" · ");
+                tooltip.textContent = `${cat}${types ? " — " + types : ""}`;
+                card.appendChild(tooltip);
+            });
+
+            // Contador de juegos en badgeGames
+            const totalGames = cards.length;
+
+            // Chips dinámicos de categorías (sin duplicar tipos ya cubiertos por typeFilters)
+            const categoryFilters = document.getElementById("categoryFilters");
+            const typeValues = new Set(
+                Array.from(typeFilters.querySelectorAll(".chip")).map(
+                    (c) => c.dataset.type,
+                ),
+            );
+            const typeToCategory = {
+                action: "Acción",
+                multiplayer: "Multiplayer",
+                idle: "Idle",
+                classic: "Clásicos",
+                clicker: "Idle",
+                tools: "Herramientas",
+            };
+            const coveredCategories = new Set(
+                [...typeValues].map((v) => typeToCategory[v]).filter(Boolean),
+            );
+            const uniqueCategories = [
+                ...new Set(
+                    cards
+                        .map((c) => c.dataset.category || "")
+                        .filter(Boolean),
+                ),
+            ].filter((c) => !coveredCategories.has(c));
+            if (categoryFilters && uniqueCategories.length) {
+                uniqueCategories.forEach((cat) => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "chip";
+                    btn.dataset.category = cat;
+                    btn.textContent = cat;
+                    categoryFilters.appendChild(btn);
+                });
+            }
+
             const gamesGrid = document.getElementById("gamesGrid");
             const noResults = document.getElementById("noResults");
             const resultsCount = document.getElementById("resultsCount");
@@ -3049,6 +3216,11 @@
                     resultsCount: (count) => `${count} juegos`,
                     favoriteSaved: "Guardado",
                     playersLabel: "jugadores",
+                    chipRecent: "🆕 Recientes",
+                    randomGame: "🎲 Juego al azar",
+                    shelfRecent: "🕐 Jugado recientemente",
+                    noRecent: "Aún no has jugado nada.",
+                    categoriesLabel: "Categorías",
                 },
                 en: {
                     htmlLang: "en",
@@ -3105,6 +3277,11 @@
                     resultsCount: (count) => `${count} games`,
                     favoriteSaved: "Saved",
                     playersLabel: "players",
+                    chipRecent: "🆕 Recent",
+                    randomGame: "🎲 Random game",
+                    shelfRecent: "🕐 Recently played",
+                    noRecent: "You haven't played anything yet.",
+                    categoriesLabel: "Categories",
                 },
                 pt: {
                     htmlLang: "pt",
@@ -3161,12 +3338,18 @@
                     resultsCount: (count) => `${count} jogos`,
                     favoriteSaved: "Salvo",
                     playersLabel: "jogadores",
+                    chipRecent: "🆕 Recentes",
+                    randomGame: "🎲 Jogo aleatório",
+                    shelfRecent: "🕐 Jogado recentemente",
+                    noRecent: "Você ainda não jogou nada.",
+                    categoriesLabel: "Categorias",
                 },
             };
 
             let currentLanguage = "es";
 
             let activeType = "all";
+            let activeCategory = "";
             let popularityState = readJson(POPULARITY_KEY, {});
             let firebaseDb = null;
             let firebaseEnabled = false;
@@ -3736,6 +3919,7 @@
 
                 renderShelves();
                 applyFilters();
+                updateDynamicLabels();
             }
 
             function loadLanguagePreference() {
@@ -3799,7 +3983,7 @@
                     favBtn.textContent = isFavorite ? "★" : "☆";
                 });
 
-                // Shelf de jugado recientemente
+                // Shelf de jugado recientemente (visual grid)
                 const recentlyPlayed = readJson(RECENTLY_PLAYED_KEY, []);
                 if (recentlyPlayedList) {
                     if (recentlyPlayed.length) {
@@ -3808,14 +3992,22 @@
                                 const card = cards.find(
                                     (c) => getCardHref(c) === href,
                                 );
-                                const name = card
-                                    ? card.querySelector("strong").textContent
-                                    : href;
-                                return `<li><span>${name}</span><span>▶</span></li>`;
+                                if (!card) return "";
+                                const name = card.querySelector("strong").textContent;
+                                const img = card.querySelector(".cover img");
+                                const src = img ? img.getAttribute("src") : "";
+                                return `<div class="recent-mini" data-recent-href="${href}">${src ? `<img src="${src}" alt="${name}">` : ""}<span class="recent-mini-name">${name}</span></div>`;
                             })
                             .join("");
+                        recentlyPlayedList.querySelectorAll(".recent-mini").forEach((mini) => {
+                            mini.addEventListener("click", () => {
+                                const href = mini.dataset.recentHref;
+                                const card = cards.find((c) => getCardHref(c) === href);
+                                if (card) card.click();
+                            });
+                        });
                     } else {
-                        recentlyPlayedList.innerHTML = `<li><span>Aún no has jugado nada.</span><span>—</span></li>`;
+                        recentlyPlayedList.innerHTML = `<span class="recent-empty">${getTranslations().noRecent}</span>`;
                     }
                 }
             }
@@ -3843,9 +4035,15 @@
                         name.includes(term) ||
                         categoryText.includes(term) ||
                         descText.includes(term);
-                    const matchType =
+                    let matchType =
                         activeType === "all" || types.includes(activeType);
-                    const visible = matchSearch && matchType;
+                    if (activeType === "recent") {
+                        matchType = card.dataset.new === "true";
+                    }
+                    const matchCat =
+                        !activeCategory ||
+                        card.dataset.category === activeCategory;
+                    const visible = matchSearch && matchType && matchCat;
                     card.classList.toggle("hidden-card", !visible);
                     if (visible) visibleCount += 1;
                 });
@@ -3854,6 +4052,7 @@
                     getTranslations().resultsCount(visibleCount);
                 noResults.style.display = visibleCount ? "none" : "block";
                 sortGamesByRanking(false);
+                updateDynamicLabels();
             }
 
             function openAppTransition() {
@@ -3955,12 +4154,89 @@
                 const button = event.target.closest(".chip");
                 if (!button) return;
                 activeType = button.dataset.type;
+                activeCategory = "";
                 typeFilters
                     .querySelectorAll(".chip")
                     .forEach((chip) => chip.classList.remove("active"));
                 button.classList.add("active");
+                if (categoryFilters) {
+                    categoryFilters
+                        .querySelectorAll(".chip")
+                        .forEach((chip) => chip.classList.remove("active"));
+                }
                 applyFilters();
             });
+
+            if (categoryFilters) {
+                categoryFilters.addEventListener("click", (event) => {
+                    const button = event.target.closest(".chip");
+                    if (!button) return;
+                    if (activeCategory === button.dataset.category) {
+                        activeCategory = "";
+                        button.classList.remove("active");
+                    } else {
+                        categoryFilters
+                            .querySelectorAll(".chip")
+                            .forEach((chip) => chip.classList.remove("active"));
+                        activeCategory = button.dataset.category;
+                        button.classList.add("active");
+                    }
+                    activeType = "all";
+                    typeFilters
+                        .querySelectorAll(".chip")
+                        .forEach((chip) => chip.classList.remove("active"));
+                    typeFilters.querySelector('[data-type="all"]').classList.add("active");
+                    applyFilters();
+                });
+            }
+
+            // Boton juego al azar
+            const randomGameBtn = document.getElementById("randomGameBtn");
+            if (randomGameBtn) {
+                randomGameBtn.addEventListener("click", () => {
+                    const visibleCards = cards.filter(
+                        (c) => !c.classList.contains("hidden-card"),
+                    );
+                    if (!visibleCards.length) return;
+                    const pick =
+                        visibleCards[Math.floor(Math.random() * visibleCards.length)];
+                    pick.click();
+                });
+            }
+
+            // Actualizar badge de juegos y categorias visibles dinamicamente
+            function updateDynamicLabels() {
+                const badgeGamesEl = document.querySelector('[data-i18n="badgeGames"]');
+                if (badgeGamesEl) {
+                    const t = getTranslations();
+                    if (currentLanguage === "en") {
+                        badgeGamesEl.textContent = `${totalGames} games ready`;
+                    } else if (currentLanguage === "pt") {
+                        badgeGamesEl.textContent = `${totalGames} jogos prontos`;
+                    } else {
+                        badgeGamesEl.textContent = `${totalGames} juegos listos`;
+                    }
+                }
+                const visCatEl = document.querySelector('[data-i18n="visibleCategories"]');
+                if (visCatEl) {
+                    const cats = [
+                        ...new Set(
+                            cards
+                                .filter((c) => !c.classList.contains("hidden-card"))
+                                .map((c) => c.dataset.category || "")
+                                .filter(Boolean),
+                        ),
+                    ];
+                    const t = getTranslations();
+                    if (currentLanguage === "en") {
+                        visCatEl.textContent = `Visible categories: ${cats.join(" · ")}`;
+                    } else if (currentLanguage === "pt") {
+                        visCatEl.textContent = `Categorias visíveis: ${cats.join(" · ")}`;
+                    } else {
+                        visCatEl.textContent = `Categorías visibles: ${cats.join(" · ")}`;
+                    }
+                }
+            }
 
             const preferredLanguage = loadLanguagePreference();
             applyLanguage(preferredLanguage);

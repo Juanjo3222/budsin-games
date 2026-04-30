@@ -36,7 +36,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 * 📊 **Ranking de popularidad con Firebase**
 * 🧠 **Filtros por categorías**
 * 🔍 **Búsqueda en tiempo real**
-* 🌐 **Soporte multilenguaje (ES / EN)**
+* 🌐 **Soporte multilenguaje (ES / EN / PT)**
 * ⚙️ **Ajustes para URL de Classroom Hotkey (guardado local)**
 
 ---

@@ -55,7 +55,7 @@ Este archivo centraliza la lógica de desarrollo de `budsin-games.pages.dev`. Es
 Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse en orden de prioridad. Marcar como `[x]` cuando estén completas.
 
 ### 🔴 Alta prioridad
-- [ ] **Badge "Nuevo"** (`data-new="true"`): Inyectar via JS un `<span class="new-badge">Nuevo</span>` en las tarjetas con `data-new="true"`. Estilo: píldora verde-azul, esquina inferior-izquierda de la portada. Sin Firebase. Juegos a marcar: **Budsin AI, Recoil, Soundboard, Half-Life**.
+- [ ] **Badge "Nuevo"** (`data-new="true"`): Inyectar via JS un `<span class="new-badge">Nuevo</span>` en las tarjetas con `data-new="true"`. Estilo: píldora verde-azul, esquina inferior-izquierda de la portada. Sin Firebase.
 
 ---
 *Última actualización: 25 de abril de 2026*
